@@ -217,7 +217,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
     try {
       const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/transactions/${transactionId}`,
+        `/api/transactions/${transactionId}`,
         updateData,
         { withCredentials: true }
       );

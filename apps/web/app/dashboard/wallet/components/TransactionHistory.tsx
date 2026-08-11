@@ -84,7 +84,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       if (pageNum === 1) setIsRefreshing(true);
       else setIsLoadingMore(true);
 
-      let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/transactions?type=${filterType}&page=${pageNum}&limit=20`;
+      let url = `/api/transactions?type=${filterType}&page=${pageNum}&limit=20`;
 
       if (filterMonth) {
         url += `&month=${filterMonth}`;
@@ -111,7 +111,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 
   const fetchSummary = async (filterMonth = "", filterYear = "") => {
     try {
-      let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/summary`;
+      let url = `/api/summary`;
       const params = new URLSearchParams();
 
       if (filterMonth) {
@@ -168,7 +168,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 
     try {
       const res = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/transactions/${id}`,
+        `/api/transactions/${id}`,
         { withCredentials: true },
       );
 

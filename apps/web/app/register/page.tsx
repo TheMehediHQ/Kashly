@@ -31,8 +31,7 @@ const Register = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-      await axios.post(`${API_URL}/api/register`, data);
+      await axios.post(`/api/register`, data);
 
       toast.success("Registration successful. Check your email to verify your account.");
 

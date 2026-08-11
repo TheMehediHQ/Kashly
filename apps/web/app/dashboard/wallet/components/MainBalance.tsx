@@ -30,7 +30,7 @@ const MainBalance: React.FC<MainBalanceProps> = ({ refreshKey }) => {
     setLoading(true);
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/balance`,
+        `/api/balance`,
         {
           withCredentials: true,
         },

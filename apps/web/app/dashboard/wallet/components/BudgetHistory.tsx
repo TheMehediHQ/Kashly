@@ -49,7 +49,7 @@ const BudgetHistory: React.FC<BudgetHistoryProps> = ({ onRefresh }) => {
       else setIsLoadingMore(true);
 
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/budgets/history/all?page=${pageNum}&limit=20`,
+        `/api/budgets/history/all?page=${pageNum}&limit=20`,
         {
           withCredentials: true,
         }
@@ -113,7 +113,7 @@ const BudgetHistory: React.FC<BudgetHistoryProps> = ({ onRefresh }) => {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/budgets/${budgetId}`,
+            `/api/budgets/${budgetId}`,
             {
               withCredentials: true,
             }

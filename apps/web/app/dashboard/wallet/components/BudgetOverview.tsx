@@ -42,7 +42,7 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({ refreshKey }) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/budgets`,
+        `/api/budgets`,
         {
           withCredentials: true,
         }
@@ -90,7 +90,7 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({ refreshKey }) => {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/budgets/${budgetId}`,
+            `/api/budgets/${budgetId}`,
             {
               withCredentials: true,
             }

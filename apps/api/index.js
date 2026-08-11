@@ -6,6 +6,10 @@ dotenv.config({
 });
 const express = require("express");
 const app = express();
+// Trust the first proxy hop so req.ip reflects the real client IP
+// (X-Forwarded-For) when running behind Vercel / any reverse proxy.
+// Required for express-rate-limit to key requests correctly on serverless.
+app.set("trust proxy", 1);
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cookieParser = require("cookie-parser");

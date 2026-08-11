@@ -31,6 +31,7 @@
       "name": "@moneyflow/web",
       "version": "1.0.0",
       "dependencies": {
+        "@moneyflow/api": "workspace:*",
         "@moneyflow/ui": "workspace:*",
         "@moneyflow/validation": "workspace:*",
         "axios": "^1.13.6",

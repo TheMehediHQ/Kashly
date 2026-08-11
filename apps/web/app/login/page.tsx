@@ -33,7 +33,7 @@ const Login = () => {
   const onSubmit: SubmitHandler<LoginInputs> = async (data) => {
     try {
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/login`,
+        `/api/login`,
         data,
         {
           withCredentials: true,

@@ -52,7 +52,7 @@ const MyProfile = () => {
     try {
       // Update profile
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/me`,
+        `/api/me`,
         {
           fullName: fullName.trim(),
           photoURL: photoURL || undefined,
@@ -65,7 +65,7 @@ const MyProfile = () => {
       // Update password if provided
       if (oldPassword && newPassword) {
         await axios.put(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/me/password`,
+          `/api/me/password`,
           {
             oldPassword,
             newPassword,

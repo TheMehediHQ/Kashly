@@ -27,8 +27,7 @@ export default function ResendVerificationPage() {
 
     try {
       setIsSubmitting(true);
-      const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const response = await axios.post(`${API_URL}/api/resend-verification`, {
+      const response = await axios.post(`/api/resend-verification`, {
         email: email.trim(),
       });
 

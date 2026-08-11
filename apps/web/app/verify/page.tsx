@@ -28,8 +28,7 @@ function VerifyContent() {
       }
 
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-        await axios.get(`${API_URL}/api/verify?token=${token}`);
+        await axios.get(`/api/verify?token=${token}`);
 
         setStatus("success");
 

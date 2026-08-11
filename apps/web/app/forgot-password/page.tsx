@@ -25,7 +25,7 @@ const ForgotPassword = () => {
 
   const onSubmit: SubmitHandler<ForgotInputs> = async (data) => {
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/forgot-password`, data);
+      await axios.post(`/api/forgot-password`, data);
 
       toast.success("Password reset link sent");
 

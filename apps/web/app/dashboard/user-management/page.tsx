@@ -40,7 +40,7 @@ const UserManagement = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/users`,
+        `/api/admin/users`,
         {
           withCredentials: true,
         },
@@ -74,7 +74,7 @@ const UserManagement = () => {
 
     try {
       const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/users/${userId}/transaction-status`,
+        `/api/admin/users/${userId}/transaction-status`,
         { isTransactionAllowed: newStatus },
         { withCredentials: true },
       );
@@ -130,7 +130,7 @@ const UserManagement = () => {
 
     try {
       const res = await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/admin/users/${selectedUser._id}/credits`,
+        `/api/admin/users/${selectedUser._id}/credits`,
         { credits: creditsToAdd },
         { withCredentials: true },
       );

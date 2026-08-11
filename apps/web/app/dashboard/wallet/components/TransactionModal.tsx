@@ -138,7 +138,7 @@ time: format(new Date(`1970-01-01T${formData.time}`), "hh:mm a"),
 
 try {  
   const res = await axios.post(  
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/transactions`,  
+    `/api/transactions`,  
     transactionData,  
     { withCredentials: true },  
   );  

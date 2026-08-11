@@ -46,7 +46,7 @@ const ResetPassword = () => {
     }
 
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/reset-password`, {
+      await axios.post(`/api/reset-password`, {
         token,
         newPassword: data.newPassword,
       });

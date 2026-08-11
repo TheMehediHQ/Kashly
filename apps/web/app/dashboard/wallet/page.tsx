@@ -40,7 +40,7 @@ const Wallet = () => {
     setSummaryLoading(true);
     try {
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/summary`,
+        `/api/summary`,
         {
           withCredentials: true,
         },

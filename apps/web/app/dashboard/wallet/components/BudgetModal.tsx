@@ -115,7 +115,7 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
       if (editingBudgetId) {
         // Update budget
         const response = await axios.put(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/budgets/${editingBudgetId}`,
+          `/api/budgets/${editingBudgetId}`,
           {
             category: data.category,
             limit: data.limit,
@@ -136,7 +136,7 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
       } else {
         // Create budget
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/budgets`,
+          `/api/budgets`,
           {
             category: data.category,
             limit: data.limit,
