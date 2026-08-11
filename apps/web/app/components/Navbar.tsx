@@ -19,7 +19,23 @@ import toast from "react-hot-toast";
 const Navbar = () => {
   const router = useRouter();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { user } = useAuth();
+
+  // Reset the error flag when the avatar URL changes (e.g. new upload / re-login).
+  useEffect(() => {
+    setAvatarError(false);
+  }, [user?.photoURL]);
+
+  // Load avatars directly from the origin (Cloudinary / DiceBear) instead of
+  // through the next/image optimization proxy, which can fail intermittently
+  // on serverless deployments. Fall back to the default avatar on error.
+  const avatarSrc =
+    !avatarError && user?.photoURL
+      ? user.photoURL
+      : "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix";
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -66,8 +82,6 @@ const Navbar = () => {
     // { name: "Settings", href: "/settings", icon: <LuSettings size={18} /> },
   ];
 
-  const { user } = useAuth();
-
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-(--border) bg-(--background) transition-colors duration-300 backdrop-blur-md">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -103,17 +117,16 @@ const Navbar = () => {
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="flex items-center gap-2 rounded-full border border-(--border) p-1 pr-3 transition-all hover:bg-(--hover-bg) active:scale-95"
                 >
-                  <div className="relative h-8 w-8 overflow-hidden rounded-full border border-gray-100">
+                  <div className="relative h-8 w-8 overflow-hidden rounded-full border border-gray-100 bg-gray-100">
                     <Image
-                      src={
-                        user?.photoURL ||
-                        "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
-                      }
+                      src={avatarSrc}
                       alt="User Profile"
                       fill
                       className="object-cover"
                       sizes="32px"
                       priority
+                      unoptimized
+                      onError={() => setAvatarError(true)}
                     />
                   </div>
 

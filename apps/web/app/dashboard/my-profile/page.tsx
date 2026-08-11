@@ -35,12 +35,26 @@ const MyProfile = () => {
   const [uploadError, setUploadError] = React.useState<string>("");
   const [isSaving, setIsSaving] = React.useState(false);
   const [message, setMessage] = React.useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [avatarError, setAvatarError] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Source of truth for what to display:
+  // - Not editing → read straight from the user object so it is never stale
+  //   (fixes the brief "ghost avatar" flash while auth is hydrating).
+  // - Editing → use the local draft so upload preview and cancel still work.
+  const displayPhotoURL = isEditing ? photoURL : (user?.photoURL || "");
+  const displayFullName = isEditing ? fullName : (user?.fullName || "");
 
   React.useEffect(() => {
     setFullName(user?.fullName || "");
     setPhotoURL(user?.photoURL || "");
   }, [user]);
+
+  // Reset the avatar error flag whenever the displayed photo URL changes
+  // (new upload, profile save, or re-login).
+  React.useEffect(() => {
+    setAvatarError(false);
+  }, [displayPhotoURL]);
 
   const handleSaveProfile = async () => {
     if (!fullName.trim()) {
@@ -228,12 +242,14 @@ const MyProfile = () => {
                 <div className="relative">
                   <div className="relative h-32 w-32 overflow-hidden rounded-2xl border-4 shadow-lg" style={{borderColor: isDark ? "#1f2937" : "#fff"}}>
                     <Image
-                      src={photoURL || defaultAvatar}
+                      src={!avatarError && displayPhotoURL ? displayPhotoURL : defaultAvatar}
                       alt="User Profile"
                       fill
                       className="object-cover"
                       sizes="128px"
                       priority
+                      unoptimized
+                      onError={() => setAvatarError(true)}
                     />
                   </div>
                   {isEditing && (
@@ -310,7 +326,7 @@ const MyProfile = () => {
                     />
                   ) : (
                     <div className={`px-4 py-3 rounded-xl font-medium ${isDark ? "bg-neutral-800 text-white" : "bg-neutral-100 text-black"}`}>
-                      {fullName || user?.fullName}
+                      {displayFullName}
                     </div>
                   )}
                 </div>
@@ -359,7 +375,7 @@ const MyProfile = () => {
                     </div>
                   ) : (
                     <div className={`px-4 py-3 rounded-xl text-sm ${isDark ? "bg-neutral-800 text-neutral-400" : "bg-neutral-100 text-neutral-600"}`}>
-                      {photoURL ? "Custom avatar set" : "Using default avatar"}
+                      {displayPhotoURL ? "Custom avatar set" : "Using default avatar"}
                     </div>
                   )}
                   {isEditing && (
