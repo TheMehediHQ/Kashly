@@ -101,36 +101,30 @@ const Wallet = () => {
         </div>
       </div>
 
-     {/* Main Balance, Income, and Expense Overview Cards (Side by Side) */}
-<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-  {/* Main Balance Card */}
-  <div className="w-full">
-    <MainBalance refreshKey={refreshKey} onRefresh={handleRefresh} />
-  </div>
-
-  {/* Income Overview Card */}
-  <div className="w-full">
-    <LastMonthIncome
-      income={summary?.thisMonthIncome}
-      count={summary?.incomeTransactions}
-      loading={summaryLoading}
-    />
-  </div>
-
-  {/* Expense Overview Card */}
-  <div className="w-full">
-    <LastMonthExpense
-      expense={summary?.thisMonthExpense}
-      count={summary?.expenseTransactions}
-      loading={summaryLoading}
-    />
-  </div>
-</div>
+      {/* Main Balance Card */}
+      <div className="w-full">
+        <MainBalance refreshKey={refreshKey} onRefresh={handleRefresh} />
+      </div>
 
       {/* Quick Action Modals (Add Income & Add Expense) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <TransactionModal type="income" onSuccess={handleRefresh} />
         <TransactionModal type="expense" onSuccess={handleRefresh} />
+      </div>
+
+      {/* Income and Expense Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <LastMonthIncome
+          income={summary?.thisMonthIncome}
+          count={summary?.incomeTransactions}
+          loading={summaryLoading}
+        />
+
+        <LastMonthExpense
+          expense={summary?.thisMonthExpense}
+          count={summary?.expenseTransactions}
+          loading={summaryLoading}
+        />
       </div>
 
       {/* Budget Overview Widget */}
