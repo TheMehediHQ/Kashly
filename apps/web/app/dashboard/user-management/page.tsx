@@ -4,7 +4,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useTheme } from "@/app/context/ThemeContext";
 import {
   Plus,
   Search,
@@ -13,7 +12,6 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 
-// Updated Type: _id is now a direct string
 interface UserData {
   _id: string;
   fullName: string;
@@ -26,8 +24,6 @@ interface UserData {
 }
 
 const UserManagement = () => {
-  const { effectiveTheme, isMounted } = useTheme();
-  const isDark = effectiveTheme === "dark";
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,7 +31,6 @@ const UserManagement = () => {
   const [amount, setAmount] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // ১. ডাটাবেস থেকে ইউজার ফেচ করা
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -57,15 +52,9 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  if (!isMounted) {
-    return <div className="min-h-screen" />;
-  }
-
-  // ২. ট্রানজ্যাকশন স্ট্যাটাস টগল (Fixed Logic for u._id)
   const handleToggleStatus = async (userId: string, currentStatus: boolean) => {
     const newStatus = !currentStatus;
 
-    // Optimistic Update: UI সাথে সাথে পরিবর্তন হবে
     setUsers((prev) =>
       prev.map((u) =>
         u._id === userId ? { ...u, isTransactionAllowed: newStatus } : u,
@@ -82,12 +71,10 @@ const UserManagement = () => {
       if (response.data.success) {
         toast.success(response.data.message);
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       const msg = error.response?.data?.message || "Update failed";
       toast.error(msg);
 
-      // এরর হলে আগের অবস্থায় রোলব্যাক
       setUsers((prev) =>
         prev.map((u) =>
           u._id === userId ? { ...u, isTransactionAllowed: currentStatus } : u,
@@ -104,16 +91,14 @@ const UserManagement = () => {
 
   if (loading && users.length === 0) {
     return (
-      <div className={`min-h-screen transition-colors ${isDark ? "bg-black" : "bg-white"}`}>
-        <div className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-          <div className="max-w-5xl mx-auto space-y-6">
-            <div className="space-y-3">
-              <div className={`h-9 w-56 rounded-lg animate-pulse ${isDark ? "bg-neutral-800" : "bg-neutral-200"}`} />
-              <div className={`h-5 w-40 rounded-lg animate-pulse ${isDark ? "bg-neutral-900" : "bg-neutral-100"}`} />
-            </div>
-            <div className={`h-12 w-full rounded-xl animate-pulse ${isDark ? "bg-neutral-900" : "bg-neutral-100"}`} />
-            <div className={`h-[420px] w-full rounded-2xl animate-pulse ${isDark ? "bg-neutral-900" : "bg-neutral-100"}`} />
+      <div className="w-full min-h-screen text-white">
+        <div className="max-w-5xl mx-auto space-y-6">
+          <div className="space-y-3">
+            <div className="h-9 w-56 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
+            <div className="h-5 w-40 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
           </div>
+          <div className="h-12 w-full rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
+          <div className="h-[420px] w-full rounded-3xl bg-white/5 border border-white/10 animate-pulse" />
         </div>
       </div>
     );
@@ -135,7 +120,6 @@ const UserManagement = () => {
         { withCredentials: true },
       );
 
-      // Update UI: add credits locally
       setUsers((prev) =>
         prev.map((u) =>
           u._id === selectedUser._id ? { ...u, credits: res.data.credits } : u,
@@ -152,28 +136,31 @@ const UserManagement = () => {
   };
 
   return (
-    <div className={`min-h-screen antialiased font-sans ${isDark ? "bg-black text-neutral-300" : "bg-white text-neutral-700"}`}>
-      <div className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-        <div className="max-w-5xl mx-auto">
+    <div className="w-full min-h-screen text-white">
+      <div className="max-w-5xl mx-auto space-y-8">
         {/* Header */}
-        <header className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 mb-6 lg:mb-8">
+        <header className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 pb-6 border-b border-white/10">
           <div>
-            <h1 className={`text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight ${isDark ? "text-white" : "text-black"}`}>
-              Admin Console
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-2">
+              <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
+              ADMIN CONSOLE
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+              User Management
             </h1>
-            <p className={`text-xs sm:text-sm mt-1 uppercase tracking-widest font-bold ${isDark ? "text-neutral-500" : "text-neutral-500"}`}>
-              System Management
+            <p className="text-sm text-slate-400 mt-1">
+              Control permissions, manage credits, and monitor system accounts.
             </p>
           </div>
 
           <div className="relative group w-full lg:w-80">
-            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-all ${isDark ? "text-neutral-500 group-focus-within:text-slate-400" : "text-neutral-500 group-focus-within:text-slate-600"}`} />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#BDFE00] transition-colors" />
             <input
               type="text"
-              placeholder="Search users..."
+              placeholder="Search users by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-10 pr-4 py-3 rounded-xl focus:ring-2 focus:ring-neutral-400/50 focus:border-neutral-400 outline-none transition-all text-sm sm:text-base ${isDark ? "bg-neutral-900/50 border-neutral-700/50 text-white placeholder:text-neutral-400" : "bg-neutral-50/50 border-neutral-300/50 text-black placeholder:text-neutral-500"} border`}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
             />
           </div>
         </header>
@@ -183,21 +170,21 @@ const UserManagement = () => {
           {filteredUsers.map((user) => (
             <div
               key={user._id}
-              className={`rounded-2xl p-4 ${isDark ? "bg-neutral-900/40 border-neutral-800/60" : "bg-neutral-50/40 border-neutral-200/60"} border`}
+              className="rounded-2xl p-5 bg-slate-900/40 border border-white/10 backdrop-blur-xl space-y-4"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className={`h-12 w-12 rounded-2xl border flex items-center justify-center font-bold text-lg transition-colors ${isDark ? "bg-slate-600/10 border-slate-600/20 text-slate-400" : "bg-slate-600/10 border-slate-600/20 text-slate-600"}`}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="h-11 w-11 rounded-xl bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00] flex items-center justify-center font-bold text-base shrink-0">
                     {user.fullName.charAt(0)}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <div className={`text-base font-bold flex items-center gap-2 truncate ${isDark ? "text-white" : "text-black"}`}>
+                  <div className="min-w-0">
+                    <div className="text-base font-bold text-white flex items-center gap-1.5 truncate">
                       <span className="truncate">{user.fullName}</span>
                       {user.isVerified && (
-                        <CheckCircle2 size={14} className="text-slate-400 flex-shrink-0" />
+                        <CheckCircle2 size={14} className="text-[#BDFE00] shrink-0" />
                       )}
                     </div>
-                    <div className={`text-sm truncate ${isDark ? "text-neutral-400" : "text-neutral-600"}`}>
+                    <div className="text-xs text-slate-400 font-mono truncate">
                       {user.email}
                     </div>
                   </div>
@@ -207,44 +194,36 @@ const UserManagement = () => {
                     setSelectedUser(user);
                     setIsModalOpen(true);
                   }}
-                  className={`p-2 rounded-xl transition-all active:scale-95 ml-2 ${isDark ? "bg-neutral-800 text-white hover:bg-neutral-700" : "bg-neutral-900 text-white hover:bg-neutral-800"}`}
+                  className="p-2.5 rounded-xl bg-[#BDFE00] text-black hover:bg-[#aef000] transition-all cursor-pointer shrink-0"
                 >
-                  <Plus size={18} strokeWidth={3} />
+                  <Plus size={18} strokeWidth={2.5} />
                 </button>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="text-center">
-                    <div className={`inline-block px-3 py-1 rounded-lg font-mono font-bold text-sm transition-colors ${isDark ? "bg-neutral-900 border-neutral-800 text-white" : "bg-neutral-50 border-neutral-200 text-black"} border`}>
-                      {user.credits}
-                    </div>
-                    <div className={`text-xs mt-1 ${isDark ? "text-neutral-500" : "text-neutral-500"}`}>
-                      Credits
-                    </div>
-                  </div>
+              <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                <div className="flex items-center gap-2 font-mono text-xs">
+                  <span className="text-slate-400">Credits:</span>
+                  <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[#BDFE00] font-bold">
+                    {user.credits}
+                  </span>
+                </div>
 
-                  <div className="flex flex-col items-center gap-2">
-                    <button
-                      onClick={() => handleToggleStatus(user._id, user.isTransactionAllowed)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-all duration-300 ease-in-out ${
-                        user.isTransactionAllowed
-                          ? "bg-slate-600 shadow-[0_0_15px_rgba(71,85,105,0.4)]"
-                          : isDark ? "bg-neutral-700" : "bg-neutral-300"
-                      }`}
-                    >
-                      <span
-                        className={`h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform duration-300 ease-in-out ${
-                          user.isTransactionAllowed ? "translate-x-6" : "translate-x-1"
-                        }`}
-                      />
-                    </button>
+                <div className="flex items-center gap-3">
+                  <span className={`text-[10px] font-mono uppercase tracking-wider ${user.isTransactionAllowed ? "text-[#BDFE00]" : "text-slate-500"}`}>
+                    {user.isTransactionAllowed ? "Active" : "Locked"}
+                  </span>
+                  <button
+                    onClick={() => handleToggleStatus(user._id, user.isTransactionAllowed)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                      user.isTransactionAllowed ? "bg-[#BDFE00]" : "bg-white/10"
+                    }`}
+                  >
                     <span
-                      className={`text-[9px] font-black uppercase tracking-widest ${user.isTransactionAllowed ? "text-slate-400" : isDark ? "text-neutral-600" : "text-neutral-400"}`}
-                    >
-                      {user.isTransactionAllowed ? "Active" : "Locked"}
-                    </span>
-                  </div>
+                      className={`h-4 w-4 transform rounded-full bg-black transition-transform ${
+                        user.isTransactionAllowed ? "translate-x-6" : "translate-x-1 bg-white"
+                      }`}
+                    />
+                  </button>
                 </div>
               </div>
             </div>
@@ -252,99 +231,75 @@ const UserManagement = () => {
         </div>
 
         {/* Desktop Table View */}
-        <div className={`hidden md:block rounded-2xl sm:rounded-4xl backdrop-blur-md shadow-sm overflow-hidden ${isDark ? "bg-neutral-900/40 border-neutral-800/60" : "bg-neutral-50/40 border-neutral-200/60"} border`}>
+        <div className="hidden md:block rounded-3xl bg-slate-900/40 border border-white/10 backdrop-blur-xl overflow-hidden shadow-2xl">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-separate border-spacing-0 min-w-[600px]">
+            <table className="w-full text-left border-separate border-spacing-0">
               <thead>
-                <tr className={`text-[10px] sm:text-[11px] uppercase tracking-[0.2em] font-black transition-colors ${isDark ? "bg-neutral-800/30 text-neutral-500" : "bg-neutral-200/30 text-neutral-500"}`}>
-                  <th className={`px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b ${isDark ? "border-neutral-800/50" : "border-neutral-200/50"}`}>
-                    User Profile
-                  </th>
-                  <th className={`px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b text-center ${isDark ? "border-neutral-800/50" : "border-neutral-200/50"}`}>
-                    Status
-                  </th>
-                  <th className={`px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b text-center ${isDark ? "border-neutral-800/50" : "border-neutral-200/50"}`}>
-                    Credits
-                  </th>
-                  <th className={`px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b text-right ${isDark ? "border-neutral-800/50" : "border-neutral-200/50"}`}>
-                    Actions
-                  </th>
+                <tr className="text-[10px] uppercase tracking-widest font-mono text-slate-400 bg-white/5 border-b border-white/10">
+                  <th className="px-6 py-4 border-b border-white/10">User Profile</th>
+                  <th className="px-6 py-4 border-b border-white/10 text-center">Status</th>
+                  <th className="px-6 py-4 border-b border-white/10 text-center">Credits</th>
+                  <th className="px-6 py-4 border-b border-white/10 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className={`divide-y ${isDark ? "divide-neutral-800/30" : "divide-neutral-200/30"}`}>
+              <tbody className="divide-y divide-white/5">
                 {filteredUsers.map((user) => (
-                  <tr
-                    key={user._id}
-                    className={`transition-colors group ${isDark ? "hover:bg-slate-600/3" : "hover:bg-slate-600/3"}`}
-                  >
-                    <td className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-                      <div className="flex items-center gap-3 sm:gap-4">
-                        <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl border flex items-center justify-center font-bold text-sm sm:text-lg transition-colors ${isDark ? "bg-slate-600/10 border-slate-600/20 text-slate-400" : "bg-slate-600/10 border-slate-600/20 text-slate-600"}`}>
+                  <tr key={user._id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00] flex items-center justify-center font-bold text-sm shrink-0">
                           {user.fullName.charAt(0)}
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <div className={`text-sm sm:text-[15px] font-bold flex items-center gap-2 truncate ${isDark ? "text-white" : "text-black"}`}>
+                        <div className="min-w-0">
+                          <div className="text-sm font-bold text-white flex items-center gap-1.5 truncate">
                             <span className="truncate">{user.fullName}</span>
                             {user.isVerified && (
-                              <CheckCircle2
-                                size={12}
-                                className="text-slate-400 flex-shrink-0"
-                              />
+                              <CheckCircle2 size={14} className="text-[#BDFE00] shrink-0" />
                             )}
                           </div>
-                          <div className={`text-xs font-medium truncate ${isDark ? "text-neutral-500" : "text-neutral-500"}`}>
+                          <div className="text-xs text-slate-400 font-mono truncate">
                             {user.email}
                           </div>
                         </div>
                       </div>
                     </td>
 
-                    <td className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-                      <div className="flex flex-col items-center gap-2">
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex flex-col items-center gap-1.5">
                         <button
-                          onClick={() =>
-                            handleToggleStatus(
-                              user._id,
-                              user.isTransactionAllowed,
-                            )
-                          }
-                          className={`relative inline-flex h-5 w-9 sm:h-6 sm:w-11 items-center rounded-full transition-all duration-300 ease-in-out ${
-                            user.isTransactionAllowed
-                              ? "bg-slate-600 shadow-[0_0_15px_rgba(71,85,105,0.4)]"
-                              : isDark ? "bg-neutral-700" : "bg-neutral-300"
+                          onClick={() => handleToggleStatus(user._id, user.isTransactionAllowed)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                            user.isTransactionAllowed ? "bg-[#BDFE00]" : "bg-white/10"
                           }`}
                         >
                           <span
-                            className={`h-3 w-3 sm:h-4 sm:w-4 transform rounded-full bg-white shadow-sm transition-transform duration-300 ease-in-out ${
-                              user.isTransactionAllowed
-                                ? "translate-x-5 sm:translate-x-6"
-                                : "translate-x-1"
+                            className={`h-4 w-4 transform rounded-full transition-transform ${
+                              user.isTransactionAllowed ? "translate-x-6 bg-black" : "translate-x-1 bg-white"
                             }`}
                           />
                         </button>
-                        <span
-                          className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest ${user.isTransactionAllowed ? "text-slate-400" : isDark ? "text-neutral-600" : "text-neutral-400"}`}
-                        >
+                        <span className={`text-[9px] font-mono uppercase tracking-wider ${user.isTransactionAllowed ? "text-[#BDFE00]" : "text-slate-500"}`}>
                           {user.isTransactionAllowed ? "Active" : "Locked"}
                         </span>
                       </div>
                     </td>
 
-                    <td className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 text-center">
-                      <div className={`inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg font-mono font-bold text-xs sm:text-sm transition-colors ${isDark ? "bg-neutral-900 border-neutral-800 text-white" : "bg-neutral-50 border-neutral-200 text-black"} border`}>
+                    <td className="px-6 py-4 text-center">
+                      <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[#BDFE00] font-mono font-bold text-xs">
                         {user.credits}
-                      </div>
+                      </span>
                     </td>
 
-                    <td className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 text-right">
+                    <td className="px-6 py-4 text-right">
                       <button
                         onClick={() => {
                           setSelectedUser(user);
                           setIsModalOpen(true);
                         }}
-                        className={`p-2 sm:p-2.5 border rounded-xl transition-all hover:scale-105 active:scale-95 ${isDark ? "bg-neutral-800 border-neutral-700 text-white hover:bg-neutral-700" : "bg-neutral-900 border-neutral-800 text-white hover:bg-neutral-800"}`}
+                        className="p-2.5 rounded-xl bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_15px_rgba(189,254,0,0.3)] transition-all cursor-pointer"
+                        title="Add Credits"
                       >
-                        <Plus size={16} className="sm:w-[18px] sm:h-[18px]" strokeWidth={3} />
+                        <Plus size={16} strokeWidth={2.5} />
                       </button>
                     </td>
                   </tr>
@@ -354,61 +309,56 @@ const UserManagement = () => {
           </div>
         </div>
       </div>
-      </div>
 
       {/* Credit Update Modal */}
       {isModalOpen && (
-        <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xl animate-in fade-in duration-300 ${isDark ? "bg-black/90" : "bg-white/90"}`}>
-          <div className={`w-full max-w-sm mx-4 rounded-3xl shadow-2xl p-6 sm:p-8 animate-in zoom-in-95 relative transition-colors ${isDark ? "bg-neutral-900 border-neutral-800" : "bg-neutral-50 border-neutral-200"} border`}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-sm rounded-3xl bg-[#0B0F17] border border-white/10 shadow-2xl p-6 sm:p-8 relative">
             <button
               onClick={() => setIsModalOpen(false)}
-              className={`absolute top-4 right-4 p-2 rounded-full transition-colors ${isDark ? "text-neutral-500 hover:text-white hover:bg-neutral-800" : "text-neutral-500 hover:text-black hover:bg-neutral-100"}`}
+              className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
 
             <div className="text-center mb-6">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-slate-600/10 rounded-3xl flex items-center justify-center mx-auto mb-4 border border-slate-600/20 text-slate-400">
-                <ArrowUpRight size={28} className="sm:w-[32px] sm:h-[32px]" />
+              <div className="w-14 h-14 bg-[#BDFE00]/10 border border-[#BDFE00]/20 rounded-2xl flex items-center justify-center mx-auto mb-4 text-[#BDFE00]">
+                <ArrowUpRight size={28} />
               </div>
-              <h3 className={`text-xl sm:text-2xl font-bold tracking-tight ${isDark ? "text-white" : "text-black"}`}>
+              <h3 className="text-xl font-bold text-white">
                 Add Credits
               </h3>
-              <p className={`text-sm mt-2 truncate px-2 ${isDark ? "text-neutral-400" : "text-neutral-600"}`}>
+              <p className="text-xs font-mono text-slate-400 mt-1 truncate px-2">
                 {selectedUser?.fullName}
               </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div>
-                <label className={`block text-sm font-medium mb-3 text-center ${isDark ? "text-neutral-300" : "text-neutral-700"}`}>
-                  Enter Credit Amount
+                <label className="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-2 text-center">
+                  Credit Amount
                 </label>
                 <input
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0"
-                  className={`w-full px-6 py-5 rounded-2xl text-3xl font-mono font-bold text-center focus:ring-2 focus:ring-neutral-400/50 outline-none transition-all ${isDark ? "bg-black border-neutral-800/50 text-white placeholder:text-neutral-600" : "bg-white border-neutral-200/50 text-black placeholder:text-neutral-400"} border`}
+                  className="w-full px-4 py-4 rounded-2xl bg-white/5 border border-white/10 text-3xl font-mono font-bold text-center text-[#BDFE00] focus:outline-none focus:border-[#BDFE00] transition-colors"
                   inputMode="numeric"
                   autoFocus
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className={`py-4 text-sm font-bold rounded-2xl transition-all active:scale-95 ${isDark ? "text-neutral-400 hover:bg-neutral-800/50 border border-neutral-700" : "text-neutral-600 hover:bg-neutral-200/50 border border-neutral-300"}`}
+                  className="py-3 text-sm font-semibold rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCredits}
-                  className={`py-4 text-sm font-medium rounded-2xl transition-all active:scale-95 shadow-lg border ${
-                    isDark
-                      ? "bg-white text-black hover:bg-neutral-100 border-neutral-200"
-                      : "bg-black text-white hover:bg-neutral-900 border-neutral-800"
-                  }`}
+                  className="py-3 text-sm font-semibold rounded-xl bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)] transition-all cursor-pointer"
                 >
                   Add Credits
                 </button>

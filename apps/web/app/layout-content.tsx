@@ -17,7 +17,7 @@ export function LayoutContent({
   return (
     <div className="flex flex-col min-h-screen bg-(--background) text-(--foreground) transition-colors duration-300">
       {!isDashboardPage && <Navbar />}
-      <div className="flex-1 pt-12">
+      <div >
         {children}
       </div>
       {!isDashboardPage && <Footer />}

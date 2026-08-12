@@ -5,7 +5,6 @@ import Image from "next/image";
 import React, { useState, useRef, useEffect, ChangeEvent } from "react";
 import { format } from "date-fns";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useTheme } from "@/app/context/ThemeContext";
 import {
   FiX,
   FiCalendar,
@@ -75,8 +74,6 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   onSuccess,
   initialTransaction,
 }) => {
-  const { effectiveTheme } = useTheme();
-  const isDark = effectiveTheme === "dark";
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -86,7 +83,6 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   );
 
   const isIncome = transactionType === "income";
-  const themeColor = isIncome ? "emerald" : "rose";
   const label = isIncome ? "Income" : "Expense";
 
   const incomeCategories = [
@@ -203,7 +199,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       setValue("attachment", data.secure_url);
       setPreview(data.secure_url);
     } catch {
-      // Connection error silently handled
+      // Connection error handled silently
     } finally {
       setIsUploading(false);
     }
@@ -244,215 +240,210 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   return (
     <>
       <div
-        className="fixed inset-0 z-40 bg-black/70 backdrop-blur-lg transition-opacity duration-300"
+        className="fixed inset-0 z-40 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
         onClick={handleClose}
-      ></div>
+      />
       <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center overflow-y-auto p-3 sm:p-4 pointer-events-none">
         <div
-          className={`pointer-events-auto relative w-full max-w-md rounded-2xl sm:rounded-3xl border transition-all duration-300 transform scale-100 max-h-[calc(100vh-1.5rem)] sm:max-h-[90vh] overflow-hidden ${isDark ? "border-neutral-700" : "border-neutral-300"}`}
+          className="pointer-events-auto relative w-full max-w-md rounded-3xl border border-white/10 bg-[#0B0F17] shadow-2xl overflow-hidden max-h-[calc(100vh-1.5rem)] sm:max-h-[90vh]"
           onClick={(e) => e.stopPropagation()}
-          style={{ 
-            backgroundColor: isDark ? "#111111" : "#FFFFFF",
-            boxShadow: isDark 
-              ? "0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3)" 
-              : "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.05)"
-          }}
         >
-          <div className="overflow-y-auto max-h-[calc(100vh-1.5rem)] sm:max-h-[90vh] p-4 sm:p-6 md:p-8">
-            <button
-              type="button"
-              onClick={handleClose}
-              className={`absolute right-3 top-3 sm:right-4 sm:top-4 p-2 rounded-lg transition-all duration-200 hover:scale-110 ${isDark ? "text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800" : "text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100"}`}
-            >
-              <FiX size={24} />
-            </button>
-
-            <form className="space-y-5 sm:space-y-6 md:space-y-8" onSubmit={handleSubmit(onSubmit)}>
-                {/* Image Section */}
-                <div className="flex flex-col items-center justify-center">
-                  {!preview ? (
-                    <div
-                      onClick={() => fileInputRef.current?.click()}
-                      className={`group relative flex h-24 w-24 sm:h-28 sm:w-28 md:h-36 md:w-36 cursor-pointer flex-col items-center justify-center rounded-full border-2 border-dashed transition-all duration-300 ${isDark ? "border-neutral-700 bg-neutral-800 hover:border-neutral-600 hover:bg-neutral-700" : "border-neutral-300 bg-neutral-50 hover:border-neutral-500 hover:bg-neutral-100"}`}
-                    >
-                      <FiUploadCloud
-                        size={28}
-                        className={`transition-colors duration-200 group-hover:scale-110 ${isUploading ? "animate-spin" : ""} ${isDark ? "text-neutral-500 group-hover:text-neutral-400" : "text-neutral-400 group-hover:text-neutral-600"}`}
-                      />
-                      <span className={`mt-2 text-[10px] font-bold uppercase tracking-widest transition-colors duration-200 ${isDark ? "text-neutral-500 group-hover:text-neutral-400" : "text-neutral-400 group-hover:text-neutral-600"}`}>
-                        Receipt
-                      </span>
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                      />
-                    </div>
-                  ) : (
-                    <div className="relative h-24 w-24 sm:h-28 sm:w-28 md:h-36 md:w-36 group">
-                      <Image
-                        src={preview || ""}
-                        alt="Preview"
-                        fill
-                        className={`rounded-full object-cover border ${isDark ? "border-neutral-700" : "border-neutral-300"}`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPreview(null);
-                          setValue("attachment", "");
-                        }}
-                        className="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <FiTrash2 size={24} />
-                      </button>
-                    </div>
-                  )}
+          <div className="overflow-y-auto max-h-[calc(100vh-1.5rem)] sm:max-h-[90vh] p-6 sm:p-8">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+              <div>
+                <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wide mb-1 ${
+                  isIncome
+                    ? "bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00]"
+                    : "bg-rose-500/10 border border-rose-500/20 text-rose-400"
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isIncome ? "bg-[#BDFE00]" : "bg-rose-400"}`} />
+                  EDIT {label.toUpperCase()}
                 </div>
+                <h2 className="text-xl font-bold text-white">
+                  Update Entry
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={handleClose}
+                className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                <FiX size={20} />
+              </button>
+            </div>
 
-                {/* Amount Display */}
-                <div
-                  className={`group rounded-2xl md:rounded-3xl p-4 sm:p-6 md:p-8 transition-all duration-300 border focus-within:ring-2 focus-within:ring-offset-0`}
-                  style={{
-                    backgroundColor: isDark ? "#1a1a1a" : "#f9f9f9",
-                    borderColor: errors.amount
-                      ? "#ef4444"
-                      : themeColor === "emerald"
-                        ? "#10b981"
-                        : "#f43f5e",
-                    boxShadow: isDark ? "inset 0 1px 3px rgba(0, 0, 0, 0.3)" : "inset 0 1px 3px rgba(0, 0, 0, 0.05)"
-                  }}
-                >
-                  <p className={`text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-${themeColor}-600 mb-2`}>
-                    Total {label}
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`text-3xl md:text-5xl font-bold ${isDark ? "text-white" : "text-black"}`}
-                    >
-                      ৳
+            <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+              {/* Image Section */}
+              <div className="flex flex-col items-center justify-center">
+                {!preview ? (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="group relative flex h-24 w-24 sm:h-28 sm:w-28 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/5 hover:border-[#BDFE00]/50 hover:bg-white/10 transition-all duration-300"
+                  >
+                    <FiUploadCloud
+                      size={24}
+                      className={`transition-colors duration-200 group-hover:scale-110 ${
+                        isUploading ? "animate-spin text-[#BDFE00]" : "text-slate-400 group-hover:text-[#BDFE00]"
+                      }`}
+                    />
+                    <span className="mt-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 group-hover:text-white">
+                      Receipt
                     </span>
                     <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      onKeyDown={(e) =>
-                        ["e", "E", "+", "-"].includes(e.key) &&
-                        e.preventDefault()
-                      }
-                      {...register("amount", {
-                        required: "Amount is required",
-                        valueAsNumber: true,
-                        min: {
-                          value: 0.01,
-                          message: "Amount must be greater than 0",
-                        },
-                      })}
-                      placeholder="0.00"
-                      className={`w-full bg-transparent text-3xl sm:text-4xl md:text-6xl font-bold outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${isDark ? "text-white placeholder:text-neutral-600" : "text-black placeholder:text-neutral-400"}`}
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageChange}
                     />
                   </div>
-                  {errors.amount && (
-                    <p className="mt-2 text-[10px] font-bold text-red-500 uppercase">
-                      {errors.amount.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Grid for Dropdowns */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  <div className="relative group">
-                    <FiTag className={`absolute left-4 top-1/2 -translate-y-1/2 text-${themeColor}-500 z-10`} />
-                    <select
-                      {...register("category", { required: true })}
-                      className={`w-full appearance-none rounded-xl border-none pl-11 pr-10 py-3 md:py-4 text-sm font-medium ring-1 ring-neutral-300 dark:ring-neutral-600 focus:ring-2 focus:ring-offset-0 outline-none cursor-pointer transition-all duration-200 hover:ring-neutral-400 dark:hover:ring-neutral-500 ${isDark ? "text-white" : "text-black"}`}
-                      style={{ backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5" }}
+                ) : (
+                  <div className="relative h-24 w-24 sm:h-28 sm:w-28 group">
+                    <Image
+                      src={preview || ""}
+                      alt="Preview"
+                      fill
+                      className="rounded-2xl object-cover border border-white/10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPreview(null);
+                        setValue("attachment", "");
+                      }}
+                      className="absolute inset-0 flex items-center justify-center bg-black/60 text-rose-400 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                     >
-                      {categories.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
-                    <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400 pointer-events-none" />
+                      <FiTrash2 size={20} />
+                    </button>
                   </div>
+                )}
+              </div>
 
-                  <div className="relative group">
-                    <FiCreditCard className={`absolute left-4 top-1/2 -translate-y-1/2 text-${themeColor}-500 z-10`} />
-                    <select
-                      {...register("method", { required: true })}
-                      className={`w-full appearance-none rounded-xl border-none pl-11 pr-10 py-3 md:py-4 text-sm font-medium ring-1 ring-neutral-300 dark:ring-neutral-600 focus:ring-2 focus:ring-offset-0 outline-none cursor-pointer transition-all duration-200 hover:ring-neutral-400 dark:hover:ring-neutral-500 ${isDark ? "text-white" : "text-black"}`}
-                      style={{ backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5" }}
-                    >
-                      <option value="Cash">Cash</option>
-                      <option value="bKash">BKash</option>
-                      <option value="Nagad">Nagad</option>
-                      <option value="Rocket">Rocket</option>
-                      <option value="Bank">Bank Transfer</option>
-                      <option value="Card">Card</option>
-                      <option value="Other">Other</option>
-                    </select>
-                    <FiChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Grid for Date & Time */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                  <div className="relative">
-                    <FiCalendar className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
-                    <input
-                      type="date"
-                      {...register("date", { required: true })}
-                      className={`w-full rounded-xl border-none pl-11 py-3 md:py-4 text-sm font-medium ring-1 ring-neutral-300 dark:ring-neutral-600 focus:ring-2 focus:ring-offset-0 outline-none transition-all duration-200 hover:ring-neutral-400 dark:hover:ring-neutral-500 ${isDark ? "text-white" : "text-black"} ${isDark ? "dark:placeholder:text-neutral-500" : "placeholder:text-neutral-400"}`}
-                      style={{ backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5" }}
-                    />
-                  </div>
-                  <div className="relative">
-                    <FiClock className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 dark:text-neutral-400" />
-                    <input
-                      type="time"
-                      {...register("time", { required: true })}
-                      className={`w-full rounded-xl border-none pl-11 py-3 md:py-4 text-sm font-medium ring-1 ring-neutral-200 focus:ring-1 focus:ring-neutral-400 outline-none ${isDark ? "text-white bg-neutral-800" : "text-black bg-neutral-100"} ${isDark ? "dark:placeholder:text-neutral-500" : "placeholder:text-neutral-400"}`}
-                    />
-                  </div>
-                </div>
-
-                {/* Note Area */}
-                <div className="relative">
-                  <FiEdit3 className="absolute left-4 top-5 text-neutral-500 dark:text-neutral-400" />
-                  <textarea
-                    placeholder="Add a reference note..."
-                    rows={3}
-                    {...register("note")}
-                    className={`w-full rounded-xl border-none pl-11 pr-4 py-3 md:py-4 text-sm font-medium ring-1 ring-neutral-300 dark:ring-neutral-600 focus:ring-2 focus:ring-offset-0 outline-none transition-all duration-200 hover:ring-neutral-400 dark:hover:ring-neutral-500 resize-none ${isDark ? "text-white" : "text-black"} ${isDark ? "dark:placeholder:text-neutral-500" : "placeholder:text-neutral-400"}`}
-                    style={{ backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5" }}
+              {/* Amount Display */}
+              <div className="rounded-2xl p-5 bg-white/5 border border-white/10 focus-within:border-[#BDFE00]/60 transition-colors">
+                <p className={`text-[10px] font-mono font-bold uppercase tracking-widest mb-1 ${
+                  isIncome ? "text-[#BDFE00]" : "text-rose-400"
+                }`}>
+                  Total {label}
+                </p>
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl sm:text-4xl font-extrabold text-white font-mono">
+                    ৳
+                  </span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    onKeyDown={(e) =>
+                      ["e", "E", "+", "-"].includes(e.key) && e.preventDefault()
+                    }
+                    {...register("amount", {
+                      required: "Amount is required",
+                      valueAsNumber: true,
+                      min: {
+                        value: 0.01,
+                        message: "Amount must be greater than 0",
+                      },
+                    })}
+                    placeholder="0.00"
+                    className="w-full bg-transparent text-3xl sm:text-4xl font-extrabold font-mono text-white outline-none placeholder:text-slate-600 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
+                {errors.amount && (
+                  <p className="mt-1.5 text-xs text-rose-400 font-medium">
+                    {errors.amount.message}
+                  </p>
+                )}
+              </div>
 
-                {/* Footer Actions */}
-                <div className="flex flex-col-reverse sm:flex-row gap-4 pt-6 border-t border-neutral-200 dark:border-neutral-800 mt-2">
-                  <button
-                    type="button"
-                    onClick={handleClose}
-                    className={`flex-1 rounded-lg py-3 md:py-4 text-xs font-medium uppercase tracking-wide transition-all border ${
-                      isDark
-                        ? "bg-black text-white hover:bg-neutral-800 border-neutral-700"
-                        : "bg-white text-black hover:bg-neutral-50 border-neutral-300"
-                    }`}
+              {/* Dropdowns Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="relative">
+                  <FiTag className={`absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 ${
+                    isIncome ? "text-[#BDFE00]" : "text-rose-400"
+                  }`} />
+                  <select
+                    {...register("category", { required: true })}
+                    className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 pl-10 pr-9 py-3 text-sm font-medium text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isUploading}
-                    className={`flex-1 rounded-lg py-3 md:py-4 text-xs font-semibold uppercase tracking-wide transition-all duration-200 border
-                      ${isUploading ? `${isDark ? "bg-neutral-800 text-neutral-500 border-neutral-700" : "bg-neutral-200 text-neutral-400 border-neutral-300"} cursor-not-allowed opacity-70` : `${isDark ? "bg-white text-black border-white hover:bg-neutral-100" : "bg-black text-white border-black hover:bg-neutral-800"} hover:shadow-lg active:scale-95`}`}
-                  >
-                    {isUploading ? "Uploading..." : "Update Entry"}
-                  </button>
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat} className="bg-[#0B0F17] text-white">
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                  <FiChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
+
+                <div className="relative">
+                  <FiCreditCard className={`absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 ${
+                    isIncome ? "text-[#BDFE00]" : "text-rose-400"
+                  }`} />
+                  <select
+                    {...register("method", { required: true })}
+                    className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 pl-10 pr-9 py-3 text-sm font-medium text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
+                  >
+                    <option value="Cash" className="bg-[#0B0F17] text-white">Cash</option>
+                    <option value="bKash" className="bg-[#0B0F17] text-white">BKash</option>
+                    <option value="Nagad" className="bg-[#0B0F17] text-white">Nagad</option>
+                    <option value="Rocket" className="bg-[#0B0F17] text-white">Rocket</option>
+                    <option value="Bank" className="bg-[#0B0F17] text-white">Bank Transfer</option>
+                    <option value="Card" className="bg-[#0B0F17] text-white">Card</option>
+                    <option value="Other" className="bg-[#0B0F17] text-white">Other</option>
+                  </select>
+                  <FiChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Date & Time Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="relative">
+                  <FiCalendar className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="date"
+                    {...register("date", { required: true })}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-3 py-3 text-sm font-medium text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
+                  />
+                </div>
+                <div className="relative">
+                  <FiClock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="time"
+                    {...register("time", { required: true })}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-3 py-3 text-sm font-medium text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* Note Area */}
+              <div className="relative">
+                <FiEdit3 className="absolute left-3.5 top-3.5 text-slate-400" />
+                <textarea
+                  placeholder="Add a reference note..."
+                  rows={3}
+                  {...register("note")}
+                  className="w-full rounded-xl border border-white/10 bg-white/5 pl-10 pr-4 py-3 text-sm font-medium text-white placeholder:text-slate-500 focus:outline-none focus:border-[#BDFE00]/60 transition-colors resize-none"
+                />
+              </div>
+
+              {/* Footer Actions */}
+              <div className="flex gap-3 pt-4 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="flex-1 rounded-xl py-3 text-sm font-semibold border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUploading}
+                  className="flex-1 rounded-xl py-3 text-sm font-semibold bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)] transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {isUploading ? "Uploading..." : "Update Entry"}
+                </button>
+              </div>
             </form>
           </div>
         </div>

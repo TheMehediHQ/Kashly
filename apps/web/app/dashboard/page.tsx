@@ -1,62 +1,65 @@
 "use client";
+
 import React from "react";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
-import { useTheme } from "../context/ThemeContext";
+import { LuWallet, LuChartPie } from "react-icons/lu";
 
 const DashboardPage = () => {
   const { user } = useAuth();
-  const { effectiveTheme } = useTheme();
-  const isDark = effectiveTheme === "dark";
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 flex items-center justify-center ${isDark ? "bg-black" : "bg-white"}`}>
-      <div className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 w-full">
-        <div className="max-w-5xl mx-auto text-center">
+    <div className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center">
+      <div className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 w-full">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Header */}
-          <div>
-            <h1 className={`text-4xl sm:text-5xl font-bold tracking-tight mb-2 ${isDark ? "text-white" : "text-black"}`}>
-              Welcome back, {user?.fullName}! 👋
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00]">
+              <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
+              NEXVIBE DASHBOARD
+            </div>
+
+            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+              Welcome back, <span className="text-[#BDFE00]">{user?.fullName || "Developer"}</span>! 👋
             </h1>
-            <p className={`text-lg ${isDark ? "text-neutral-400" : "text-neutral-600"}`}>
-              Manage your finances from here
+
+            <p className="text-slate-400 text-base sm:text-lg max-w-lg mx-auto">
+              Monitor real-time cash flow, manage budgets, and maintain complete financial clarity.
             </p>
           </div>
 
-          {/* Quick Links */}
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-md mx-auto">
+          {/* Quick Links Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl mx-auto pt-4">
+            {/* Wallet Card */}
             <Link
               href="/dashboard/wallet"
-              className={`block p-6 rounded-lg border transition-all duration-200 hover:scale-105 ${
-                isDark
-                  ? "bg-neutral-900 border-neutral-700 text-white hover:bg-neutral-800"
-                  : "bg-white border-neutral-200 text-black hover:bg-neutral-50"
-              }`}
+              className="group p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl hover:border-[#BDFE00]/50 hover:bg-white/[0.07] transition-all duration-300 hover:-translate-y-1 text-left relative overflow-hidden"
             >
-              <div className="text-center">
-                <div className="text-2xl mb-2">💰</div>
-                <h3 className="font-semibold">Wallet</h3>
-                <p className={`text-sm ${isDark ? "text-neutral-400" : "text-neutral-600"}`}>
-                  View your balance and transactions
-                </p>
+              <div className="w-12 h-12 rounded-xl bg-[#BDFE00]/10 flex items-center justify-center text-[#BDFE00] mb-5 group-hover:scale-110 transition-transform">
+                <LuWallet size={24} />
               </div>
+              <h3 className="text-xl font-bold text-white mb-1 group-hover:text-[#BDFE00] transition-colors">
+                Wallet
+              </h3>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                View real-time balances, income, and detailed transaction activity.
+              </p>
             </Link>
 
+            {/* Budgets Card */}
             <Link
               href="/dashboard/budgets"
-              className={`block p-6 rounded-lg border transition-all duration-200 hover:scale-105 ${
-                isDark
-                  ? "bg-neutral-900 border-neutral-700 text-white hover:bg-neutral-800"
-                  : "bg-white border-neutral-200 text-black hover:bg-neutral-50"
-              }`}
+              className="group p-8 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl hover:border-[#BDFE00]/50 hover:bg-white/[0.07] transition-all duration-300 hover:-translate-y-1 text-left relative overflow-hidden"
             >
-              <div className="text-center">
-                <div className="text-2xl mb-2">📊</div>
-                <h3 className="font-semibold">Budgets</h3>
-                <p className={`text-sm ${isDark ? "text-neutral-400" : "text-neutral-600"}`}>
-                  Manage your spending limits
-                </p>
+              <div className="w-12 h-12 rounded-xl bg-[#1FBFD8]/10 flex items-center justify-center text-[#1FBFD8] mb-5 group-hover:scale-110 transition-transform">
+                <LuChartPie size={24} />
               </div>
+              <h3 className="text-xl font-bold text-white mb-1 group-hover:text-[#1FBFD8] transition-colors">
+                Budgets
+              </h3>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Define spending targets and ensure discipline across monthly limits.
+              </p>
             </Link>
           </div>
         </div>

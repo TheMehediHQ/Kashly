@@ -1,8 +1,8 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
-import { useTheme } from "@/app/context/ThemeContext";
 
 type Balance = {
   income: number;
@@ -16,8 +16,6 @@ interface MainBalanceProps {
 }
 
 const MainBalance: React.FC<MainBalanceProps> = ({ refreshKey }) => {
-  const { effectiveTheme } = useTheme();
-  const isDark = effectiveTheme === "dark";
   const [isVisible, setIsVisible] = useState(true);
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<Balance>({
@@ -53,52 +51,53 @@ const MainBalance: React.FC<MainBalanceProps> = ({ refreshKey }) => {
   }, [refreshKey]);
 
   return (
-    <div className={`relative w-full rounded-xl p-8 transition-all border overflow-hidden backdrop-blur-sm ${isDark ? "border-slate-800/60" : "border-slate-200/60"}`} style={{backgroundColor: isDark ? "#111111" : "#FFFFFF"}}>
-      <div className="relative z-20">
-        {/* Label */}
-        <p className={`text-xs font-semibold uppercase tracking-wider mb-3 ${isDark ? "text-slate-500" : "text-slate-600"}`}>
-          Balance
-        </p>
-
-        {/* Amount */}
-        <div className="mb-8">
-          <div className="flex items-baseline gap-1">
-            {loading ? (
-              <div className="flex items-end gap-2">
-                <div className={`h-6 w-6 rounded animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-                <div className={`h-14 sm:h-16 w-48 sm:w-64 rounded-lg animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-                <div className={`h-5 w-12 rounded animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-              </div>
-            ) : (
-              <>
-                <span className={`text-2xl font-medium ${isDark ? "text-slate-500" : "text-slate-600"}`}>
-                  ৳
-                </span>
-                <h2 className={`text-5xl sm:text-6xl font-bold tracking-tight ${isDark ? "text-white" : "text-black"}`}>
-                  {isVisible ? data.balance.toLocaleString() : "••••••"}
-                </h2>
-                <span className={`text-lg font-semibold ${isDark ? "text-slate-500" : "text-slate-600"}`}>
-                  BDT
-                </span>
-              </>
-            )}
+    <div className="relative w-full rounded-2xl p-6 sm:p-8 border border-white/10 bg-slate-900/40 backdrop-blur-xl shadow-2xl overflow-hidden transition-all">
+      <div className="relative z-20 space-y-6">
+        {/* Badge & Label */}
+        <div className="flex items-center justify-between">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00]">
+            <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
+            NET BALANCE
           </div>
         </div>
 
-        {/* Hide/Show Button */}
-        {loading ? (
-          <div className={`w-full mb-8 h-10 rounded-lg animate-pulse ${isDark ? "bg-slate-800" : "bg-slate-100"}`} />
-        ) : (
-          <button
-            onClick={() => setIsVisible(!isVisible)}
-            className={`w-full mb-8 flex items-center justify-center gap-2 py-2 rounded-lg transition-colors font-medium text-sm ${isDark ? "text-slate-400" : "text-slate-600 hover:bg-slate-100"}`}
-            onMouseEnter={(e) => isDark && (e.currentTarget.style.backgroundColor = "#171717")}
-            onMouseLeave={(e) => isDark && (e.currentTarget.style.backgroundColor = "")}
-          >
-            {isVisible ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
-            {isVisible ? "Hide Balance" : "Show Balance"}
-          </button>
-        )}
+        {/* Amount Display */}
+        <div>
+          {loading ? (
+            <div className="flex items-baseline gap-2 py-2">
+              <div className="h-6 w-6 rounded bg-white/10 animate-pulse" />
+              <div className="h-12 sm:h-16 w-56 sm:w-72 rounded-2xl bg-white/10 animate-pulse" />
+              <div className="h-5 w-12 rounded bg-white/5 animate-pulse" />
+            </div>
+          ) : (
+            <div className="flex items-baseline gap-2 font-mono">
+              <span className="text-2xl sm:text-3xl font-bold text-[#BDFE00]">
+                ৳
+              </span>
+              <h2 className="text-4xl sm:text-6xl font-extrabold text-white tracking-tight">
+                {isVisible ? data.balance.toLocaleString() : "••••••••"}
+              </h2>
+              <span className="text-sm font-semibold text-slate-400">
+                BDT
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Visibility Toggle Button */}
+        <div>
+          {loading ? (
+            <div className="w-full h-10 rounded-xl bg-white/5 animate-pulse" />
+          ) : (
+            <button
+              onClick={() => setIsVisible(!isVisible)}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-colors font-mono text-xs font-medium cursor-pointer"
+            >
+              {isVisible ? <FiEyeOff className="w-4 h-4 text-[#BDFE00]" /> : <FiEye className="w-4 h-4 text-[#BDFE00]" />}
+              <span>{isVisible ? "Hide Balance" : "Show Balance"}</span>
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

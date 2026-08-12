@@ -3,13 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import axios from "axios";
-import { useTheme } from "@/app/context/ThemeContext";
 import { LuMail } from "react-icons/lu";
 
 export default function ResendVerificationPage() {
-  const { effectiveTheme } = useTheme();
-  const isDark = effectiveTheme === "dark";
-
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -31,7 +27,10 @@ export default function ResendVerificationPage() {
         email: email.trim(),
       });
 
-      setMessage(response.data?.message || "If the account is unverified, we sent a new link.");
+      setMessage(
+        response.data?.message ||
+          "If the account is unverified, we sent a new link."
+      );
       setEmail("");
     } catch (err) {
       if (axios.isAxiosError(err)) {
@@ -45,21 +44,31 @@ export default function ResendVerificationPage() {
   };
 
   return (
-    <div className={`flex min-h-screen items-center justify-center p-4 transition-colors ${isDark ? "bg-neutral-950" : "bg-white"}`}>
-      <div className={`w-full max-w-md rounded-2xl p-8 shadow-sm border transition-colors ${isDark ? "bg-neutral-900 border-neutral-800" : "bg-white border-neutral-200/50"}`}>
-        <div className="mb-8 text-center">
-          <div className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${isDark ? "bg-neutral-800" : "bg-neutral-100"}`}>
-            <LuMail className={`h-8 w-8 ${isDark ? "text-neutral-300" : "text-neutral-700"}`} />
+    <div className="flex min-h-screen items-center justify-center p-4 bg-[#0B0F17] text-white">
+      <div className="w-full max-w-md rounded-3xl bg-slate-900/40 border border-white/10 p-8 shadow-2xl backdrop-blur-xl">
+        {/* Header */}
+        <div className="mb-8 text-center space-y-3">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00]">
+            <LuMail className="h-7 w-7" />
           </div>
-          <h1 className={`text-2xl font-bold ${isDark ? "text-white" : "text-black"}`}>Resend Verification</h1>
-          <p className={`mt-2 text-sm ${isDark ? "text-neutral-400" : "text-neutral-600"}`}>
+
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00]">
+            <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
+            VERIFICATION RECOVERY
+          </div>
+
+          <h1 className="text-2xl font-bold tracking-tight text-white">
+            Resend Verification
+          </h1>
+          <p className="text-sm text-slate-400">
             Enter your email and we will send a new verification link.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Email Input */}
           <div>
-            <label className={`mb-1.5 block text-sm font-medium ${isDark ? "text-neutral-300" : "text-neutral-700"}`}>
+            <label className="mb-2 block text-xs font-mono uppercase tracking-wider text-slate-300">
               Email Address
             </label>
             <input
@@ -67,45 +76,38 @@ export default function ResendVerificationPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className={`w-full rounded-lg border px-4 py-2.5 outline-none transition-all focus:ring-1 ${
-                isDark
-                  ? "bg-neutral-800 text-white placeholder:text-neutral-500 border-neutral-700 focus:ring-neutral-600/50 focus:border-neutral-600"
-                  : "bg-white text-black placeholder:text-neutral-400 border-neutral-200 focus:ring-neutral-400/50 focus:border-neutral-400"
-              }`}
+              className="w-full rounded-xl border border-white/10 px-4 py-3 text-sm text-white placeholder:text-slate-500 bg-white/5 outline-none focus:border-[#BDFE00]/60 transition-colors"
             />
           </div>
 
+          {/* Alert Messages */}
           {message && (
-            <p className={`rounded-lg border px-3 py-2 text-sm ${isDark ? "border-emerald-900 bg-emerald-950/40 text-emerald-300" : "border-emerald-200 bg-emerald-50 text-emerald-700"}`}>
+            <p className="rounded-xl border border-[#BDFE00]/30 bg-[#BDFE00]/10 px-4 py-3 text-xs font-mono text-[#BDFE00]">
               {message}
             </p>
           )}
 
           {error && (
-            <p className={`rounded-lg border px-3 py-2 text-sm ${isDark ? "border-red-900 bg-red-950/40 text-red-300" : "border-red-200 bg-red-50 text-red-700"}`}>
+            <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-xs font-mono text-rose-400">
               {error}
             </p>
           )}
 
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`w-full rounded-lg py-2.5 font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
-              isDark
-                ? "bg-white text-black hover:bg-neutral-100"
-                : "bg-black text-white hover:bg-neutral-900"
-            }`}
+            className="w-full rounded-xl bg-[#BDFE00] py-3 text-sm font-semibold text-black transition-all hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isSubmitting ? "Sending..." : "Send Verification Link"}
           </button>
 
-          <p className={`text-center text-sm ${isDark ? "text-neutral-400" : "text-neutral-600"}`}>
+          {/* Back Link */}
+          <p className="text-center text-xs text-slate-400">
             Back to{" "}
             <Link
               href="/login"
-              className={`font-medium underline-offset-4 hover:underline ${
-                isDark ? "text-white hover:text-neutral-300" : "text-black hover:text-neutral-700"
-              }`}
+              className="font-semibold text-[#BDFE00] hover:underline transition-all"
             >
               login
             </Link>

@@ -1,30 +1,43 @@
 "use client";
 
-import { useTheme } from "../context/ThemeContext";
+import React from "react";
 
 export default function DashboardLoading() {
-  const { effectiveTheme } = useTheme();
-  const isDark = effectiveTheme === "dark";
-
   return (
-    <div className={`flex min-h-screen ${isDark ? "bg-neutral-950" : "bg-neutral-50"}`}>
-      <aside className={`hidden md:flex w-64 border-r p-6 ${isDark ? "border-neutral-800/50 bg-black" : "border-neutral-200/50 bg-neutral-50"}`}>
-        <div className="w-full space-y-4">
-          <div className={`h-10 w-32 rounded-lg animate-pulse ${isDark ? "bg-neutral-800" : "bg-neutral-200"}`} />
-          <div className={`h-9 w-full rounded-lg animate-pulse ${isDark ? "bg-neutral-900" : "bg-neutral-100"}`} />
-          <div className={`h-9 w-full rounded-lg animate-pulse ${isDark ? "bg-neutral-900" : "bg-neutral-100"}`} />
-          <div className={`h-9 w-full rounded-lg animate-pulse ${isDark ? "bg-neutral-900" : "bg-neutral-100"}`} />
+    <div className="flex min-h-screen bg-[#0B0F17] text-white">
+      {/* Sidebar Placeholder */}
+      <aside className="hidden md:flex w-64 border-r border-white/10 p-6 bg-[#0B0F17] shrink-0">
+        <div className="w-full space-y-6">
+          {/* Logo Skeleton */}
+          <div className="h-10 w-32 rounded-xl bg-white/10 animate-pulse" />
+          
+          {/* Nav Item Skeletons */}
+          <div className="space-y-3 pt-4">
+            <div className="h-10 w-full rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+            <div className="h-10 w-full rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+            <div className="h-10 w-full rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+            <div className="h-10 w-full rounded-xl bg-white/5 border border-white/5 animate-pulse" />
+          </div>
         </div>
       </aside>
 
+      {/* Main Content Area Placeholder */}
       <main className="flex-1 p-6 md:p-10">
-        <div className="max-w-5xl mx-auto space-y-6">
-          <div className={`h-10 w-56 rounded-lg animate-pulse ${isDark ? "bg-neutral-800" : "bg-neutral-200"}`} />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className={`h-40 rounded-xl animate-pulse ${isDark ? "bg-neutral-900" : "bg-white border border-neutral-200"}`} />
-            <div className={`h-40 rounded-xl animate-pulse ${isDark ? "bg-neutral-900" : "bg-white border border-neutral-200"}`} />
+        <div className="max-w-5xl mx-auto space-y-8">
+          {/* Page Header Skeleton */}
+          <div className="space-y-2">
+            <div className="h-5 w-32 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 animate-pulse" />
+            <div className="h-10 w-56 rounded-xl bg-white/10 animate-pulse" />
           </div>
-          <div className={`h-72 rounded-xl animate-pulse ${isDark ? "bg-neutral-900" : "bg-white border border-neutral-200"}`} />
+
+          {/* Cards Skeleton Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="h-44 rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
+            <div className="h-44 rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
+          </div>
+
+          {/* Chart / Section Skeleton */}
+          <div className="h-72 rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
         </div>
       </main>
     </div>

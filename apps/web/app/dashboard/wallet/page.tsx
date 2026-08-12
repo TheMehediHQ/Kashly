@@ -4,7 +4,6 @@
 import React, { useEffect, useState } from "react";
 import { FiRefreshCw, FiArchive } from "react-icons/fi";
 import Link from "next/link";
-import { useTheme } from "@/app/context/ThemeContext";
 import MainBalance from "./components/MainBalance";
 import TransactionModal from "./components/TransactionModal";
 import TransactionHistory from "./components/TransactionHistory";
@@ -21,8 +20,6 @@ type Summary = {
 };
 
 const Wallet = () => {
-  const { effectiveTheme } = useTheme();
-  const isDark = effectiveTheme === "dark";
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [summaryLoading, setSummaryLoading] = useState<boolean>(true);
   const [summary, setSummary] = useState<Summary>({
@@ -61,69 +58,75 @@ const Wallet = () => {
   }, [refreshKey]);
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDark ? "bg-black" : "bg-white"}`}>
-      <div className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className={`text-4xl sm:text-5xl font-bold tracking-tight ${isDark ? "text-white" : "text-black"}`}>
-                Wallet
-              </h1>
+    <div className="w-full min-h-screen text-white">
+      <div className="max-w-5xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-2">
+              <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
+              FINANCIAL OVERVIEW
             </div>
-            <div className="flex items-center gap-2">
-              <Link
-                href="/dashboard/budgets"
-                className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                  isDark
-                    ? "hover:bg-slate-900 text-slate-400 hover:text-slate-200"
-                    : "hover:bg-slate-100 text-slate-600 hover:text-slate-800"
-                }`}
-                title="View budget history"
-              >
-                <FiArchive className="w-5 h-5" />
-              </Link>
-              <button
-                onClick={handleRefresh}
-                className={`inline-flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${isDark ? "hover:bg-slate-900 text-slate-400" : "hover:bg-slate-100 text-slate-600"}`}
-                title="Refresh"
-              >
-                <FiRefreshCw className="w-5 h-5" />
-              </button>
-            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+              Wallet & Cash Flow
+            </h1>
+            <p className="text-sm text-slate-400 mt-1">
+              Monitor real-time balance, log income and expenses, and review recent activity.
+            </p>
           </div>
 
-          {/* Main Balance */}
-          <div className="mb-8">
-            <MainBalance refreshKey={refreshKey} onRefresh={handleRefresh} />
-          </div>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/dashboard/budgets"
+              className="inline-flex items-center justify-center h-10 px-3.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer text-sm font-medium gap-2"
+              title="View budget history"
+            >
+              <FiArchive className="w-4 h-4 text-[#BDFE00]" />
+              <span className="hidden sm:inline">Budgets</span>
+            </Link>
 
-          {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-3 mb-8">
-            <TransactionModal type="income" onSuccess={handleRefresh} />
-            <TransactionModal type="expense" onSuccess={handleRefresh} />
+            <button
+              onClick={handleRefresh}
+              className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              title="Refresh Wallet Data"
+            >
+              <FiRefreshCw className="w-4 h-4" />
+            </button>
           </div>
+        </div>
 
-          {/* Income and Expense Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-            <LastMonthIncome
-              income={summary?.thisMonthIncome}
-              count={summary?.incomeTransactions}
-              loading={summaryLoading}
-            />
-            <LastMonthExpense
-              expense={summary?.thisMonthExpense}
-              count={summary?.expenseTransactions}
-              loading={summaryLoading}
-            />
-          </div>
+        {/* Main Balance Card */}
+        <div className="w-full">
+          <MainBalance refreshKey={refreshKey} onRefresh={handleRefresh} />
+        </div>
 
-          {/* Budget Overview */}
-          <div className="mb-8">
-            <BudgetOverview refreshKey={refreshKey} />
-          </div>
+        {/* Action Trigger Buttons */}
+        <div className="grid grid-cols-2 gap-4">
+          <TransactionModal type="income" onSuccess={handleRefresh} />
+          <TransactionModal type="expense" onSuccess={handleRefresh} />
+        </div>
 
-          {/* Transactions */}
+        {/* Income and Expense Overview Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <LastMonthIncome
+            income={summary?.thisMonthIncome}
+            count={summary?.incomeTransactions}
+            loading={summaryLoading}
+          />
+          <LastMonthExpense
+            expense={summary?.thisMonthExpense}
+            count={summary?.expenseTransactions}
+            loading={summaryLoading}
+          />
+        </div>
+
+        {/* Budget Overview Widget */}
+        <div className="w-full">
+          <BudgetOverview refreshKey={refreshKey} />
+        </div>
+
+        {/* Recent Transactions Table / History */}
+        <div className="w-full">
           <TransactionHistory
             refreshKey={refreshKey}
             onRefresh={handleRefresh}

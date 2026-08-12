@@ -8,27 +8,21 @@ import {
   LuLayoutDashboard,
   LuUser,
   LuChevronRight,
-  LuWallet,
   LuArchive,
-  LuTarget,
   LuMenu,
   LuX,
 } from "react-icons/lu";
 import { IoWallet } from "react-icons/io5";
-import { useAuth } from "@/app/context/AuthContext";
-import { useTheme } from "@/app/context/ThemeContext";
 import { FiUser } from "react-icons/fi";
 import { LucideHome } from "lucide-react";
-import ThemeToggle from "@/app/components/ThemeToggle";
+import { useAuth } from "@/app/context/AuthContext";
 
 const Sidebar = () => {
   const pathname = usePathname();
   const { user } = useAuth();
-  const { effectiveTheme } = useTheme();
-  const isDark = effectiveTheme === "dark";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // 🔥 Menu Items
+  // Menu Items
   const menuItems = [
     {
       name: "Dashboard",
@@ -54,118 +48,108 @@ const Sidebar = () => {
       name: "User Management",
       href: "/dashboard/user-management",
       icon: <IoWallet size={20} />,
-      adminOnly: true, // ✅ only admin দেখবে
+      adminOnly: true,
     },
   ];
 
-  // ✅ Filter based on role
+  // Filter based on role
   const filteredMenuItems = menuItems.filter(
     (item) => !item.adminOnly || user?.role === "admin"
   );
 
   return (
     <>
-      {/* Mobile Menu Button */}
+      {/* Mobile Menu Toggle Button */}
       <button
         onClick={() => setIsMobileMenuOpen(true)}
-        className={`fixed top-4 left-4 z-40 md:hidden p-2 rounded-lg transition-colors ${isDark ? "bg-neutral-900 text-white hover:bg-neutral-800" : "bg-white text-black hover:bg-neutral-100"} shadow-lg`}
+        className="fixed top-4 left-4 z-40 md:hidden p-2.5 rounded-xl bg-[#0B0F17] text-white border border-white/10 shadow-lg hover:bg-white/5 transition-colors"
       >
         <LuMenu size={20} />
       </button>
 
-      {/* Mobile Backdrop */}
+      {/* Mobile Backdrop Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-black/50 md:hidden"
+            className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
-      <motion.div
-        initial={{ x: 0 }}
-        animate={{
-          x: 0, // Desktop: always visible, Mobile: controlled by CSS
-        }}
-        transition={{ type: "tween", duration: 0.3 }}
-        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col justify-between border-r p-6 shadow-sm transition-colors md:fixed md:translate-x-0 ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        } ${
-          isDark
-            ? "border-neutral-800/50 bg-black text-neutral-300"
-            : "border-neutral-200/50 bg-neutral-50 text-neutral-700"
+      {/* Sidebar Container */}
+      <aside
+        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col justify-between border-r border-white/10 bg-[#0B0F17] p-6 shadow-xl transition-transform duration-300 md:translate-x-0 ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Close Button for Mobile */}
         <button
           onClick={() => setIsMobileMenuOpen(false)}
-          className={`absolute top-4 right-4 md:hidden p-2 rounded-lg transition-colors ${isDark ? "text-neutral-400 hover:text-white" : "text-neutral-600 hover:text-black"}`}
+          className="absolute top-4 right-4 p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 md:hidden transition-colors"
         >
           <LuX size={20} />
         </button>
 
         <div>
-          {/* Logo */}
-          <div className="mb-10 flex items-center gap-3 px-2">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-lg font-bold text-white ${isDark ? "bg-neutral-800" : "bg-neutral-900"}`}>
-              M
+          {/* Brand Logo */}
+          <Link
+            href="/"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="mb-10 flex items-center gap-2.5 px-2 group"
+          >
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#BDFE00] text-black font-extrabold text-lg shadow-[0_0_15px_rgba(189,254,0,0.25)] group-hover:scale-105 transition-transform">
+              N
             </div>
-            <h1 className={`text-lg font-bold tracking-tight ${isDark ? "text-white" : "text-black"}`}>
-              MoneyFlow
-            </h1>
-          </div>
+            <span className="text-xl font-bold tracking-tight text-white">
+              Nex<span className="text-[#BDFE00]">Vibe</span>
+            </span>
+          </Link>
 
-          {/* Navigation */}
+          {/* Navigation Links */}
           <nav>
-            <ul className="space-y-2">
+            <ul className="space-y-1.5">
               {filteredMenuItems.map((item, index) => {
                 const isActive = pathname === item.href;
 
                 return (
                   <motion.li
                     key={item.name}
-                    initial={{ opacity: 0, x: -20 }}
+                    initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ delay: index * 0.05 }}
                   >
                     <Link
                       href={item.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={`group relative flex items-center justify-between rounded-lg px-4 py-3 transition-all duration-300 ${
+                      className={`group relative flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-200 ${
                         isActive
-                          ? isDark ? "bg-neutral-900 text-white" : "bg-neutral-200 text-black"
-                          : isDark ? "hover:bg-neutral-900 hover:text-white" : "hover:bg-neutral-100 hover:text-black"
+                          ? "bg-[#BDFE00] text-black shadow-[0_0_20px_rgba(189,254,0,0.2)]"
+                          : "text-slate-400 hover:bg-white/5 hover:text-white"
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <span
                           className={`transition-colors ${
                             isActive
-                              ? isDark ? "text-white" : "text-black"
-                              : isDark ? "text-neutral-500 group-hover:text-white" : "text-neutral-600 group-hover:text-black"
+                              ? "text-black"
+                              : "text-slate-400 group-hover:text-[#BDFE00]"
                           }`}
                         >
                           {item.icon}
                         </span>
-                        <span className="text-sm font-semibold tracking-wide">
-                          {item.name}
-                        </span>
+                        <span>{item.name}</span>
                       </div>
 
-                      {/* Active Arrow */}
+                      {/* Active Indicator Arrow */}
                       {isActive && (
                         <motion.div layoutId="activeArrow">
-                          <LuChevronRight size={16} />
+                          <LuChevronRight size={16} className="text-black" />
                         </motion.div>
                       )}
-
-                      {/* Hover Glow */}
-                      <div className={`absolute inset-0 -z-10 rounded-lg opacity-0 transition-opacity group-hover:opacity-100 ${isDark ? "bg-neutral-900/50" : "bg-neutral-100/50"}`} />
                     </Link>
                   </motion.li>
                 );
@@ -174,42 +158,41 @@ const Sidebar = () => {
           </nav>
         </div>
 
-        {/* Footer */}
-        <div className={`border-t ${isDark ? "border-neutral-800/50" : "border-neutral-200/50"}`}>
-          <div className="my-2">
+        {/* Footer & User Profile Info */}
+        <div className="border-t border-white/10 pt-4 space-y-3">
+          {/* Return Home Link */}
+          <div>
             <Link
               href="/"
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-300 ${isDark ? "bg-neutral-900/50 text-neutral-400 hover:bg-black hover:text-white" : "bg-neutral-200/50 text-neutral-600 hover:bg-neutral-300 hover:text-black"}`}
+              className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
             >
-              <LucideHome size={20} />
+              <LucideHome size={18} className="text-[#BDFE00]" />
               <span>Return to Home</span>
             </Link>
           </div>
 
-          <div className={`flex items-center gap-3 rounded-lg p-3 ring-1 ${isDark ? "bg-neutral-900/30 ring-neutral-800" : "bg-neutral-200/30 ring-neutral-300"}`}>
-            <div className={`h-9 w-9 rounded-full flex items-center justify-center ${isDark ? "bg-neutral-800 text-neutral-400" : "bg-neutral-300 text-neutral-700"}`}>
-              <FiUser className="text-lg" />
+          {/* User Profile Summary */}
+          <div className="flex items-center gap-3 rounded-xl p-3 bg-white/5 border border-white/10">
+            <div className="h-9 w-9 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/30 flex items-center justify-center text-[#BDFE00] shrink-0">
+              <FiUser className="text-base" />
             </div>
             <div className="overflow-hidden">
-              <p className={`truncate text-sm font-bold ${isDark ? "text-white" : "text-black"}`}>
-                {user?.fullName}
+              <p className="truncate text-sm font-semibold text-slate-100">
+                {user?.fullName || user?.email || "User"}
               </p>
-              <p className={`truncate text-xs ${isDark ? "text-neutral-500" : "text-neutral-600"}`}>
-                Credits {user?.credits} left
+              <p className="truncate text-xs font-mono text-slate-400">
+                Credits: <span className="text-[#BDFE00]">{user?.credits ?? 0}</span> left
               </p>
             </div>
           </div>
 
-          <div className="mt-4 flex justify-center">
-            <ThemeToggle />
-          </div>
-
-          <p className={`mt-4 text-center text-[10px] font-medium uppercase tracking-[0.2em] ${isDark ? "text-neutral-600" : "text-neutral-500"}`}>
-            © 2026 MoneyFlow
+          {/* Copyright Tag */}
+          <p className="text-center text-[10px] font-mono uppercase tracking-widest text-slate-500 pt-1">
+            © {new Date().getFullYear()} NexVibe
           </p>
         </div>
-      </motion.div>
+      </aside>
     </>
   );
 };

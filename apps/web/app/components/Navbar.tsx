@@ -5,9 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LuLayoutDashboard,
-  LuSettings,
   LuLogOut,
-  LuUser,
   LuChevronDown,
 } from "react-icons/lu";
 import Image from "next/image";
@@ -24,14 +22,11 @@ const Navbar = () => {
 
   const { user } = useAuth();
 
-  // Reset the error flag when the avatar URL changes (e.g. new upload / re-login).
+  // Reset the error flag when the avatar URL changes
   useEffect(() => {
     setAvatarError(false);
   }, [user?.photoURL]);
 
-  // Load avatars directly from the origin (Cloudinary / DiceBear) instead of
-  // through the next/image optimization proxy, which can fail intermittently
-  // on serverless deployments. Fall back to the default avatar on error.
   const avatarSrc =
     !avatarError && user?.photoURL
       ? user.photoURL
@@ -55,11 +50,8 @@ const Navbar = () => {
       await axios.post(
         `/api/logout`,
         {},
-        { withCredentials: true },
+        { withCredentials: true }
       );
-
-      // optional: clear user state (if using context)
-      // setUser(null);
 
       toast.success("Logout successful");
 
@@ -78,46 +70,46 @@ const Navbar = () => {
       name: "Dashboard",
       href: "/dashboard",
       icon: <LuLayoutDashboard size={18} />,
-    }
-    // { name: "Settings", href: "/settings", icon: <LuSettings size={18} /> },
+    },
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-(--border) bg-(--background) transition-colors duration-300 backdrop-blur-md">
+    <nav className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#0B0F17] transition-colors duration-300">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-black text-white font-bold">
-              M
+          {/* Brand Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#BDFE00] text-black font-extrabold text-lg shadow-[0_0_15px_rgba(189,254,0,0.25)] group-hover:scale-105 transition-transform">
+              N
             </div>
-            <span className="text-lg font-bold tracking-tight text-(--foreground)">
-              MoneyFlow
+            <span className="text-xl font-bold tracking-tight text-white">
+              Nex<span className="text-[#BDFE00]">Vibe</span>
             </span>
           </Link>
 
-          {/* Center: Desktop Nav */}
+          {/* Center Nav Links */}
           <div className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm font-medium text-(--muted-foreground) hover:text-(--foreground) transition-colors"
+                className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
               >
                 {link.name}
               </Link>
             ))}
           </div>
 
-          {/* Right: Profile & Mobile */}
+          {/* Right Section: Profile & Login */}
           <div className="flex items-center gap-3">
             {user ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center gap-2 rounded-full border border-(--border) p-1 pr-3 transition-all hover:bg-(--hover-bg) active:scale-95"
+                  className="flex items-center gap-2 rounded-full 
+                  p-1 pr-3   transition-all active:scale-95 cursor-pointer"
                 >
-                  <div className="relative h-8 w-8 overflow-hidden rounded-full border border-gray-100 bg-gray-100">
+                  <div className="relative h-8 w-8 overflow-hidden rounded-full border border-[#BDFE00]/40 bg-slate-800">
                     <Image
                       src={avatarSrc}
                       alt="User Profile"
@@ -131,8 +123,8 @@ const Navbar = () => {
                   </div>
 
                   <LuChevronDown
-                    className={`text-gray-400 transition-transform duration-300 ${
-                      isProfileOpen ? "rotate-180" : ""
+                    className={`text-slate-400 transition-transform duration-300 ${
+                      isProfileOpen ? "rotate-180 text-white" : ""
                     }`}
                   />
                 </button>
@@ -140,35 +132,36 @@ const Navbar = () => {
                 <AnimatePresence>
                   {isProfileOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 12, scale: 0.95 }}
-                      className="absolute right-0 mt-3 w-60 origin-top-right rounded-xl border border-(--border) bg-(--background) p-2 shadow-sm"
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 mt-3 w-60 origin-top-right rounded-xl border border-white/10 bg-[#0B0F17] p-2 shadow-2xl"
                     >
-                      <div className="px-3 py-2 border-b border-(--border) mb-1">
-                        <p className="text-[11px] font-semibold uppercase tracking-widest text-(--muted-foreground)">
+                      <div className="px-3 py-2 border-b border-white/10 mb-1">
+                        <p className="text-[10px] font-mono uppercase tracking-widest text-[#BDFE00]">
                           Account
                         </p>
-                        <p className="truncate text-sm font-medium text-(--foreground)">
+                        <p className="truncate text-sm font-medium text-slate-200">
                           {user?.email}
                         </p>
                       </div>
+
                       <div className="flex flex-col gap-1">
                         {profileLinks.map((item) => (
                           <Link
                             key={item.name}
                             href={item.href}
                             onClick={() => setIsProfileOpen(false)}
-                            className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg text-(--muted-foreground) hover:bg-(--hover-bg) hover:text-(--foreground) transition-colors"
+                            className="flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg text-slate-300 hover:bg-white/5 hover:text-white transition-colors"
                           >
-                            <span className="opacity-70">{item.icon}</span>
+                            <span className="text-[#BDFE00]">{item.icon}</span>
                             {item.name}
                           </Link>
                         ))}
 
                         <button
                           onClick={handleLogout}
-                          className="flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium rounded-lg text-red-500 hover:bg-(--hover-bg) transition-colors"
+                          className="flex items-center gap-3 w-full px-3 py-2 text-sm font-medium rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors cursor-pointer"
                         >
                           <LuLogOut size={18} />
                           Sign out
@@ -181,12 +174,11 @@ const Navbar = () => {
             ) : (
               <Link
                 href="/login"
-                className="rounded-lg border border-(--border) px-4 py-2 text-sm font-medium text-(--foreground) hover:bg-(--hover-bg) transition-all active:scale-95"
+                className="rounded-xl border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium text-white hover:bg-white/10 hover:border-white/20 transition-all active:scale-95"
               >
                 Login
               </Link>
             )}
-
           </div>
         </div>
       </div>

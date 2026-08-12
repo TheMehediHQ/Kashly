@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useTheme } from "@/app/context/ThemeContext";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -23,8 +22,6 @@ interface BudgetHistoryProps {
 }
 
 const BudgetHistory: React.FC<BudgetHistoryProps> = ({ onRefresh }) => {
-  const { effectiveTheme } = useTheme();
-  const isDark = effectiveTheme === "dark";
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -107,7 +104,9 @@ const BudgetHistory: React.FC<BudgetHistoryProps> = ({ onRefresh }) => {
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#dc2626",
-      cancelButtonColor: "#6b7280",
+      cancelButtonColor: "#334155",
+      background: "#0B0F17",
+      color: "#ffffff",
       confirmButtonText: "Delete",
     }).then(async (result) => {
       if (result.isConfirmed) {
@@ -144,14 +143,12 @@ const BudgetHistory: React.FC<BudgetHistoryProps> = ({ onRefresh }) => {
     if (onRefresh) onRefresh();
   };
 
-  // Filter budgets by month/year
   const filteredBudgets = budgets.filter((budget) => {
     if (filterMonth && budget.month !== filterMonth) return false;
     if (filterYear && budget.year !== filterYear) return false;
     return true;
   });
 
-  // Group budgets by year first, then by month within each year
   const groupedByYearAndMonth = budgets.reduce(
     (acc, budget) => {
       if (!acc[budget.year]) {
@@ -166,7 +163,6 @@ const BudgetHistory: React.FC<BudgetHistoryProps> = ({ onRefresh }) => {
     {} as Record<number, Record<number, Budget[]>>
   );
 
-  // Get all unique years from budgets, sorted descending
   const allYears = Array.from(new Set(budgets.map((b) => b.year))).sort(
     (a, b) => b - a
   );
@@ -190,59 +186,35 @@ const BudgetHistory: React.FC<BudgetHistoryProps> = ({ onRefresh }) => {
   if (loading) {
     return (
       <div className="space-y-8">
-        {/* Skeleton for Year Header */}
         <div className="space-y-6">
           <div className="flex items-center gap-3">
-            <div className={`h-8 w-20 rounded-lg ${isDark ? "bg-slate-700" : "bg-slate-200"} animate-pulse`} />
-            <div className={`h-6 w-16 rounded-full ${isDark ? "bg-slate-700" : "bg-slate-200"} animate-pulse`} />
+            <div className="h-8 w-24 rounded-xl bg-white/10 animate-pulse" />
+            <div className="h-6 w-16 rounded-full bg-white/5 animate-pulse" />
           </div>
 
-          {/* Skeleton for Month Sections */}
           {[1, 2].map((i) => (
-            <div key={i} className="ml-0 space-y-4">
+            <div key={i} className="space-y-4">
               <div className="flex items-center gap-3">
-                <div className={`h-6 w-32 rounded-lg ${isDark ? "bg-slate-700" : "bg-slate-200"} animate-pulse`} />
-                <div className={`h-5 w-12 rounded-full ${isDark ? "bg-slate-600" : "bg-slate-300"} animate-pulse`} />
+                <div className="h-6 w-36 rounded-lg bg-white/10 animate-pulse" />
+                <div className="h-5 w-12 rounded-full bg-white/5 animate-pulse" />
               </div>
 
-              {/* Skeleton for Budget Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[1, 2, 3].map((j) => (
                   <div
                     key={j}
-                    className={`p-4 rounded-lg border ${
-                      isDark ? "border-slate-700 bg-slate-800/50" : "border-slate-200 bg-slate-50"
-                    }`}
+                    className="p-5 rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl animate-pulse space-y-4"
                   >
-                    {/* Card Header Skeleton */}
-                    <div className="flex items-center justify-between mb-3">
-                      <div className={`h-5 w-20 rounded ${isDark ? "bg-slate-700" : "bg-slate-200"} animate-pulse`} />
-                      <div className="flex gap-2">
-                        <div className={`h-8 w-8 rounded ${isDark ? "bg-slate-700" : "bg-slate-200"} animate-pulse`} />
-                        <div className={`h-8 w-8 rounded ${isDark ? "bg-slate-700" : "bg-slate-200"} animate-pulse`} />
-                      </div>
-                    </div>
-
-                    {/* Amount Info Skeleton */}
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <div className={`h-4 w-12 rounded ${isDark ? "bg-slate-700" : "bg-slate-200"} animate-pulse mb-1`} />
-                        <div className={`h-6 w-16 rounded ${isDark ? "bg-slate-700" : "bg-slate-200"} animate-pulse`} />
-                      </div>
-                      <div className="text-right">
-                        <div className={`h-4 w-10 rounded ${isDark ? "bg-slate-700" : "bg-slate-200"} animate-pulse mb-1`} />
-                        <div className={`h-6 w-16 rounded ${isDark ? "bg-slate-700" : "bg-slate-200"} animate-pulse`} />
-                      </div>
-                    </div>
-
-                    {/* Progress Bar Skeleton */}
-                    <div className={`w-full h-2 rounded-full ${isDark ? "bg-slate-700" : "bg-slate-200"} mb-2 animate-pulse`} />
-
-                    {/* Status Skeleton */}
                     <div className="flex items-center justify-between">
-                      <div className={`h-4 w-16 rounded ${isDark ? "bg-slate-700" : "bg-slate-200"} animate-pulse`} />
-                      <div className={`h-4 w-20 rounded ${isDark ? "bg-slate-700" : "bg-slate-200"} animate-pulse`} />
+                      <div className="h-5 w-24 rounded bg-white/10" />
+                      <div className="flex gap-2">
+                        <div className="h-8 w-8 rounded-lg bg-white/5" />
+                        <div className="h-8 w-8 rounded-lg bg-white/5" />
+                      </div>
                     </div>
+
+                    <div className="h-16 w-full rounded-xl bg-white/5" />
+                    <div className="h-2 w-full rounded-full bg-slate-800" />
                   </div>
                 ))}
               </div>
@@ -259,27 +231,22 @@ const BudgetHistory: React.FC<BudgetHistoryProps> = ({ onRefresh }) => {
   };
 
   return (
-    <div>
-      {/* Filter Section */}
+    <div className="space-y-6">
+      {/* Filters Section */}
       {!loading && budgets.length > 0 && (
-        <div className="mb-6 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-          {/* Filters - RIGHT */}
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto order-2 sm:order-0">
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             {/* Month Filter */}
             <select
               value={filterMonth || ""}
               onChange={(e) =>
                 setFilterMonth(e.target.value ? Number(e.target.value) : null)
               }
-              className={`px-3 py-2 text-sm rounded-lg border transition-all w-full sm:w-40 ${
-                isDark
-                  ? "bg-slate-900 border-slate-800 text-white focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500/20"
-                  : "bg-white border-slate-200 text-slate-900 focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500/20"
-              } focus:outline-none`}
+              className="px-4 py-2.5 text-sm rounded-xl border border-white/10 bg-white/5 text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors w-full sm:w-40 cursor-pointer"
             >
-              <option value="">All Months</option>
+              <option value="" className="bg-[#0B0F17] text-white">All Months</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                <option key={month} value={month}>
+                <option key={month} value={month} className="bg-[#0B0F17] text-white">
                   {monthNames[month]}
                 </option>
               ))}
@@ -291,75 +258,51 @@ const BudgetHistory: React.FC<BudgetHistoryProps> = ({ onRefresh }) => {
               onChange={(e) =>
                 setFilterYear(e.target.value ? Number(e.target.value) : null)
               }
-              className={`px-3 py-2 text-sm rounded-lg border transition-all w-full sm:w-40 ${
-                isDark
-                  ? "bg-slate-900 border-slate-800 text-white focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500/20"
-                  : "bg-white border-slate-200 text-slate-900 focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500/20"
-              } focus:outline-none`}
+              className="px-4 py-2.5 text-sm rounded-xl border border-white/10 bg-white/5 text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors w-full sm:w-40 cursor-pointer"
             >
-              <option value="">All Years</option>
+              <option value="" className="bg-[#0B0F17] text-white">All Years</option>
               {allYears.map((year) => (
-                <option key={year} value={year}>
+                <option key={year} value={year} className="bg-[#0B0F17] text-white">
                   {year}
                 </option>
               ))}
             </select>
 
-            {/* Clear Filter Button */}
+            {/* Clear Filters Button */}
             {(filterMonth || filterYear) && (
               <button
                 onClick={handleClearFilter}
-                className={`px-4 py-2 text-sm rounded-lg font-medium transition-all whitespace-nowrap w-full sm:w-auto ${
-                  isDark
-                    ? "bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white"
-                    : "bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900"
-                }`}
+                className="px-4 py-2.5 text-sm rounded-xl font-medium border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
               >
-                Clear
+                Clear Filters
               </button>
             )}
           </div>
         </div>
       )}
 
+      {/* Empty States */}
       {budgets.length === 0 ? (
-        <div
-          className={`text-center py-12 rounded-lg border-2 border-dashed ${
-            isDark
-              ? "border-slate-700 text-slate-400"
-              : "border-slate-200 text-slate-600"
-          }`}
-        >
-          <p className="text-lg font-medium">No budgets found</p>
-          <p className="text-sm">Create a budget to get started</p>
+        <div className="text-center py-16 rounded-2xl border border-dashed border-white/10 bg-slate-900/20 text-slate-400">
+          <p className="text-lg font-bold text-white">No budgets found</p>
+          <p className="text-sm text-slate-400 mt-1">Create a budget target to get started</p>
         </div>
       ) : filteredBudgets.length === 0 ? (
-        <div
-          className={`text-center py-12 rounded-lg border-2 border-dashed ${
-            isDark
-              ? "border-slate-700 text-slate-400"
-              : "border-slate-200 text-slate-600"
-          }`}
-        >
-          <p className="text-lg font-medium">No budgets for selected filters</p>
+        <div className="text-center py-16 rounded-2xl border border-dashed border-white/10 bg-slate-900/20 text-slate-400 space-y-4">
+          <p className="text-lg font-bold text-white">No budgets match your filters</p>
           <button
             onClick={handleClearFilter}
-            className={`mt-4 px-4 py-2 rounded-lg font-medium transition-all ${
-              isDark
-                ? "bg-white text-black hover:bg-neutral-100"
-                : "bg-black text-white hover:bg-neutral-900"
-            }`}
+            className="px-5 py-2.5 rounded-xl font-semibold bg-[#BDFE00] text-black hover:bg-[#aef000] transition-all cursor-pointer text-sm"
           >
             Clear Filters
           </button>
         </div>
       ) : (
-        <div className="space-y-8">
-          {/* Render budgets grouped by year and month */}
+        <div className="space-y-10">
+          {/* Render grouped budgets */}
           {allYears
             .filter((year) => !filterYear || year === filterYear)
             .map((year) => {
-              // Calculate total budgets for this year
               const yearBudgetCount = Object.values(groupedByYearAndMonth[year] || {}).reduce(
                 (total, monthBudgets) => total + monthBudgets.length,
                 0
@@ -368,256 +311,192 @@ const BudgetHistory: React.FC<BudgetHistoryProps> = ({ onRefresh }) => {
               return (
                 <div key={year} className="space-y-6">
                   {/* Year Header */}
-                  <div className="flex items-center gap-3">
-                    <h2
-                      className={`text-2xl font-bold ${
-                        isDark ? "text-white" : "text-black"
-                      }`}
-                    >
+                  <div className="flex items-center gap-3 border-b border-white/10 pb-3">
+                    <h2 className="text-2xl font-extrabold text-white">
                       {year}
                     </h2>
-                    <div
-                      className={`text-sm font-medium px-3 py-1 rounded-full ${
-                        isDark
-                          ? "bg-slate-800 text-slate-300"
-                          : "bg-slate-200 text-slate-700"
-                      }`}
-                    >
+                    <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00]">
                       {yearBudgetCount} budget{yearBudgetCount !== 1 ? "s" : ""}
-                    </div>
+                    </span>
                   </div>
 
                   {/* Months within this year */}
-                {Array.from({ length: 12 }, (_, i) => i + 1)
-                  .filter((month) => {
-                    if (filterMonth && month !== filterMonth) return false;
-                    return groupedByYearAndMonth[year]?.[month]?.length > 0;
-                  })
-                  .sort((a, b) => b - a) // Sort months descending (newest first)
-                  .map((month) => (
-                    <div key={`${year}-${month}`} className="ml-0 space-y-4">
-                      {/* Month Header */}
-                      <div className="flex items-center gap-3">
-                        <h3
-                          className={`text-xl font-semibold ${
-                            isDark ? "text-slate-200" : "text-slate-800"
-                          }`}
-                        >
-                          {monthNames[month]} {year}
-                        </h3>
-                        <div
-                          className={`text-sm font-medium px-3 py-1 rounded-full ${
-                            isDark
-                              ? "bg-slate-700 text-slate-300"
-                              : "bg-slate-300 text-slate-700"
-                          }`}
-                        >
-                          {groupedByYearAndMonth[year][month].length} budget{groupedByYearAndMonth[year][month].length !== 1 ? "s" : ""}
+                  {Array.from({ length: 12 }, (_, i) => i + 1)
+                    .filter((month) => {
+                      if (filterMonth && month !== filterMonth) return false;
+                      return groupedByYearAndMonth[year]?.[month]?.length > 0;
+                    })
+                    .sort((a, b) => b - a)
+                    .map((month) => (
+                      <div key={`${year}-${month}`} className="space-y-4">
+                        {/* Month Header */}
+                        <div className="flex items-center gap-3">
+                          <h3 className="text-xl font-bold text-slate-200">
+                            {monthNames[month]} {year}
+                          </h3>
+                          <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-400">
+                            {groupedByYearAndMonth[year][month].length} budget{groupedByYearAndMonth[year][month].length !== 1 ? "s" : ""}
+                          </span>
                         </div>
-                      </div>
 
-                      {/* Monthly Total Summary */}
-                      {(() => {
-                        const monthBudgets = groupedByYearAndMonth[year][month];
-                        const totalLimit = monthBudgets.reduce((sum, b) => sum + b.limit, 0);
-                        const totalSpent = monthBudgets.reduce((sum, b) => sum + b.spent, 0);
-                        const totalLeft = totalLimit - totalSpent;
-                        
-                        return (
-                          <div className={`mb-4 rounded-lg border p-4 ${
-                            isDark
-                              ? "border-neutral-800 bg-neutral-900/50"
-                              : "border-neutral-200 bg-neutral-50"
-                          }`}>
-                            <div className="grid grid-cols-3 gap-4">
-                              <div>
-                                <p className={`text-sm font-medium mb-1 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                                  Total Budget
-                                </p>
-                                <p className={`text-xl font-bold ${isDark ? "text-white" : "text-black"}`}>
-                                  ৳{totalLimit.toLocaleString()}
-                                </p>
-                              </div>
-                              <div>
-                                <p className={`text-sm font-medium mb-1 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                                  Total Spent
-                                </p>
-                                <p className={`text-xl font-bold text-red-500`}>
-                                  ৳{totalSpent.toLocaleString()}
-                                </p>
-                              </div>
-                              <div>
-                                <p className={`text-sm font-medium mb-1 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                                  Total Left
-                                </p>
-                                <p className={`text-xl font-bold ${totalLeft >= 0 ? "text-green-500" : "text-red-500"}`}>
-                                  ৳{Math.abs(totalLeft).toLocaleString()}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })()}
-
-                      {/* Budget Cards Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {groupedByYearAndMonth[year][month].map((budget) => {
-                          const percentage = Math.min((budget.spent / budget.limit) * 100, 100);
-                          const remaining = Math.max(budget.limit - budget.spent, 0);
-                          const isExceeded = budget.spent > budget.limit;
-
-                          const getProgressColor = () => {
-                            if (percentage < 50) return "bg-emerald-500";
-                            if (percentage < 80) return "bg-yellow-500";
-                            if (percentage < 100) return "bg-orange-500";
-                            return "bg-rose-500";
-                          };
-
-                          const getTextColor = () => {
-                            if (percentage < 50) return "text-emerald-600 dark:text-emerald-400";
-                            if (percentage < 80) return "text-yellow-600 dark:text-yellow-400";
-                            if (percentage < 100) return "text-orange-600 dark:text-orange-400";
-                            return "text-rose-600 dark:text-rose-400";
-                          };
-
+                        {/* Monthly Summary Card */}
+                        {(() => {
+                          const monthBudgets = groupedByYearAndMonth[year][month];
+                          const totalLimit = monthBudgets.reduce((sum, b) => sum + b.limit, 0);
+                          const totalSpent = monthBudgets.reduce((sum, b) => sum + b.spent, 0);
+                          const totalLeft = totalLimit - totalSpent;
+                          
                           return (
-                            <div
-                              key={budget._id}
-                              className={`p-4 rounded-lg border transition-all ${
-                                isDark
-                                  ? "border-neutral-800 bg-neutral-900/50 hover:bg-neutral-800/50"
-                                  : "border-neutral-200 bg-neutral-50 hover:bg-neutral-100/50"
-                              }`}
-                            >
-                              {/* Header */}
-                              <div className="flex items-center justify-between mb-3">
-                                <h4
-                                  className={`text-lg font-semibold ${
-                                    isDark ? "text-white" : "text-black"
-                                  }`}
-                                >
-                                  {budget.category}
-                                </h4>
-                                <div className="flex gap-2">
-                                  <button
-                                    onClick={() => handleEdit(budget._id)}
-                                    className={`p-1.5 rounded transition-colors ${
-                                      isDark
-                                        ? "hover:bg-slate-700 text-slate-400 hover:text-slate-200"
-                                        : "hover:bg-slate-200 text-slate-600 hover:text-slate-800"
-                                    }`}
-                                    title="Edit budget"
-                                  >
-                                    <FiEdit2 className="w-4 h-4" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDelete(budget._id)}
-                                    className={`p-1.5 rounded transition-colors ${
-                                      isDark
-                                        ? "hover:bg-slate-700 text-slate-400 hover:text-rose-400"
-                                        : "hover:bg-slate-200 text-slate-600 hover:text-rose-600"
-                                    }`}
-                                    title="Delete budget"
-                                  >
-                                    <FiTrash2 className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              </div>
-
-                              {/* Amount Info */}
-                              <div className="flex items-center justify-between mb-2">
+                            <div className="rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-5">
+                              <div className="grid grid-cols-3 gap-4 font-mono text-center sm:text-left">
                                 <div>
-                                  <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                                    Spent
+                                  <p className="text-xs uppercase tracking-wider text-slate-400 mb-1">
+                                    Total Budget
                                   </p>
-                                  <p
-                                    className={`text-lg font-bold ${
-                                      isDark ? "text-white" : "text-black"
-                                    }`}
-                                  >
-                                    ৳{budget.spent.toLocaleString()}
+                                  <p className="text-lg sm:text-xl font-bold text-white">
+                                    ৳{totalLimit.toLocaleString()}
                                   </p>
                                 </div>
-                                <div className="text-right">
-                                  <p className={`text-sm ${isDark ? "text-slate-400" : "text-slate-600"}`}>
-                                    Limit
+                                <div>
+                                  <p className="text-xs uppercase tracking-wider text-slate-400 mb-1">
+                                    Total Spent
                                   </p>
-                                  <p
-                                    className={`text-lg font-bold ${
-                                      isDark ? "text-white" : "text-black"
-                                    }`}
-                                  >
-                                    ৳{budget.limit.toLocaleString()}
+                                  <p className="text-lg sm:text-xl font-bold text-rose-400">
+                                    ৳{totalSpent.toLocaleString()}
                                   </p>
                                 </div>
-                              </div>
-
-                              {budget.note && (
-                                <p
-                                  className={`mb-2 text-xs italic ${isDark ? "text-slate-400" : "text-slate-600"}`}
-                                >
-                                  {budget.note}
-                                </p>
-                              )}
-
-                              {/* Progress Bar */}
-                              <div className="mb-2">
-                                <div
-                                  className={`w-full h-2 rounded-full ${
-                                    isDark ? "bg-slate-700" : "bg-slate-200"
-                                  } overflow-hidden`}
-                                >
-                                  <div
-                                    className={`h-full ${getProgressColor()} transition-all duration-300`}
-                                    style={{ width: `${percentage}%` }}
-                                  ></div>
+                                <div>
+                                  <p className="text-xs uppercase tracking-wider text-slate-400 mb-1">
+                                    Total Left
+                                  </p>
+                                  <p className={`text-lg sm:text-xl font-bold ${totalLeft >= 0 ? "text-[#BDFE00]" : "text-rose-400"}`}>
+                                    ৳{Math.abs(totalLeft).toLocaleString()}
+                                  </p>
                                 </div>
-                              </div>
-
-                              {/* Status */}
-                              <div className="flex items-center justify-between">
-                                <span className={`text-sm font-medium ${getTextColor()}`}>
-                                  {percentage.toFixed(0)}% Used
-                                </span>
-                                <span
-                                  className={`text-sm font-medium ${
-                                    isExceeded
-                                      ? "text-rose-600 dark:text-rose-400"
-                                      : "text-emerald-600 dark:text-emerald-400"
-                                  }`}
-                                >
-                                  {isExceeded ? (
-                                    <>Exceeded by ৳{(budget.spent - budget.limit).toLocaleString()}</>
-                                  ) : (
-                                    <>৳{remaining.toLocaleString()} left</>
-                                  )}
-                                </span>
                               </div>
                             </div>
                           );
-                        })}
+                        })()}
+
+                        {/* Budget Cards Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {groupedByYearAndMonth[year][month].map((budget) => {
+                            const percentage = Math.min((budget.spent / budget.limit) * 100, 100);
+                            const remaining = Math.max(budget.limit - budget.spent, 0);
+                            const isExceeded = budget.spent > budget.limit;
+
+                            const getProgressColor = () => {
+                              if (percentage < 50) return "bg-[#BDFE00]";
+                              if (percentage < 80) return "bg-yellow-400";
+                              if (percentage < 100) return "bg-orange-400";
+                              return "bg-rose-500";
+                            };
+
+                            const getTextColor = () => {
+                              if (percentage < 50) return "text-[#BDFE00]";
+                              if (percentage < 80) return "text-yellow-400";
+                              if (percentage < 100) return "text-orange-400";
+                              return "text-rose-400";
+                            };
+
+                            return (
+                              <div
+                                key={budget._id}
+                                className="p-5 rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl hover:border-white/20 transition-all duration-300 shadow-xl"
+                              >
+                                {/* Card Header */}
+                                <div className="flex items-center justify-between mb-3">
+                                  <h4 className="text-base font-bold text-white tracking-wide">
+                                    {budget.category}
+                                  </h4>
+                                  <div className="flex gap-1.5">
+                                    <button
+                                      onClick={() => handleEdit(budget._id)}
+                                      className="p-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                                      title="Edit budget"
+                                    >
+                                      <FiEdit2 className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDelete(budget._id)}
+                                      className="p-1.5 rounded-lg bg-white/5 border border-white/10 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                                      title="Delete budget"
+                                    >
+                                      <FiTrash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Amount Summary Grid */}
+                                <div className="grid grid-cols-2 gap-3 mb-3 p-3 rounded-xl bg-white/5 border border-white/5 font-mono">
+                                  <div>
+                                    <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">
+                                      Spent
+                                    </p>
+                                    <p className="text-base font-bold text-white">
+                                      ৳{budget.spent.toLocaleString()}
+                                    </p>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-0.5">
+                                      Limit
+                                    </p>
+                                    <p className="text-base font-bold text-white">
+                                      ৳{budget.limit.toLocaleString()}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {budget.note && (
+                                  <p className="mb-3 text-xs italic text-slate-400 bg-white/[0.02] p-2 rounded-lg border border-white/5">
+                                    "{budget.note}"
+                                  </p>
+                                )}
+
+                                {/* Progress Bar */}
+                                <div className="mb-2.5">
+                                  <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden p-0.5 border border-white/5">
+                                    <div
+                                      className={`h-full rounded-full ${getProgressColor()} transition-all duration-300`}
+                                      style={{ width: `${percentage}%` }}
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* Usage Status Footer */}
+                                <div className="flex items-center justify-between text-xs font-mono font-semibold">
+                                  <span className={getTextColor()}>
+                                    {percentage.toFixed(0)}% Used
+                                  </span>
+                                  <span className={isExceeded ? "text-rose-400" : "text-slate-300"}>
+                                    {isExceeded ? (
+                                      <>Exceeded by ৳{(budget.spent - budget.limit).toLocaleString()}</>
+                                    ) : (
+                                      <>৳{remaining.toLocaleString()} left</>
+                                    )}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               );
             })}
         </div>
       )}
 
-      {/* LOAD MORE BUTTON */}
+      {/* Load More Button */}
       {hasMore && budgets.length > 0 && (
-        <div className="flex justify-center mt-6">
+        <div className="flex justify-center pt-4">
           <button
             onClick={loadMore}
             disabled={isLoadingMore}
-            className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
-              isDark 
-                ? "bg-slate-800 hover:bg-slate-700 text-white disabled:bg-slate-800/50" 
-                : "bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:bg-slate-100/50"
-            }`}
+            className="px-6 py-3 rounded-xl font-semibold border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10 hover:text-white transition-all cursor-pointer disabled:opacity-50"
           >
-            {isLoadingMore ? "Loading..." : "Load More"}
+            {isLoadingMore ? "Loading..." : "Load More Budgets"}
           </button>
         </div>
       )}

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+
 import { useAuth } from "@/app/context/AuthContext";
-import { useTheme } from "@/app/context/ThemeContext";
 import React, { useState } from "react";
 import { 
   LuUser, 
@@ -21,8 +21,6 @@ import axios from "axios";
 
 const MyProfile = () => {
   const { user, setUser, loading } = useAuth();
-  const { effectiveTheme } = useTheme();
-  const isDark = effectiveTheme === "dark";
   
   const [isEditing, setIsEditing] = React.useState(false);
   const [fullName, setFullName] = React.useState(user?.fullName || "");
@@ -38,10 +36,6 @@ const MyProfile = () => {
   const [avatarError, setAvatarError] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  // Source of truth for what to display:
-  // - Not editing → read straight from the user object so it is never stale
-  //   (fixes the brief "ghost avatar" flash while auth is hydrating).
-  // - Editing → use the local draft so upload preview and cancel still work.
   const displayPhotoURL = isEditing ? photoURL : (user?.photoURL || "");
   const displayFullName = isEditing ? fullName : (user?.fullName || "");
 
@@ -50,8 +44,6 @@ const MyProfile = () => {
     setPhotoURL(user?.photoURL || "");
   }, [user]);
 
-  // Reset the avatar error flag whenever the displayed photo URL changes
-  // (new upload, profile save, or re-login).
   React.useEffect(() => {
     setAvatarError(false);
   }, [displayPhotoURL]);
@@ -64,7 +56,6 @@ const MyProfile = () => {
 
     setIsSaving(true);
     try {
-      // Update profile
       const response = await axios.put(
         `/api/me`,
         {
@@ -76,7 +67,6 @@ const MyProfile = () => {
 
       setUser(response.data.user);
 
-      // Update password if provided
       if (oldPassword && newPassword) {
         await axios.put(
           `/api/me/password`,
@@ -154,42 +144,33 @@ const MyProfile = () => {
 
   if (loading) {
     return (
-      <div className={`min-h-screen transition-colors duration-300 ${isDark ? "bg-black" : "bg-white"}`}>
-        <div className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-          <div className="max-w-5xl mx-auto space-y-6">
-            <div className="space-y-3">
-              <div className={`h-10 w-56 rounded-lg animate-pulse ${isDark ? "bg-neutral-800" : "bg-neutral-200"}`} />
-              <div className={`h-5 w-72 rounded-lg animate-pulse ${isDark ? "bg-neutral-900" : "bg-neutral-100"}`} />
-            </div>
+      <div className="w-full min-h-screen text-white">
+        <div className="max-w-5xl mx-auto space-y-6">
+          <div className="space-y-3">
+            <div className="h-10 w-56 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
+            <div className="h-5 w-72 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
+          </div>
 
-            <div className={`rounded-3xl border overflow-hidden ${isDark ? "border-neutral-800 bg-neutral-900/50" : "border-neutral-200 bg-neutral-50"}`}>
-              <div className={`h-32 ${isDark ? "bg-neutral-900/40" : "bg-neutral-100"}`} />
-              <div className="px-6 sm:px-8 -mt-16 pb-8">
-                <div className="flex flex-col sm:flex-row gap-6 mb-8">
-                  <div className={`h-32 w-32 rounded-2xl animate-pulse ${isDark ? "bg-neutral-700" : "bg-neutral-200"}`} />
-                  <div className="flex-1 space-y-3 pt-16 sm:pt-4">
-                    <div className={`h-8 w-48 rounded-lg animate-pulse ${isDark ? "bg-neutral-700" : "bg-neutral-200"}`} />
-                    <div className={`h-4 w-64 rounded animate-pulse ${isDark ? "bg-neutral-800" : "bg-neutral-100"}`} />
-                    <div className="flex gap-2">
-                      <div className={`h-7 w-24 rounded-full animate-pulse ${isDark ? "bg-neutral-800" : "bg-neutral-100"}`} />
-                      <div className={`h-7 w-20 rounded-full animate-pulse ${isDark ? "bg-neutral-800" : "bg-neutral-100"}`} />
-                    </div>
+          <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden">
+            <div className="h-32 bg-white/5" />
+            <div className="px-6 sm:px-8 -mt-16 pb-8">
+              <div className="flex flex-col sm:flex-row gap-6 mb-8">
+                <div className="h-32 w-32 rounded-2xl bg-white/10 animate-pulse" />
+                <div className="flex-1 space-y-3 pt-16 sm:pt-4">
+                  <div className="h-8 w-48 rounded-lg bg-white/10 animate-pulse" />
+                  <div className="h-4 w-64 rounded bg-white/5 animate-pulse" />
+                </div>
+              </div>
+
+              <div className="h-px mb-8 bg-white/10" />
+
+              <div className="space-y-6 pb-8">
+                {Array.from({ length: 3 }).map((_, idx) => (
+                  <div key={idx} className="space-y-3">
+                    <div className="h-4 w-28 rounded bg-white/10 animate-pulse" />
+                    <div className="h-12 w-full rounded-xl bg-white/5 border border-white/10 animate-pulse" />
                   </div>
-                </div>
-
-                <div className={`h-px mb-8 ${isDark ? "bg-neutral-800" : "bg-neutral-200"}`} />
-
-                <div className="space-y-6 pb-8">
-                  {Array.from({ length: 4 }).map((_, idx) => (
-                    <div key={idx} className="space-y-3">
-                      <div className={`h-4 w-28 rounded animate-pulse ${isDark ? "bg-neutral-700" : "bg-neutral-200"}`} />
-                      <div className={`h-12 w-full rounded-xl animate-pulse ${isDark ? "bg-neutral-800" : "bg-white border border-neutral-200"}`} />
-                    </div>
-                  ))}
-                </div>
-
-                <div className={`h-px mb-4 ${isDark ? "bg-neutral-800" : "bg-neutral-200"}`} />
-                <div className={`h-12 w-full rounded-xl animate-pulse ${isDark ? "bg-neutral-700" : "bg-neutral-200"}`} />
+                ))}
               </div>
             </div>
           </div>
@@ -201,321 +182,260 @@ const MyProfile = () => {
   const defaultAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email || "user"}`;
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDark ? "bg-black" : "bg-white"}`}>
-      <div className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-        <div className="max-w-5xl mx-auto">
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className={`text-4xl sm:text-5xl font-bold tracking-tight mb-2 ${isDark ? "text-white" : "text-black"}`}>
-              My Profile
-            </h1>
-            <p className={`text-lg ${isDark ? "text-neutral-400" : "text-neutral-600"}`}>
-              Manage and personalize your account
-            </p>
+    <div className="w-full min-h-screen text-white">
+      <div className="max-w-5xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="pb-6 border-b border-white/10">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-2">
+            <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
+            ACCOUNT SETTINGS
           </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+            My Profile
+          </h1>
+          <p className="text-sm text-slate-400 mt-1">
+            Manage and personalize your account details
+          </p>
+        </div>
 
-          {/* Alert Messages */}
-          {message && (
-            <div className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
-              message.type === "success"
-                ? isDark ? "bg-emerald-950 text-emerald-200 border border-emerald-800" : "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                : isDark ? "bg-red-950 text-red-200 border border-red-800" : "bg-red-50 text-red-800 border border-red-200"
-            }`}>
-              {message.type === "success" ? <LuCircle size={20} /> : <LuCircle size={20} />}
-              <span className="font-medium">{message.text}</span>
-            </div>
-          )}
-
-          {/* Main Profile Card */}
-          <div className={`rounded-3xl border mb-8 overflow-hidden transition-all ${
-            isDark
-              ? "border-neutral-800 bg-neutral-900/50"
-              : "border-neutral-200 bg-neutral-50"
+        {/* Alert Messages */}
+        {message && (
+          <div className={`p-4 rounded-xl flex items-center gap-3 border ${
+            message.type === "success"
+              ? "bg-[#BDFE00]/10 text-[#BDFE00] border-[#BDFE00]/30"
+              : "bg-red-500/10 text-red-400 border-red-500/30"
           }`}>
-            {/* Header Background */}
-            <div className={`h-32 ${isDark ? "bg-gradient-to-r from-neutral-900/30 to-neutral-800/30" : "bg-gradient-to-r from-neutral-50 to-neutral-100"}`}></div>
+            <LuCircle size={18} />
+            <span className="font-medium text-sm">{message.text}</span>
+          </div>
+        )}
 
-            {/* Profile Content */}
-            <div className="px-6 sm:px-8">
-              {/* Avatar and Basic Info */}
-              <div className="flex flex-col sm:flex-row gap-6 -mt-16 mb-8">
-                <div className="relative">
-                  <div className="relative h-32 w-32 overflow-hidden rounded-2xl border-4 shadow-lg" style={{borderColor: isDark ? "#1f2937" : "#fff"}}>
-                    <Image
-                      src={!avatarError && displayPhotoURL ? displayPhotoURL : defaultAvatar}
-                      alt="User Profile"
-                      fill
-                      className="object-cover"
-                      sizes="128px"
-                      priority
-                      unoptimized
-                      onError={() => setAvatarError(true)}
-                    />
-                  </div>
-                  {isEditing && (
-                    <>
-                      <button 
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploading}
-                        className={`absolute bottom-2 right-2 p-2 rounded-full shadow-lg transition-all ${
-                          isUploading
-                            ? "bg-neutral-500 cursor-not-allowed"
-                            : isDark ? "bg-neutral-700 hover:bg-neutral-800" : "bg-neutral-300 hover:bg-neutral-400"
-                        } text-white`}
-                      >
-                        {isUploading ? (
-                          <LuLoader size={16} className="animate-spin" />
-                        ) : (
-                          <LuCamera size={16} />
-                        )}
-                      </button>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAvatarUpload}
-                        className="hidden"
-                      />
-                    </>
-                  )}
+        {/* Main Profile Card */}
+        <div className="rounded-3xl border border-white/10 bg-slate-900/40 backdrop-blur-xl overflow-hidden shadow-2xl">
+          {/* Header Background */}
+          <div className="h-32 bg-gradient-to-r from-[#BDFE00]/10 via-transparent to-[#1FBFD8]/10 border-b border-white/5" />
+
+          {/* Profile Content */}
+          <div className="px-6 sm:px-8">
+            {/* Avatar and Basic Info */}
+            <div className="flex flex-col sm:flex-row gap-6 -mt-16 mb-8">
+              <div className="relative">
+                <div className="relative h-32 w-32 overflow-hidden rounded-2xl border-4 border-[#0B0F17] bg-slate-800 shadow-xl">
+                  <Image
+                    src={!avatarError && displayPhotoURL ? displayPhotoURL : defaultAvatar}
+                    alt="User Profile"
+                    fill
+                    className="object-cover"
+                    sizes="128px"
+                    priority
+                    unoptimized
+                    onError={() => setAvatarError(true)}
+                  />
                 </div>
-
-                <div className="flex-1 flex flex-col justify-center">
-                  <h2 className={`text-3xl font-bold mb-1 ${isDark ? "text-white" : "text-black"}`}>
-                    {fullName || user?.fullName}
-                  </h2>
-                  <p className={`text-sm mb-3 ${isDark ? "text-neutral-400" : "text-neutral-600"}`}>
-                    {user?.email}
-                  </p>
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-600 text-sm font-medium">
-                      <LuCircle size={14} /> Verified
-                    </span>
-                    {user?.role === "admin" && (
-                      <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-purple-500/20 text-purple-600 text-sm font-medium">
-                        <LuStar size={14} /> Admin
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className={`h-px mb-8 ${isDark ? "bg-neutral-800" : "bg-neutral-200"}`}></div>
-
-              {/* Editable Fields */}
-              <div className="space-y-6 pb-8">
-                {/* Full Name Field */}
-                <div>
-                  <label className={`flex items-center gap-2 text-sm font-semibold mb-3 ${isDark ? "text-neutral-300" : "text-neutral-700"}`}>
-                    <LuUser size={18} />
-                    Full Name
-                  </label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Enter your full name"
-                      className={`w-full px-4 py-3 rounded-xl border-2 transition-all focus:outline-none focus:border-neutral-500 ${
-                        isDark
-                          ? "bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
-                          : "bg-white border-neutral-300 text-black placeholder:text-neutral-400"
-                      }`}
-                      autoFocus
-                    />
-                  ) : (
-                    <div className={`px-4 py-3 rounded-xl font-medium ${isDark ? "bg-neutral-800 text-white" : "bg-neutral-100 text-black"}`}>
-                      {displayFullName}
-                    </div>
-                  )}
-                </div>
-
-                {/* Photo URL Field */}
-                <div>
-                  <label className={`flex items-center gap-2 text-sm font-semibold mb-3 ${isDark ? "text-neutral-300" : "text-neutral-700"}`}>
-                    <LuCamera size={18} />
-                    Avatar
-                  </label>
-                  {isEditing ? (
-                    <div className="space-y-3">
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isUploading}
-                        className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 font-medium transition-all ${
-                          isUploading
-                            ? "opacity-50 cursor-not-allowed"
-                            : isDark
-                              ? "border-neutral-700 bg-neutral-800 hover:bg-neutral-700 text-white"
-                              : "border-neutral-300 bg-white hover:bg-neutral-100 text-black"
-                        }`}
-                      >
-                        {isUploading ? (
-                          <>
-                            <LuLoader size={16} className="animate-spin" />
-                            Uploading...
-                          </>
-                        ) : (
-                          <>
-                            <LuCamera size={16} />
-                            Choose Image
-                          </>
-                        )}
-                      </button>
-                      {uploadError && (
-                        <p className="text-red-500 text-sm">{uploadError}</p>
-                      )}
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleAvatarUpload}
-                        className="hidden"
-                      />
-                    </div>
-                  ) : (
-                    <div className={`px-4 py-3 rounded-xl text-sm ${isDark ? "bg-neutral-800 text-neutral-400" : "bg-neutral-100 text-neutral-600"}`}>
-                      {displayPhotoURL ? "Custom avatar set" : "Using default avatar"}
-                    </div>
-                  )}
-                  {isEditing && (
-                    <p className={`text-xs mt-2 ${isDark ? "text-neutral-500" : "text-neutral-500"}`}>
-                      Upload an image file to set your avatar.
-                    </p>
-                  )}
-                </div>
-
-                {/* Email Field */}
-                <div>
-                  <label className={`flex items-center gap-2 text-sm font-semibold mb-3 ${isDark ? "text-neutral-300" : "text-neutral-700"}`}>
-                    <LuMail size={18} />
-                    Email Address
-                  </label>
-                  <div className={`px-4 py-3 rounded-xl cursor-not-allowed opacity-70 ${isDark ? "bg-neutral-800 text-neutral-400" : "bg-neutral-100 text-neutral-600"}`}>
-                    {user?.email}
-                  </div>
-                  <p className={`text-xs mt-2 ${isDark ? "text-neutral-500" : "text-neutral-500"}`}>
-                    Email cannot be changed. Contact support for assistance.
-                  </p>
-                </div>
-
-                {/* Password Fields */}
                 {isEditing && (
                   <>
-                    <div>
-                      <label className={`flex items-center gap-2 text-sm font-semibold mb-3 ${isDark ? "text-neutral-300" : "text-neutral-700"}`}>
-                        <LuLock size={18} />
-                        Change Password
-                      </label>
-                      <div className="space-y-3">
-                        <div className="relative">
-                          <input
-                            type={showOldPassword ? "text" : "password"}
-                            value={oldPassword}
-                            onChange={(e) => setOldPassword(e.target.value)}
-                            placeholder="Current password"
-                            className={`w-full px-4 py-3 pr-10 rounded-xl border-2 transition-all focus:outline-none focus:border-neutral-500 ${
-                              isDark
-                                ? "bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
-                                : "bg-white border-neutral-300 text-black placeholder:text-neutral-400"
-                            }`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowOldPassword(!showOldPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
-                          >
-                            {showOldPassword ? <LuEyeOff size={20} /> : <LuEye size={20} />}
-                          </button>
-                        </div>
-                        <div className="relative">
-                          <input
-                            type={showNewPassword ? "text" : "password"}
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            placeholder="New password (min 8 characters)"
-                            className={`w-full px-4 py-3 pr-10 rounded-xl border-2 transition-all focus:outline-none focus:border-neutral-500 ${
-                              isDark
-                                ? "bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
-                                : "bg-white border-neutral-300 text-black placeholder:text-neutral-400"
-                            }`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowNewPassword(!showNewPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
-                          >
-                            {showNewPassword ? <LuEyeOff size={20} /> : <LuEye size={20} />}
-                          </button>
-                        </div>
-                      </div>
-                      <p className={`text-xs mt-2 ${isDark ? "text-neutral-500" : "text-neutral-500"}`}>
-                        Leave blank to keep current password. New password must be at least 8 characters.
-                      </p>
-                    </div>
+                    <button 
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                      className="absolute bottom-2 right-2 p-2 rounded-full bg-[#BDFE00] text-black shadow-lg hover:bg-[#aef000] transition-all cursor-pointer disabled:opacity-50"
+                    >
+                      {isUploading ? (
+                        <LuLoader size={16} className="animate-spin" />
+                      ) : (
+                        <LuCamera size={16} />
+                      )}
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                    />
                   </>
                 )}
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3 pb-8 pt-4 border-t" style={{borderColor: isDark ? "#282828" : "#e5e7eb"}}>
+              <div className="flex-1 flex flex-col justify-center">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-1">
+                  {fullName || user?.fullName}
+                </h2>
+                <p className="text-sm text-slate-400 mb-3 font-mono">
+                  {user?.email}
+                </p>
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/30 text-[#BDFE00] text-xs font-semibold">
+                    <LuCircle size={12} /> Verified
+                  </span>
+                  {user?.role === "admin" && (
+                    <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1FBFD8]/10 border border-[#1FBFD8]/30 text-[#1FBFD8] text-xs font-semibold">
+                      <LuStar size={12} /> Admin
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="h-px mb-8 bg-white/10" />
+
+            {/* Editable Fields */}
+            <div className="space-y-6 pb-8">
+              {/* Full Name Field */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold mb-2.5 text-slate-300">
+                  <LuUser size={18} className="text-[#BDFE00]" />
+                  Full Name
+                </label>
                 {isEditing ? (
-                  <>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Enter your full name"
+                    className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
+                    autoFocus
+                  />
+                ) : (
+                  <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-medium">
+                    {displayFullName}
+                  </div>
+                )}
+              </div>
+
+              {/* Photo URL Field */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold mb-2.5 text-slate-300">
+                  <LuCamera size={18} className="text-[#BDFE00]" />
+                  Avatar
+                </label>
+                {isEditing ? (
+                  <div className="space-y-3">
                     <button
-                      onClick={handleSaveProfile}
-                      disabled={isSaving}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold transition-all ${
-                        isSaving
-                          ? "opacity-50 cursor-not-allowed"
-                          : "hover:shadow-lg active:scale-95"
-                      } ${
-                        isDark
-                          ? "bg-white text-black hover:bg-neutral-100"
-                          : "bg-black text-white hover:bg-neutral-900"
-                      }`}
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-medium transition-colors cursor-pointer disabled:opacity-50"
                     >
-                      {isSaving ? (
+                      {isUploading ? (
                         <>
-                          <LuLoader size={18} className="animate-spin" />
-                          Saving...
+                          <LuLoader size={16} className="animate-spin text-[#BDFE00]" />
+                          Uploading...
                         </>
                       ) : (
                         <>
-                          <LuCircle size={18} />
-                          Save Changes
+                          <LuCamera size={16} className="text-[#BDFE00]" />
+                          Choose Image
                         </>
                       )}
                     </button>
-                    <button
-                      onClick={handleCancel}
-                      disabled={isSaving}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 font-semibold transition-all ${
-                        isDark
-                          ? "border-neutral-700 text-neutral-300 hover:bg-neutral-800"
-                          : "border-neutral-300 text-neutral-700 hover:bg-neutral-100"
-                      } disabled:opacity-50`}
-                    >
-                      <LuX size={18} />
-                      Cancel
-                    </button>
-                  </>
+                    {uploadError && (
+                      <p className="text-red-400 text-sm">{uploadError}</p>
+                    )}
+                  </div>
                 ) : (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold transition-all hover:shadow-lg active:scale-95 ${
-                      isDark
-                        ? "bg-white text-black hover:bg-neutral-100"
-                        : "bg-black text-white hover:bg-neutral-900"
-                    }`}
-                  >
-                    <LuPencil size={18} />
-                    Edit Profile
-                  </button>
+                  <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-sm">
+                    {displayPhotoURL ? "Custom avatar configured" : "Using default avatar"}
+                  </div>
                 )}
               </div>
+
+              {/* Email Field */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-semibold mb-2.5 text-slate-300">
+                  <LuMail size={18} className="text-[#BDFE00]" />
+                  Email Address
+                </label>
+                <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 cursor-not-allowed opacity-70">
+                  {user?.email}
+                </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Email addresses are managed securely and cannot be changed directly.
+                </p>
+              </div>
+
+              {/* Password Fields */}
+              {isEditing && (
+                <div className="space-y-3 pt-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-slate-300">
+                    <LuLock size={18} className="text-[#BDFE00]" />
+                    Change Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showOldPassword ? "text" : "password"}
+                      value={oldPassword}
+                      onChange={(e) => setOldPassword(e.target.value)}
+                      placeholder="Current password"
+                      className="w-full px-4 py-3 pr-10 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowOldPassword(!showOldPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    >
+                      {showOldPassword ? <LuEyeOff size={18} /> : <LuEye size={18} />}
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="New password (min 8 characters)"
+                      className="w-full px-4 py-3 pr-10 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                    >
+                      {showNewPassword ? <LuEyeOff size={18} /> : <LuEye size={18} />}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 pb-8 pt-4 border-t border-white/10">
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={handleSaveProfile}
+                    disabled={isSaving}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)] transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                  >
+                    {isSaving ? (
+                      <>
+                        <LuLoader size={18} className="animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <LuCircle size={18} />
+                        Save Changes
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    disabled={isSaving}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white font-semibold transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <LuX size={18} />
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)] transition-all active:scale-95 cursor-pointer"
+                >
+                  <LuPencil size={18} />
+                  Edit Profile
+                </button>
+              )}
             </div>
           </div>
-
         </div>
       </div>
     </div>

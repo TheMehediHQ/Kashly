@@ -18,7 +18,6 @@ import {
   FiRefreshCw,
   FiPrinter,
 } from "react-icons/fi";
-import { useTheme } from "@/app/context/ThemeContext";
 import Swal from "sweetalert2";
 import EditTransactionModal from "./EditTransactionModal";
 import toast from "react-hot-toast";
@@ -57,8 +56,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   refreshKey,
   onRefresh,
 }) => {
-  const { effectiveTheme } = useTheme();
-  const isDark = effectiveTheme === "dark";
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [summary, setSummary] = useState<{ thisMonthIncome: number; thisMonthExpense: number; incomeTransactions: number; expenseTransactions: number } | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -153,14 +150,15 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   };
 
   const handleDelete = async (id: string) => {
-    console.log("id", id);
     const result = await Swal.fire({
       title: "Confirm Deletion",
       text: "This transaction will be permanently removed.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#ef4444",
-      cancelButtonColor: "#6b7280",
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#334155",
+      background: "#0B0F17",
+      color: "#ffffff",
       confirmButtonText: "Yes, delete it!",
     });
 
@@ -175,7 +173,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       if (res.data.success) {
         toast.success("Transaction deleted successfully");
 
-        // 🔄 refetch data
         onRefresh();
         fetchTransactions(type, month, year);
       }
@@ -204,42 +201,31 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 
   if (loading && transactions.length === 0) {
     return (
-      <div className="w-full">
-        <div className="mb-8 flex flex-col gap-6">
-          <div>
-            <div className={`h-8 w-56 rounded-lg animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-            <div className={`mt-2 h-4 w-64 rounded animate-pulse ${isDark ? "bg-slate-800" : "bg-slate-100"}`} />
-          </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            <div className={`h-12 w-72 rounded-lg animate-pulse ${isDark ? "bg-slate-800" : "bg-slate-100"}`} />
-            <div className={`h-10 w-44 rounded-lg animate-pulse ${isDark ? "bg-slate-800" : "bg-slate-100"}`} />
-          </div>
+      <div className="w-full space-y-6">
+        <div className="space-y-3">
+          <div className="h-8 w-56 rounded-xl bg-white/10 animate-pulse" />
+          <div className="h-4 w-64 rounded-lg bg-white/5 animate-pulse" />
         </div>
 
-        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className={`h-36 rounded-xl animate-pulse ${isDark ? "bg-neutral-900 border border-slate-800" : "bg-white border border-slate-200"}`} />
-          <div className={`h-36 rounded-xl animate-pulse ${isDark ? "bg-neutral-900 border border-slate-800" : "bg-white border border-slate-200"}`} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="h-32 rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
+          <div className="h-32 rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
         </div>
 
-        <div className="grid gap-3">
+        <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, idx) => (
             <div
               key={idx}
-              className={`rounded-xl border p-6 ${isDark ? "border-slate-800 bg-neutral-900" : "border-slate-200 bg-white"}`}
+              className="rounded-2xl border border-white/10 bg-slate-900/40 p-5 animate-pulse flex items-center justify-between"
             >
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className={`h-12 w-12 rounded-lg animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-                  <div>
-                    <div className={`h-3 w-20 rounded animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-                    <div className={`mt-2 h-5 w-24 rounded animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className={`h-5 w-24 rounded animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-                  <div className={`mt-2 h-3 w-28 rounded animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
+              <div className="flex items-center gap-4">
+                <div className="h-11 w-11 rounded-xl bg-white/10" />
+                <div className="space-y-2">
+                  <div className="h-3 w-16 rounded bg-white/10" />
+                  <div className="h-5 w-28 rounded bg-white/10" />
                 </div>
               </div>
+              <div className="h-6 w-20 rounded bg-white/10" />
             </div>
           ))}
         </div>
@@ -446,13 +432,11 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             page-break-inside: avoid;
           }
 
-          /* Print specific spacing */
           @page {
             margin: 25mm;
             size: A4;
           }
 
-          /* Detailed Transactions Header */
           h2 {
             font-size: 18px;
             font-weight: 800;
@@ -464,26 +448,25 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
           }
         }
       `}</style>
+
       {/* IMAGE PREVIEW MODAL */}
       {selectedImg && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 print-hidden"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md print-hidden"
           onClick={() => setSelectedImg(null)}
         >
-          {/* Close Button */}
           <button
-            className="absolute right-4 top-4 rounded-full bg-white/20 p-3 text-white"
+            className="absolute right-4 top-4 rounded-full bg-white/10 p-3 text-white hover:bg-white/20 transition-colors cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               setSelectedImg(null);
             }}
           >
-            <FiX size={28} />
+            <FiX size={24} />
           </button>
 
-          {/* Image Container */}
           <div
-            className="relative h-[90vh] w-[95vw]"
+            className="relative h-[85vh] w-[90vw] max-w-4xl"
             onClick={(e) => e.stopPropagation()}
           >
             <Image
@@ -496,237 +479,162 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             />
           </div>
 
-          {/* Hint */}
-          <p className="absolute bottom-5 text-sm text-neutral-500 dark:text-neutral-400">
-            Click outside to close
+          <p className="absolute bottom-5 text-xs font-mono text-slate-400">
+            Click outside to close preview
           </p>
         </div>
       )}
 
-      <div className="mb-8 flex flex-col gap-6">
-        {/* HEADER SECTION */}
-        <div>
-          <h2 className={`text-2xl font-bold tracking-tight ${isDark ? "text-white" : "text-black"}`}>
-            Transaction History
-          </h2>
-          <p className={`text-sm font-medium ${isDark ? "text-slate-500" : "text-slate-600"}`}>
-            Track your latest financial activity
-          </p>
-        </div>
+      {/* HEADER & FILTERS */}
+      <div className="mb-6 flex flex-col gap-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10 print-hidden">
+          <div>
+            <h2 className="text-2xl font-bold text-white tracking-tight">
+              Transaction History
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Detailed breakdown of recent cash flows
+            </p>
+          </div>
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 print-hidden">
-          <div className="flex items-center gap-3">
-            {/* FILTER BUTTONS */}
-            <div
-              className={`flex items-center gap-1 p-1 rounded-lg border ${isDark ? "border-slate-800/60" : "border-slate-200"}`}
-              style={{ backgroundColor: isDark ? "#111111" : "#FFFFFF" }}
-            >
+          <div className="flex flex-wrap items-center gap-3">
+            {/* TYPE FILTER */}
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10">
               <button
                 onClick={() => setType("all")}
-                className={`px-4 py-2 text-sm font-medium rounded transition-colors ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                   type === "all"
-                    ? isDark ? "text-white" : "text-black"
-                    : isDark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
+                    ? "bg-[#BDFE00] text-black shadow-[0_0_15px_rgba(189,254,0,0.2)]"
+                    : "text-slate-400 hover:text-white"
                 }`}
-                style={type === "all" ? {backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5"} : {}}
               >
                 All
               </button>
               <button
                 onClick={() => setType("income")}
-                className={`px-4 py-2 text-sm font-medium rounded transition-colors ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                   type === "income"
-                    ? isDark ? "text-white" : "text-black"
-                    : isDark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
+                    ? "bg-[#BDFE00] text-black shadow-[0_0_15px_rgba(189,254,0,0.2)]"
+                    : "text-slate-400 hover:text-white"
                 }`}
-                style={type === "income" ? {backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5"} : {}}
               >
                 Income
               </button>
               <button
                 onClick={() => setType("expense")}
-                className={`px-4 py-2 text-sm font-medium rounded transition-colors ${
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
                   type === "expense"
-                    ? isDark ? "text-white" : "text-black"
-                    : isDark ? "text-slate-400 hover:text-white" : "text-slate-600 hover:text-black"
+                    ? "bg-[#BDFE00] text-black shadow-[0_0_15px_rgba(189,254,0,0.2)]"
+                    : "text-slate-400 hover:text-white"
                 }`}
-                style={type === "expense" ? {backgroundColor: isDark ? "#1a1a1a" : "#f5f5f5"} : {}}
               >
                 Expense
               </button>
             </div>
 
-            {/* BUTTONS */}
-            <div className="flex items-center gap-2">
-              {/* REFRESH BUTTON */}
-              <button
-                onClick={() => fetchTransactions(type, month, year)}
-                disabled={isRefreshing}
-                className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${isDark ? "hover:bg-slate-900 text-slate-400" : "hover:bg-slate-200 text-slate-600"} disabled:opacity-50`}
-                title="Refresh"
-              >
-                <FiRefreshCw className={isRefreshing ? "animate-spin" : ""} size={18} />
-              </button>
-
-              {/* PRINT BUTTON */}
-              <button
-                onClick={handlePrint}
-                className={`flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${isDark ? "hover:bg-slate-900 text-slate-400 hover:text-slate-200" : "hover:bg-slate-200 text-slate-600 hover:text-slate-800"}`}
-                title="Print Report"
-              >
-                <FiPrinter size={18} />
-              </button>
-            </div>
-          </div>
-
-          {/* DATE FILTERS */}
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* MONTH DROPDOWN */}
+            {/* MONTH & YEAR DROPDOWNS */}
             <select
               value={month}
               onChange={(e) => setMonth(e.target.value)}
-              className={`px-3 py-2 text-sm font-medium rounded-lg border outline-none focus:ring-1 focus:ring-slate-400 ${isDark ? "border-slate-700 bg-slate-900 text-white" : "border-slate-300 bg-white text-black"}`}
+              className="px-3 py-2 text-xs font-semibold rounded-xl border border-white/10 bg-white/5 text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
             >
-              <option value="">All Months</option>
-              <option value="1">January</option>
-              <option value="2">February</option>
-              <option value="3">March</option>
-              <option value="4">April</option>
-              <option value="5">May</option>
-              <option value="6">June</option>
-              <option value="7">July</option>
-              <option value="8">August</option>
-              <option value="9">September</option>
-              <option value="10">October</option>
-              <option value="11">November</option>
-              <option value="12">December</option>
+              <option value="" className="bg-[#0B0F17] text-white">All Months</option>
+              <option value="1" className="bg-[#0B0F17] text-white">January</option>
+              <option value="2" className="bg-[#0B0F17] text-white">February</option>
+              <option value="3" className="bg-[#0B0F17] text-white">March</option>
+              <option value="4" className="bg-[#0B0F17] text-white">April</option>
+              <option value="5" className="bg-[#0B0F17] text-white">May</option>
+              <option value="6" className="bg-[#0B0F17] text-white">June</option>
+              <option value="7" className="bg-[#0B0F17] text-white">July</option>
+              <option value="8" className="bg-[#0B0F17] text-white">August</option>
+              <option value="9" className="bg-[#0B0F17] text-white">September</option>
+              <option value="10" className="bg-[#0B0F17] text-white">October</option>
+              <option value="11" className="bg-[#0B0F17] text-white">November</option>
+              <option value="12" className="bg-[#0B0F17] text-white">December</option>
             </select>
 
-            {/* YEAR DROPDOWN */}
             <select
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              className={`px-3 py-2 text-sm font-medium rounded-lg border outline-none focus:ring-1 focus:ring-slate-400 ${isDark ? "border-slate-700 bg-slate-900 text-white" : "border-slate-300 bg-white text-black"}`}
+              className="px-3 py-2 text-xs font-semibold rounded-xl border border-white/10 bg-white/5 text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
             >
               {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map((y) => (
-                <option key={y} value={y.toString()}>
+                <option key={y} value={y.toString()} className="bg-[#0B0F17] text-white">
                   {y}
                 </option>
               ))}
             </select>
-          </div>
-        </div>
-      </div>
 
-      {/* PRINT HEADER - Only visible when printing */}
-      <div className="print-hidden" style={{ display: "none" }}>
-        <div className="report-header">
-          <h1>Financial Report</h1>
-          <p>Transaction Summary & Activity Report</p>
-          <div className="period-info">
-            Reporting Period: {getPeriodLabel()}
+            {/* ACTION BUTTONS */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => fetchTransactions(type, month, year)}
+                disabled={isRefreshing}
+                className="p-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
+                title="Refresh Transactions"
+              >
+                <FiRefreshCw className={isRefreshing ? "animate-spin" : ""} size={16} />
+              </button>
+
+              <button
+                onClick={handlePrint}
+                className="p-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                title="Print Report"
+              >
+                <FiPrinter size={16} />
+              </button>
+            </div>
           </div>
-          <p style={{ fontSize: "12px", marginTop: "10px", color: "#718096", fontWeight: "500" }}>
-            Generated on {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
         </div>
       </div>
 
       {/* SUMMARY CARDS */}
       {summary && (
-        <>
-          {/* Screen View */}
-          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4 summary-cards">
-            {/* INCOME CARD */}
-            <div
-            className="rounded-xl border p-8 transition-all"
-            style={{
-              backgroundColor: isDark ? "#111111" : "#FFFFFF",
-              borderColor: "#10b981",
-            }}
-          >
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* INCOME CARD */}
+          <div className="rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-6 shadow-xl relative overflow-hidden">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-emerald-600 mb-1">
+                <p className="text-xs font-mono font-bold uppercase tracking-wider text-[#BDFE00] mb-1">
                   Total Income
                 </p>
-                <p className="text-3xl font-bold text-emerald-500">
+                <p className="text-3xl font-extrabold text-[#BDFE00] font-mono">
                   ৳{summary.thisMonthIncome.toLocaleString()}
                 </p>
-                <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-slate-600"}`}>
+                <p className="text-xs font-mono text-slate-400 mt-2">
                   {summary.incomeTransactions} transaction{summary.incomeTransactions !== 1 ? 's' : ''}
                 </p>
               </div>
-              <div className="text-emerald-500/20 text-5xl">
-                <FiArrowUpRight size={40} />
+              <div className="text-[#BDFE00]/20 text-5xl">
+                <FiArrowUpRight size={44} />
               </div>
             </div>
           </div>
 
           {/* EXPENSE CARD */}
-          <div
-            className="rounded-xl border p-8 transition-all"
-            style={{
-              backgroundColor: isDark ? "#111111" : "#FFFFFF",
-              borderColor: "#f43f5e",
-            }}
-          >
+          <div className="rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-6 shadow-xl relative overflow-hidden">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-rose-600 mb-1">
+                <p className="text-xs font-mono font-bold uppercase tracking-wider text-rose-400 mb-1">
                   Total Expense
                 </p>
-                <p className="text-3xl font-bold text-rose-500">
+                <p className="text-3xl font-extrabold text-rose-400 font-mono">
                   ৳{summary.thisMonthExpense.toLocaleString()}
                 </p>
-                <p className={`text-xs mt-2 ${isDark ? "text-slate-500" : "text-slate-600"}`}>
+                <p className="text-xs font-mono text-slate-400 mt-2">
                   {summary.expenseTransactions} transaction{summary.expenseTransactions !== 1 ? 's' : ''}
                 </p>
               </div>
-              <div className="text-rose-500/20 text-5xl">
-                <FiArrowDownLeft size={40} />
+              <div className="text-rose-400/20 text-5xl">
+                <FiArrowDownLeft size={44} />
               </div>
             </div>
           </div>
-          </div>
-        </>
+        </div>
       )}
 
-      {/* PRINT VERSION - SUMMARY TABLE */}
-      <div className="print-hidden" style={{ display: "none" }}>
-        {summary && (
-          <table className="transactions-table" style={{ marginBottom: "30px" }}>
-            <thead>
-              <tr>
-                <th style={{ textAlign: "left" }}>Metric</th>
-                <th style={{ textAlign: "right" }}>Amount</th>
-                <th style={{ textAlign: "right" }}>Count</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={{ color: "#10b981", fontWeight: "600" }}>Total Income</td>
-                <td className="transaction-amount income">৳{summary.thisMonthIncome.toLocaleString()}</td>
-                <td style={{ textAlign: "right" }}>{summary.incomeTransactions}</td>
-              </tr>
-              <tr>
-                <td style={{ color: "#ef4444", fontWeight: "600" }}>Total Expense</td>
-                <td className="transaction-amount expense">৳{summary.thisMonthExpense.toLocaleString()}</td>
-                <td style={{ textAlign: "right" }}>{summary.expenseTransactions}</td>
-              </tr>
-              <tr style={{ backgroundColor: isDark ? "#111111" : "#f5f5f5", fontWeight: "bold", borderTop: isDark ? "2px solid #1f2937" : "2px solid #333" }}>
-                <td>Net Balance</td>
-                <td className="transaction-amount" style={{ color: summary.thisMonthIncome - summary.thisMonthExpense >= 0 ? "#10b981" : "#ef4444" }}>
-                  ৳{(summary.thisMonthIncome - summary.thisMonthExpense).toLocaleString()}
-                </td>
-                <td style={{ textAlign: "right" }}>{summary.incomeTransactions + summary.expenseTransactions}</td>
-              </tr>
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      <div className="grid gap-3">
+      {/* TRANSACTIONS LIST */}
+      <div className="space-y-3">
         {transactions.length > 0 ? (
           transactions.map((transaction) => {
             const isIncome = transaction.transactionType === "income";
@@ -735,8 +643,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             return (
               <div
                 key={transactionId}
-                className={`group flex flex-col gap-4 rounded-xl border p-6 transition-all duration-200 sm:flex-row sm:items-center sm:justify-between sm:gap-6 transaction-card ${isDark ? "border-slate-800/60" : "border-slate-200"}`}
-                style={{backgroundColor: isDark ? "#111111" : "#FFFFFF"}}
+                className="group flex flex-col gap-4 rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-5 sm:flex-row sm:items-center sm:justify-between transition-all hover:border-white/20 shadow-lg"
               >
                 <div className="flex items-center gap-4">
                   <div className="relative h-12 w-12 shrink-0">
@@ -744,68 +651,68 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                       <img
                         src={transaction.attachment}
                         alt="receipt"
-                        className={`h-full w-full cursor-zoom-in rounded-lg object-cover transition-transform hover:scale-105 ${isDark ? "ring-2 ring-slate-700" : "ring-2 ring-slate-300"}`}
+                        className="h-full w-full cursor-zoom-in rounded-xl object-cover ring-1 ring-white/10 hover:scale-105 transition-transform"
                         onClick={() => setSelectedImg(transaction.attachment!)}
                       />
                     ) : (
                       <div
                         className={`flex h-full w-full items-center justify-center rounded-xl text-xl ${
                           isIncome
-                            ? "bg-emerald-500/10 text-emerald-500"
-                            : "bg-rose-500/10 text-rose-500"
+                            ? "bg-[#BDFE00]/10 text-[#BDFE00]"
+                            : "bg-rose-500/10 text-rose-400"
                         }`}
                       >
                         {getCategoryIcon(transaction.category)}
                       </div>
                     )}
                     <div
-                      className={`absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-                        isDark ? "border-black" : "border-white"
-                      } ${
-                        isIncome ? "bg-emerald-500" : "bg-rose-500"
-                      } text-[10px] text-white`}
+                      className={`absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#0B0F17] ${
+                        isIncome ? "bg-[#BDFE00] text-black" : "bg-rose-500 text-white"
+                      } text-[10px] font-bold`}
                     >
                       {isIncome ? <FiArrowUpRight /> : <FiArrowDownLeft />}
                     </div>
                   </div>
 
                   <div className="flex flex-col">
-                    <span className={`text-[10px] font-medium uppercase tracking-wider ${isDark ? "text-slate-500" : "text-slate-600"}`}>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">
                       {transaction.method}
                     </span>
-                    <h3 className={`font-bold ${isDark ? "text-white" : "text-black"}`}>
+                    <h3 className="font-bold text-white text-base">
                       {transaction.category}
                     </h3>
                     {transaction.note && (
-                      <p className={`max-w-xs truncate text-xs italic ${isDark ? "text-slate-500" : "text-slate-500"} sm:max-w-sm`}>
-                        {transaction.note}
+                      <p className="max-w-xs truncate text-xs italic text-slate-400 sm:max-w-sm mt-0.5">
+                        "{transaction.note}"
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className={`flex items-center justify-between pt-3 sm:justify-end sm:pt-0 sm:gap-6 ${isDark ? "border-t border-slate-800" : "border-t border-slate-200"} sm:border-none`}>
-                  <div className="text-left sm:text-right">
-                    <p className={`text-lg font-bold ${isIncome ? "text-emerald-500" : "text-rose-500"}`}>
+                <div className="flex items-center justify-between pt-3 sm:justify-end sm:pt-0 sm:gap-6 border-t border-white/5 sm:border-none">
+                  <div className="text-left sm:text-right font-mono">
+                    <p className={`text-lg font-bold ${isIncome ? "text-[#BDFE00]" : "text-rose-400"}`}>
                       {isIncome ? "+" : "-"} ৳{transaction.amount.toLocaleString()}
                     </p>
-                    <p className={`text-xs ${isDark ? "text-slate-500" : "text-slate-600"}`}>
+                    <p className="text-xs text-slate-400">
                       {transaction.date} • {transaction.time}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-1 print-hidden">
+                  <div className="flex items-center gap-1.5 print-hidden">
                     <button
                       onClick={() => handleEdit(transaction)}
-                      className={`rounded-lg p-2 transition-colors ${isDark ? "text-slate-500 hover:bg-slate-900 hover:text-white" : "text-slate-600 hover:bg-slate-200 hover:text-black"}`}
+                      className="rounded-xl p-2 bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                      title="Edit Transaction"
                     >
-                      <FiEdit2 size={18} />
+                      <FiEdit2 size={16} />
                     </button>
                     <button
                       onClick={() => handleDelete(transactionId)}
-                      className={`rounded-lg p-2 transition-colors ${isDark ? "text-slate-500 hover:bg-rose-500/10 hover:text-rose-400" : "text-slate-600 hover:bg-rose-100 hover:text-rose-600"}`}
+                      className="rounded-xl p-2 bg-white/5 border border-white/10 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                      title="Delete Transaction"
                     >
-                      <FiTrash2 size={18} />
+                      <FiTrash2 size={16} />
                     </button>
                   </div>
                 </div>
@@ -813,78 +720,27 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             );
           })
         ) : (
-          <div className={`rounded-lg border-2 border-dashed p-12 text-center ${isDark ? "border-slate-800 text-slate-500" : "border-slate-200 text-slate-600"}`}>
-            <p>No transactions found for this period.</p>
+          <div className="rounded-2xl border border-dashed border-white/10 bg-slate-900/20 p-12 text-center text-slate-400">
+            <p className="text-base font-bold text-white">No transactions found</p>
+            <p className="text-xs text-slate-400 mt-1">Try adjusting filters or recording a transaction</p>
           </div>
         )}
 
         {/* LOAD MORE BUTTON */}
         {hasMore && transactions.length > 0 && (
-          <div className="flex justify-center mt-4 print-hidden">
+          <div className="flex justify-center pt-4 print-hidden">
             <button
               onClick={loadMore}
               disabled={isLoadingMore}
-              className={`px-6 py-2.5 rounded-lg font-medium transition-all ${
-                isDark 
-                  ? "bg-slate-800 hover:bg-slate-700 text-white disabled:bg-slate-800/50" 
-                  : "bg-slate-100 hover:bg-slate-200 text-slate-700 disabled:bg-slate-100/50"
-              }`}
+              className="px-6 py-3 rounded-xl font-semibold border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10 hover:text-white transition-all cursor-pointer disabled:opacity-50"
             >
-              {isLoadingMore ? "Loading..." : "Load More"}
+              {isLoadingMore ? "Loading..." : "Load More Activity"}
             </button>
           </div>
         )}
       </div>
 
-      {/* PRINT TABLE VIEW */}
-      <div className="print-hidden" style={{ display: "none" }}>
-        {transactions.length > 0 && (
-          <>
-            <h2 style={{ fontSize: "16px", fontWeight: "bold", marginBottom: "15px", borderBottom: "2px solid #333", paddingBottom: "10px" }}>
-              Detailed Transactions
-            </h2>
-            <table className="transactions-table">
-              <thead>
-                <tr>
-                  <th style={{ width: "12%" }}>Date</th>
-                  <th style={{ width: "15%" }}>Category</th>
-                  <th style={{ width: "15%" }}>Method</th>
-                  <th style={{ width: "20%" }}>Description</th>
-                  <th style={{ width: "15%" }}>Type</th>
-                  <th style={{ width: "15%" }}>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((transaction) => (
-                  <tr key={transaction._id}>
-                    <td>{transaction.date}</td>
-                    <td>{transaction.category}</td>
-                    <td>{transaction.method}</td>
-                    <td style={{ fontSize: "11px" }}>{transaction.note || "—"}</td>
-                    <td>
-                      <span style={{
-                        padding: "3px 8px",
-                        borderRadius: "3px",
-                        fontSize: "10px",
-                        fontWeight: "600",
-                        backgroundColor: transaction.transactionType === "income" ? "#d1fae5" : "#fee2e2",
-                        color: transaction.transactionType === "income" ? "#065f46" : "#7f1d1d"
-                      }}>
-                        {transaction.transactionType === "income" ? "INCOME" : "EXPENSE"}
-                      </span>
-                    </td>
-                    <td className={`transaction-amount ${transaction.transactionType === "income" ? "income" : "expense"}`}>
-                      {transaction.transactionType === "income" ? "+" : "-"} ৳{transaction.amount.toLocaleString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
-      </div>
-
-      {/* PRINT FOOTER */}
+      {/* PRINT REPORT FOOTER */}
       <div className="print-hidden" style={{ display: "none" }}>
         <div className="print-footer">
           <div className="footer-line">
@@ -894,7 +750,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             This document is auto-generated and contains confidential financial information.
           </div>
           <div className="footer-line">
-            © {new Date().getFullYear()} MoneyFlow | All rights reserved
+            © {new Date().getFullYear()} NexVibe | All rights reserved
           </div>
         </div>
       </div>

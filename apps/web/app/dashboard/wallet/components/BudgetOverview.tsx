@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useTheme } from "@/app/context/ThemeContext";
 import { FiPlusCircle } from "react-icons/fi";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -24,8 +23,6 @@ interface BudgetOverviewProps {
 }
 
 const BudgetOverview: React.FC<BudgetOverviewProps> = ({ refreshKey }) => {
-  const { effectiveTheme } = useTheme();
-  const isDark = effectiveTheme === "dark";
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -83,8 +80,10 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({ refreshKey }) => {
       text: "This action cannot be undone",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#6b7280",
-      cancelButtonColor: "#6b7280",
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#334155",
+      background: "#0B0F17",
+      color: "#ffffff",
       confirmButtonText: "Delete",
     }).then(async (result) => {
       if (result.isConfirmed) {
@@ -122,33 +121,27 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({ refreshKey }) => {
 
   if (loading) {
     return (
-      <div className="py-4">
-        <div className="mb-6 flex items-center justify-between">
-          <div className={`h-8 w-48 rounded-lg animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-          <div className={`h-10 w-32 rounded-lg animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
+      <div className="py-4 space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="h-8 w-48 rounded-xl bg-white/10 animate-pulse" />
+          <div className="h-10 w-32 rounded-xl bg-white/5 animate-pulse" />
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 3 }).map((_, idx) => (
             <div
               key={idx}
-              className={`rounded-lg border p-4 ${isDark ? "border-neutral-800 bg-neutral-900/50" : "border-neutral-200 bg-neutral-50"}`}
+              className="p-5 rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl animate-pulse space-y-4"
             >
-              <div className="mb-3 flex items-center justify-between">
-                <div className={`h-6 w-24 rounded animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
+              <div className="flex items-center justify-between">
+                <div className="h-5 w-24 rounded bg-white/10" />
                 <div className="flex gap-2">
-                  <div className={`h-8 w-8 rounded animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-                  <div className={`h-8 w-8 rounded animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
+                  <div className="h-8 w-8 rounded-lg bg-white/5" />
+                  <div className="h-8 w-8 rounded-lg bg-white/5" />
                 </div>
               </div>
-              <div className="mb-3 grid grid-cols-2 gap-3">
-                <div className={`h-14 rounded animate-pulse ${isDark ? "bg-slate-800" : "bg-slate-100"}`} />
-                <div className={`h-14 rounded animate-pulse ${isDark ? "bg-slate-800" : "bg-slate-100"}`} />
-              </div>
-              <div className={`mb-2 h-2 w-full rounded-full animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-              <div className="flex justify-between">
-                <div className={`h-4 w-16 rounded animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-                <div className={`h-4 w-20 rounded animate-pulse ${isDark ? "bg-slate-700" : "bg-slate-200"}`} />
-              </div>
+              <div className="h-16 w-full rounded-xl bg-white/5" />
+              <div className="h-2 w-full rounded-full bg-slate-800" />
             </div>
           ))}
         </div>
@@ -156,65 +149,67 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({ refreshKey }) => {
     );
   }
 
+  const totalLimit = budgets.reduce((sum, budget) => sum + budget.limit, 0);
+  const totalSpent = budgets.reduce((sum, budget) => sum + budget.spent, 0);
+  const totalLeft = totalLimit - totalSpent;
+
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2
-          className={`text-2xl font-bold ${isDark ? "text-white" : "text-black"}`}
-        >
-          Monthly Budgets
-        </h2>
+      <div className="flex items-center justify-between pb-4 border-b border-white/10">
+        <div>
+          <h2 className="text-2xl font-bold text-white">
+            Monthly Budgets
+          </h2>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Active spending limits for current period
+          </p>
+        </div>
+
         <button
           onClick={() => {
             setEditingBudgetId(null);
             setEditingBudgetData(null);
             setIsModalOpen(true);
           }}
-          className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm sm:text-base font-medium transition-colors ${
-            isDark
-              ? "bg-white text-black hover:bg-neutral-100"
-              : "bg-black text-white hover:bg-neutral-900"
-          }`}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#BDFE00] text-black font-semibold text-sm hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)] transition-all cursor-pointer active:scale-95"
         >
-          <FiPlusCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+          <FiPlusCircle className="w-4 h-4 stroke-[2.5]" />
           <span>New Budget</span>
         </button>
       </div>
 
       {/* Total Budget Summary */}
       {budgets.length > 0 && (
-        <div className={`mb-6 rounded-lg border p-4 sm:p-6 ${
-          isDark
-            ? "border-neutral-800 bg-neutral-900/50"
-            : "border-neutral-200 bg-neutral-50"
-        }`}>
-          <h3 className={`text-lg font-semibold mb-4 ${isDark ? "text-white" : "text-black"}`}>
+        <div className="rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl p-6 shadow-xl">
+          <h3 className="text-sm font-mono uppercase tracking-wider text-slate-400 mb-4">
             Total Budget Summary
           </h3>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-4 font-mono">
             <div>
-              <p className={`text-sm font-medium mb-1 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+              <p className="text-xs uppercase tracking-wider text-slate-400 mb-1">
                 Total Budget
               </p>
-              <p className={`text-2xl font-bold ${isDark ? "text-white" : "text-black"}`}>
-                ৳{budgets.reduce((sum, budget) => sum + budget.limit, 0).toLocaleString()}
+              <p className="text-xl sm:text-2xl font-extrabold text-white">
+                ৳{totalLimit.toLocaleString()}
               </p>
             </div>
+
             <div>
-              <p className={`text-sm font-medium mb-1 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+              <p className="text-xs uppercase tracking-wider text-slate-400 mb-1">
                 Total Spent
               </p>
-              <p className={`text-2xl font-bold text-red-500`}>
-                ৳{budgets.reduce((sum, budget) => sum + budget.spent, 0).toLocaleString()}
+              <p className="text-xl sm:text-2xl font-extrabold text-rose-400">
+                ৳{totalSpent.toLocaleString()}
               </p>
             </div>
+
             <div>
-              <p className={`text-sm font-medium mb-1 ${isDark ? "text-slate-400" : "text-slate-600"}`}>
+              <p className="text-xs uppercase tracking-wider text-slate-400 mb-1">
                 Total Left
               </p>
-              <p className={`text-2xl font-bold text-green-500`}>
-                ৳{(budgets.reduce((sum, budget) => sum + budget.limit, 0) - budgets.reduce((sum, budget) => sum + budget.spent, 0)).toLocaleString()}
+              <p className={`text-xl sm:text-2xl font-extrabold ${totalLeft >= 0 ? "text-[#BDFE00]" : "text-rose-400"}`}>
+                ৳{Math.abs(totalLeft).toLocaleString()}
               </p>
             </div>
           </div>
@@ -223,28 +218,20 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({ refreshKey }) => {
 
       {/* Budgets Grid */}
       {budgets.length === 0 ? (
-        <div
-          className={`text-center py-12 rounded-lg border-2 border-dashed ${
-            isDark
-              ? "border-slate-700 text-slate-400"
-              : "border-slate-200 text-slate-600"
-          }`}
-        >
-          <p className="text-lg font-medium mb-2">No budgets yet</p>
-          <p className="text-sm mb-4">Create your first budget to track spending by category</p>
+        <div className="text-center py-16 rounded-2xl border border-dashed border-white/10 bg-slate-900/20 text-slate-400 space-y-4">
+          <div>
+            <p className="text-lg font-bold text-white">No budgets set for this month</p>
+            <p className="text-xs text-slate-400 mt-1">Create your first budget target to start tracking category spend</p>
+          </div>
           <button
             onClick={() => {
               setEditingBudgetId(null);
               setEditingBudgetData(null);
               setIsModalOpen(true);
             }}
-            className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm sm:text-base font-medium transition-colors ${
-              isDark
-                ? "bg-white text-black hover:bg-neutral-100"
-                : "bg-black text-white hover:bg-neutral-900"
-            }`}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#BDFE00] text-black font-semibold text-sm hover:bg-[#aef000] transition-all cursor-pointer"
           >
-            <FiPlusCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+            <FiPlusCircle className="w-4 h-4 stroke-[2.5]" />
             <span>New Budget</span>
           </button>
         </div>
