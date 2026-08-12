@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B0F17" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+
+    <!-- Acid Green Gradient for 'K' Left Pillar -->
+    <linearGradient id="acidGreenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#D0FF33" />
+      <stop offset="100%" stop-color="#BDFE00" />
+    </linearGradient>
+
+    <!-- Cyan Electric Blue Gradient for Upward Growth Arrow -->
+    <linearGradient id="cyanGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1FBFD8" />
+      <stop offset="100%" stop-color="#5EEAD4" />
+    </linearGradient>
+
+    <!-- Glow Effect -->
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Container Box / App Icon Surface -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" stroke="rgba(255,255,255,0.08)" stroke-width="4" />
+
+  <g transform="translate(32, 24)" filter="url(#neonGlow)">
+    <!-- Left Vertical Bar of 'K' (Wallet Pillar) -->
+    <rect x="110" y="120" width="48" height="220" rx="24" fill="url(#acidGreenGrad)" />
+
+    <!-- Lower Diagonal Arm of 'K' -->
+    <path d="M 180 240 L 290 340" stroke="url(#acidGreenGrad)" stroke-width="46" stroke-linecap="round" />
+
+    <!-- Upper Diagonal Arm of 'K' / Financial Growth Arrow (Cyan) -->
+    <path d="M 170 220 L 310 110" stroke="url(#cyanGrad)" stroke-width="46" stroke-linecap="round" />
+    
+    <!-- Arrow Head for Financial Trajectory -->
+    <path d="M 255 110 L 325 100 L 315 170" fill="none" stroke="url(#cyanGrad)" stroke-width="42" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>

@@ -16,7 +16,7 @@ const DashboardPage = () => {
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00]">
               <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
-              NEXVIBE DASHBOARD
+              KASHLY DASHBOARD
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">

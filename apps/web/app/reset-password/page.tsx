@@ -114,7 +114,7 @@ const ResetPassword = () => {
             Reset Password
           </h1>
           <p className="text-sm text-slate-400">
-            Create a new secure password for your NexVibe account.
+            Create a new secure password for your Kashly account.
           </p>
         </div>
 

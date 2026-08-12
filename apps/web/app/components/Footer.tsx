@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono">
           {/* Brand & Copyright */}
           <p className="text-slate-400">
-            &copy; {currentYear} <span className="text-[#BDFE00] font-semibold">NexVibe</span>. All rights reserved.
+            &copy; {currentYear} <span className="text-[#BDFE00] font-semibold">Kashly</span>. All rights reserved.
           </p>
 
           {/* Quick Links / Status */}

@@ -62,7 +62,7 @@ const Login = () => {
         <div className="mb-8 text-center space-y-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-2">
             <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
-            NEXVIBE AUTHENTICATION
+            KASHLY AUTHENTICATION
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-white">
             Welcome Back

@@ -58,7 +58,7 @@ const Navbar = () => {
       setTimeout(() => {
         router.push("/login");
       }, 1200);
-    } catch (error) {
+    } catch {
       toast.error("Failed to logout");
     }
   };
@@ -79,11 +79,18 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#BDFE00] text-black font-extrabold text-lg shadow-[0_0_15px_rgba(189,254,0,0.25)] group-hover:scale-105 transition-transform">
-              N
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden shrink-0">
+              <Image
+                src="/kashly.svg"
+                alt="Kashly Logo"
+                width={36}
+                height={36}
+                className="object-contain group-hover:scale-105 transition-transform"
+                priority
+              />
             </div>
             <span className="text-xl font-bold tracking-tight text-white">
-              Nex<span className="text-[#BDFE00]">Vibe</span>
+              <span className="text-[#BDFE00]">Kashly</span>
             </span>
           </Link>
 
@@ -106,8 +113,7 @@ const Navbar = () => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center gap-2 rounded-full 
-                  p-1 pr-3   transition-all active:scale-95 cursor-pointer"
+                  className="flex items-center gap-2 rounded-full p-1 pr-3 transition-all active:scale-95 cursor-pointer"
                 >
                   <div className="relative h-8 w-8 overflow-hidden rounded-full border border-[#BDFE00]/40 bg-slate-800">
                     <Image

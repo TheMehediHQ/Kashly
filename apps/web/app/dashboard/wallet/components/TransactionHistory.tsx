@@ -750,7 +750,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             This document is auto-generated and contains confidential financial information.
           </div>
           <div className="footer-line">
-            © {new Date().getFullYear()} NexVibe | All rights reserved
+            © {new Date().getFullYear()} Kashly | All rights reserved
           </div>
         </div>
       </div>

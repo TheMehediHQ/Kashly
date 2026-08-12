@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -62,7 +63,7 @@ const Sidebar = () => {
       {/* Mobile Menu Toggle Button */}
       <button
         onClick={() => setIsMobileMenuOpen(true)}
-        className="fixed top-4 left-4 z-40 md:hidden p-2.5 rounded-xl bg-[#0B0F17] text-white border border-white/10 shadow-lg hover:bg-white/5 transition-colors"
+        className="fixed top-4 left-4 z-40 md:hidden p-2.5 rounded-xl bg-[#0B0F17] text-white border border-white/10 shadow-lg hover:bg-white/5 transition-colors cursor-pointer"
       >
         <LuMenu size={20} />
       </button>
@@ -89,7 +90,7 @@ const Sidebar = () => {
         {/* Close Button for Mobile */}
         <button
           onClick={() => setIsMobileMenuOpen(false)}
-          className="absolute top-4 right-4 p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 md:hidden transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 md:hidden transition-colors cursor-pointer"
         >
           <LuX size={20} />
         </button>
@@ -99,13 +100,21 @@ const Sidebar = () => {
           <Link
             href="/"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="mb-10 flex items-center gap-2.5 px-2 group"
+            className="mb-10 flex items-center gap-3 px-2 group"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#BDFE00] text-black font-extrabold text-lg shadow-[0_0_15px_rgba(189,254,0,0.25)] group-hover:scale-105 transition-transform">
-              N
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden shrink-0">
+              <Image
+                src="/kashly.svg"
+                alt="Kashly Logo"
+                width={36}
+                height={36}
+                className="object-contain"
+                priority
+              />
             </div>
+          
             <span className="text-xl font-bold tracking-tight text-white">
-              Nex<span className="text-[#BDFE00]">Vibe</span>
+              <span className="text-[#BDFE00]">Kashly</span>
             </span>
           </Link>
 
@@ -189,7 +198,7 @@ const Sidebar = () => {
 
           {/* Copyright Tag */}
           <p className="text-center text-[10px] font-mono uppercase tracking-widest text-slate-500 pt-1">
-            © {new Date().getFullYear()} NexVibe
+            © {new Date().getFullYear()} Kashly | All rights reserved
           </p>
         </div>
       </aside>
