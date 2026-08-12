@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import {
@@ -31,41 +31,38 @@ const UserManagement = () => {
   const [amount, setAmount] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(
-        `/api/admin/users`,
-        {
-          withCredentials: true,
-        },
-      );
-      setUsers(res.data.users);
-    } catch (error: any) {
+      const res = await axios.get(`/api/admin/users`, {
+        withCredentials: true,
+      });
+      setUsers(res.data.users || []);
+    } catch {
       toast.error("Failed to load users");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   const handleToggleStatus = async (userId: string, currentStatus: boolean) => {
     const newStatus = !currentStatus;
 
     setUsers((prev) =>
       prev.map((u) =>
-        u._id === userId ? { ...u, isTransactionAllowed: newStatus } : u,
-      ),
+        u._id === userId ? { ...u, isTransactionAllowed: newStatus } : u
+      )
     );
 
     try {
       const response = await axios.patch(
         `/api/admin/users/${userId}/transaction-status`,
         { isTransactionAllowed: newStatus },
-        { withCredentials: true },
+        { withCredentials: true }
       );
 
       if (response.data.success) {
@@ -77,32 +74,11 @@ const UserManagement = () => {
 
       setUsers((prev) =>
         prev.map((u) =>
-          u._id === userId ? { ...u, isTransactionAllowed: currentStatus } : u,
-        ),
+          u._id === userId ? { ...u, isTransactionAllowed: currentStatus } : u
+        )
       );
     }
   };
-
-  const filteredUsers = users.filter(
-    (u) =>
-      u.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
-
-  if (loading && users.length === 0) {
-    return (
-      <div className="w-full min-h-screen text-white">
-        <div className="max-w-5xl mx-auto space-y-6">
-          <div className="space-y-3">
-            <div className="h-9 w-56 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
-            <div className="h-5 w-40 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
-          </div>
-          <div className="h-12 w-full rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
-          <div className="h-[420px] w-full rounded-3xl bg-white/5 border border-white/10 animate-pulse" />
-        </div>
-      </div>
-    );
-  }
 
   const handleCredits = async () => {
     if (!selectedUser) return;
@@ -117,17 +93,18 @@ const UserManagement = () => {
       const res = await axios.patch(
         `/api/admin/users/${selectedUser._id}/credits`,
         { credits: creditsToAdd },
-        { withCredentials: true },
+        { withCredentials: true }
       );
 
       setUsers((prev) =>
         prev.map((u) =>
-          u._id === selectedUser._id ? { ...u, credits: res.data.credits } : u,
-        ),
+          u._id === selectedUser._id ? { ...u, credits: res.data.credits } : u
+        )
       );
 
-      toast.success(res.data.message);
+      toast.success(res.data.message || "Credits added successfully");
       setIsModalOpen(false);
+      setSelectedUser(null);
       setAmount("");
     } catch (error: any) {
       const msg = error.response?.data?.message || "Failed to update credits";
@@ -135,42 +112,62 @@ const UserManagement = () => {
     }
   };
 
+  const filteredUsers = users.filter(
+    (u) =>
+      u.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (loading && users.length === 0) {
+    return (
+      <div className="w-full min-h-screen text-white p-3 sm:p-6 lg:p-8 space-y-6">
+        <div className="space-y-3">
+          <div className="h-8 w-56 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
+          <div className="h-4 w-48 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
+        </div>
+        <div className="h-12 w-full rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
+        <div className="h-[420px] w-full rounded-3xl bg-white/5 border border-white/10 animate-pulse" />
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full min-h-screen text-white">
-      <div className="max-w-5xl mx-auto space-y-8">
-        {/* Header */}
-        <header className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0 pb-6 border-b border-white/10">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-2">
-              <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
-              ADMIN CONSOLE
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-              User Management
-            </h1>
-            <p className="text-sm text-slate-400 mt-1">
-              Control permissions, manage credits, and monitor system accounts.
-            </p>
+    <div className="w-full min-h-screen text-white space-y-6 sm:space-y-8 p-3 sm:p-6 lg:p-8">
+      {/* Header */}
+      <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between pb-6 border-b border-white/10">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-2.5">
+            <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
+            ADMIN CONSOLE
           </div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
+            User Management
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            Control permissions, manage credits, and monitor system accounts.
+          </p>
+        </div>
 
-          <div className="relative group w-full lg:w-80">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#BDFE00] transition-colors" />
-            <input
-              type="text"
-              placeholder="Search users by name or email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
-            />
-          </div>
-        </header>
+        {/* Search Control */}
+        <div className="relative group w-full md:w-80">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-[#BDFE00] transition-colors" />
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-slate-500 text-xs sm:text-sm focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
+          />
+        </div>
+      </header>
 
-        {/* Mobile Cards View */}
-        <div className="block md:hidden space-y-4">
-          {filteredUsers.map((user) => (
+      {/* Mobile Cards View */}
+      <div className="block md:hidden space-y-4">
+        {filteredUsers.length > 0 ? (
+          filteredUsers.map((user) => (
             <div
               key={user._id}
-              className="rounded-2xl p-5 bg-slate-900/40 border border-white/10 backdrop-blur-xl space-y-4"
+              className="rounded-2xl p-5 bg-slate-900/40 border border-white/10 backdrop-blur-xl space-y-4 shadow-lg"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
@@ -178,7 +175,7 @@ const UserManagement = () => {
                     {user.fullName.charAt(0)}
                   </div>
                   <div className="min-w-0">
-                    <div className="text-base font-bold text-white flex items-center gap-1.5 truncate">
+                    <div className="text-sm font-bold text-white flex items-center gap-1.5 truncate">
                       <span className="truncate">{user.fullName}</span>
                       {user.isVerified && (
                         <CheckCircle2 size={14} className="text-[#BDFE00] shrink-0" />
@@ -195,12 +192,13 @@ const UserManagement = () => {
                     setIsModalOpen(true);
                   }}
                   className="p-2.5 rounded-xl bg-[#BDFE00] text-black hover:bg-[#aef000] transition-all cursor-pointer shrink-0"
+                  title="Add Credits"
                 >
                   <Plus size={18} strokeWidth={2.5} />
                 </button>
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-white/5">
+              <div className="flex items-center justify-between pt-3 border-t border-white/5">
                 <div className="flex items-center gap-2 font-mono text-xs">
                   <span className="text-slate-400">Credits:</span>
                   <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[#BDFE00] font-bold">
@@ -219,31 +217,38 @@ const UserManagement = () => {
                     }`}
                   >
                     <span
-                      className={`h-4 w-4 transform rounded-full bg-black transition-transform ${
-                        user.isTransactionAllowed ? "translate-x-6" : "translate-x-1 bg-white"
+                      className={`h-4 w-4 transform rounded-full transition-transform ${
+                        user.isTransactionAllowed ? "translate-x-6 bg-black" : "translate-x-1 bg-white"
                       }`}
                     />
                   </button>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          ))
+        ) : (
+          <div className="rounded-2xl border border-dashed border-white/10 bg-slate-900/20 p-8 text-center text-slate-400">
+            <p className="text-sm font-bold text-white">No users found</p>
+            <p className="text-xs text-slate-400 mt-1">Try adjusting your search criteria</p>
+          </div>
+        )}
+      </div>
 
-        {/* Desktop Table View */}
-        <div className="hidden md:block rounded-3xl bg-slate-900/40 border border-white/10 backdrop-blur-xl overflow-hidden shadow-2xl">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-separate border-spacing-0">
-              <thead>
-                <tr className="text-[10px] uppercase tracking-widest font-mono text-slate-400 bg-white/5 border-b border-white/10">
-                  <th className="px-6 py-4 border-b border-white/10">User Profile</th>
-                  <th className="px-6 py-4 border-b border-white/10 text-center">Status</th>
-                  <th className="px-6 py-4 border-b border-white/10 text-center">Credits</th>
-                  <th className="px-6 py-4 border-b border-white/10 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {filteredUsers.map((user) => (
+      {/* Desktop Table View */}
+      <div className="hidden md:block rounded-3xl bg-slate-900/40 border border-white/10 backdrop-blur-xl overflow-hidden shadow-2xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-separate border-spacing-0">
+            <thead>
+              <tr className="text-[10px] uppercase tracking-widest font-mono text-slate-400 bg-white/5 border-b border-white/10">
+                <th className="px-6 py-4 border-b border-white/10">User Profile</th>
+                <th className="px-6 py-4 border-b border-white/10 text-center">Status</th>
+                <th className="px-6 py-4 border-b border-white/10 text-center">Credits</th>
+                <th className="px-6 py-4 border-b border-white/10 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
                   <tr key={user._id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -303,10 +308,17 @@ const UserManagement = () => {
                       </button>
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4} className="px-6 py-12 text-center text-slate-400">
+                    <p className="text-sm font-bold text-white">No users found</p>
+                    <p className="text-xs text-slate-400 mt-1">Try adjusting your search criteria</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -315,7 +327,10 @@ const UserManagement = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
           <div className="w-full max-w-sm rounded-3xl bg-[#0B0F17] border border-white/10 shadow-2xl p-6 sm:p-8 relative">
             <button
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => {
+                setIsModalOpen(false);
+                setSelectedUser(null);
+              }}
               className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
             >
               <X size={18} />
@@ -351,7 +366,10 @@ const UserManagement = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    setSelectedUser(null);
+                  }}
                   className="py-3 text-sm font-semibold rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
                 >
                   Cancel
