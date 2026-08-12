@@ -4,13 +4,14 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { FiRefreshCw, FiArchive } from "react-icons/fi";
 import Link from "next/link";
+import axios from "axios";
+
 import MainBalance from "./components/MainBalance";
 import TransactionModal from "./components/TransactionModal";
 import TransactionHistory from "./components/TransactionHistory";
 import LastMonthIncome from "./components/LastMonthIncome";
 import LastMonthExpense from "./components/LastMonthExpense";
 import BudgetOverview from "./components/BudgetOverview";
-import axios from "axios";
 
 type Summary = {
   thisMonthIncome: number;
@@ -23,6 +24,7 @@ const Wallet = () => {
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [summaryLoading, setSummaryLoading] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
   const [summary, setSummary] = useState<Summary>({
     thisMonthIncome: 0,
     thisMonthExpense: 0,
@@ -30,13 +32,14 @@ const Wallet = () => {
     expenseTransactions: 0,
   });
 
-  const handleRefresh = useCallback(() => {
+  const handleRefresh = useCallback((): void => {
     setIsRefreshing(true);
     setRefreshKey((prev) => prev + 1);
   }, []);
 
   const fetchSummary = useCallback(async () => {
     setSummaryLoading(true);
+
     try {
       const res = await axios.get(`/api/summary`, {
         withCredentials: true,
@@ -58,8 +61,8 @@ const Wallet = () => {
   }, [fetchSummary, refreshKey]);
 
   return (
-    <div className="w-full min-h-screen text-white space-y-6 sm:space-y-8 p-3 sm:p-6 lg:p-8">
-      {/* Top Header */}
+    <div className="min-h-screen w-full bg-[#0B0F17] text-white p-3 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
+      {/* Header & Actions */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-2.5">
@@ -74,14 +77,14 @@ const Wallet = () => {
           </p>
         </div>
 
-        {/* Action Controls */}
+        {/* Top Control Buttons */}
         <div className="flex items-center gap-3 self-start md:self-auto">
           <Link
             href="/dashboard/budgets"
             className="inline-flex items-center justify-center h-10 px-4 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer text-xs font-semibold uppercase tracking-wider gap-2 shadow-sm active:scale-95"
             title="View budget history"
           >
-            <FiArchive className="w-4 h-4 text-[#BDFE00]" />
+            <FiArchive className="h-4 w-4 text-[#BDFE00]" />
             <span>Budgets</span>
           </Link>
 
@@ -89,45 +92,54 @@ const Wallet = () => {
             onClick={handleRefresh}
             disabled={isRefreshing}
             className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer shadow-sm active:scale-95 disabled:opacity-50"
-            title="Refresh Wallet Data"
+            title="Refresh"
           >
-            <FiRefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-[#BDFE00]" : ""}`} />
+            <FiRefreshCw
+              className={`h-4 w-4 ${isRefreshing ? "animate-spin text-[#BDFE00]" : ""}`}
+            />
           </button>
         </div>
       </div>
 
-      {/* Main Balance & Action Modals Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-       
+     {/* Main Balance, Income, and Expense Overview Cards (Side by Side) */}
+<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  {/* Main Balance Card */}
+  <div className="w-full">
+    <MainBalance refreshKey={refreshKey} onRefresh={handleRefresh} />
+  </div>
 
+  {/* Income Overview Card */}
+  <div className="w-full">
+    <LastMonthIncome
+      income={summary?.thisMonthIncome}
+      count={summary?.incomeTransactions}
+      loading={summaryLoading}
+    />
+  </div>
 
-       
+  {/* Expense Overview Card */}
+  <div className="w-full">
+    <LastMonthExpense
+      expense={summary?.thisMonthExpense}
+      count={summary?.expenseTransactions}
+      loading={summaryLoading}
+    />
+  </div>
+</div>
+
+      {/* Quick Action Modals (Add Income & Add Expense) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <TransactionModal type="income" onSuccess={handleRefresh} />
+        <TransactionModal type="expense" onSuccess={handleRefresh} />
       </div>
 
-      {/* Monthly Outflow / Inflow Metric Cards */}
-       <div>
-          <MainBalance refreshKey={refreshKey} onRefresh={handleRefresh} />
-        </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <LastMonthIncome
-          income={summary?.thisMonthIncome}
-          count={summary?.incomeTransactions}
-          loading={summaryLoading}
-        />
-        <LastMonthExpense
-          expense={summary?.thisMonthExpense}
-          count={summary?.expenseTransactions}
-          loading={summaryLoading}
-        />
-      </div>
-
-      {/* Budget Target Component */}
+      {/* Budget Overview Widget */}
       <div className="w-full">
         <BudgetOverview refreshKey={refreshKey} />
       </div>
 
-      {/* Detailed Transaction Ledger */}
-      <div className="w-full pt-4">
+      {/* Transactions History Ledger */}
+      <div className="w-full pt-2">
         <TransactionHistory
           refreshKey={refreshKey}
           onRefresh={handleRefresh}
