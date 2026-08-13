@@ -55,11 +55,11 @@ const MyProfile = () => {
 
       {/* Profile Identity Card */}
       <div className="rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-xl overflow-hidden">
-        <div className="h-24 bg-gradient-to-r from-[#BDFE00]/10 via-transparent to-[#1FBFD8]/10 border-b border-white/5" />
-        <div className="px-5 sm:px-6 -mt-12 pb-6">
-          <div className="flex flex-col sm:flex-row gap-5 items-start">
+        <div className="h-20 bg-gradient-to-br from-[#BDFE00]/8 via-transparent to-[#1FBFD8]/8 " />
+        <div className="px-5 sm:px-8 -mt-10 pb-6">
+          <div className="flex items-center gap-4">
             {/* Avatar */}
-            <div className="h-24 w-24 rounded-2xl overflow-hidden border-4 border-[#0B0F17] bg-slate-800 shadow-xl shrink-0">
+            <div className=" overflow-hidden  shadow-xl">
               <UserButton
                 appearance={{
                   elements: {
@@ -70,43 +70,24 @@ const MyProfile = () => {
             </div>
 
             {/* Info */}
-            <div className="flex-1 pt-2 sm:pt-8">
-              <h2 className="text-xl sm:text-2xl font-bold text-white mb-0.5">
-                {user?.fullName}
-              </h2>
-              <p className="text-sm text-slate-400 font-mono mb-3">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight truncate">
+  {user?.fullName}
+</h2>
+              <p className="text-xs text-slate-500 font-mono truncate">
                 {user?.email}
               </p>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#BDFE00]/10 border border-[#BDFE00]/30 text-[#BDFE00] text-[10px] font-mono font-bold uppercase tracking-wider">
-                  <LuCheck size={10} /> Verified
+              <div className="flex items-center gap-1.5 flex-wrap mt-2">
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00] text-[9px] font-mono font-bold uppercase tracking-wider">
+                  <LuCheck size={9} /> Verified
                 </span>
                 {user?.role === "admin" && (
-                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#1FBFD8]/10 border border-[#1FBFD8]/30 text-[#1FBFD8] text-[10px] font-mono font-bold uppercase tracking-wider">
-                    <LuStar size={10} /> Admin
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#1FBFD8]/10 border border-[#1FBFD8]/20 text-[#1FBFD8] text-[9px] font-mono font-bold uppercase tracking-wider">
+                    <LuStar size={9} /> Admin
                   </span>
                 )}
-                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono font-bold uppercase tracking-wider">
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-mono font-bold uppercase tracking-wider">
                   Active
-                </span>
-              </div>
-            </div>
-
-            {/* Manage Identity Button */}
-            <div className="sm:text-right shrink-0">
-              <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-2">
-                Manage Identity
-              </p>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                <UserButton
-                  appearance={{
-                    elements: {
-                      avatarBox: "h-8 w-8 rounded-lg",
-                    },
-                  }}
-                />
-                <span className="text-xs text-slate-400 font-mono hidden sm:inline">
-                  Name, Password, 2FA →
                 </span>
               </div>
             </div>

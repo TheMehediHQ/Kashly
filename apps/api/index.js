@@ -144,6 +144,15 @@ const verifyToken = async (req, res, next) => {
           createdAt: new Date(),
         });
 
+        await My_Finance_db.collection("notifications").insertOne({
+          userId: result.insertedId.toString(),
+          type: "success",
+          title: "Welcome to Kashly! 🎉",
+          message: "Your account is ready. You have 1000 credits to start tracking your finances. Enjoy!",
+          read: false,
+          createdAt: new Date(),
+        });
+
         appUser = await My_Finance_db
           .collection("usersData")
           .findOne({ _id: result.insertedId });
@@ -174,6 +183,19 @@ async function run() {
     const usersCollection = My_Finance.collection("usersData");
     const transactionsCollection = My_Finance.collection("transactions");
     const budgetsCollection = My_Finance.collection("budgets");
+    const notificationsCollection = My_Finance.collection("notifications");
+
+    // Helper: create notification
+    const createNotification = async (userId, type, title, message) => {
+      await notificationsCollection.insertOne({
+        userId,
+        type,
+        title,
+        message,
+        read: false,
+        createdAt: new Date(),
+      });
+    };
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
@@ -217,7 +239,7 @@ async function run() {
 
         const existing = await usersCollection.findOne({ clerkId: id });
         if (!existing) {
-          await usersCollection.insertOne({
+          const result = await usersCollection.insertOne({
             clerkId: id,
             fullName,
             email,
@@ -228,6 +250,13 @@ async function run() {
             photoURL: image_url || "",
             createdAt: new Date(),
           });
+
+          await createNotification(
+            result.insertedId.toString(),
+            "success",
+            "Welcome to Kashly! 🎉",
+            `Your account is ready. You have 1000 credits to start tracking your finances. Enjoy!`
+          );
         }
       }
 
@@ -653,10 +682,81 @@ async function run() {
         const result = await transactionsCollection.insertOne(newTransaction);
 
         if (result.insertedId) {
-          await usersCollection.updateOne(
+          const updateResult = await usersCollection.findOneAndUpdate(
             { _id: new ObjectId(userId) },
             { $inc: { credits: -1 } },
+            { returnDocument: "after" }
           );
+
+          const newCredits = updateResult?.credits ?? 0;
+
+          // Notify when credits running low
+          if (newCredits === 50) {
+            await createNotification(
+              userId,
+              "warning",
+              "Credits Running Low",
+              `You have only ${newCredits} credits left. Contact admin to recharge.`
+            );
+          } else if (newCredits === 10) {
+            await createNotification(
+              userId,
+              "critical",
+              "Credits Almost Empty",
+              `Only ${newCredits} credits remaining! Contact admin immediately.`
+            );
+          }
+
+          // Budget exceed check for expenses
+          if (transactionType === "expense") {
+            const now = new Date();
+            const month = now.getMonth() + 1;
+            const year = now.getFullYear();
+            const dateRegex = new RegExp(
+              `^${year}-${String(month).padStart(2, "0")}-`
+            );
+
+            const budget = await budgetsCollection.findOne({
+              userId,
+              category: category || "Others",
+              month,
+              year,
+            });
+
+            if (budget) {
+              const spent = await transactionsCollection
+                .aggregate([
+                  {
+                    $match: {
+                      userId,
+                      transactionType: "expense",
+                      category: category || "Others",
+                      date: { $regex: dateRegex },
+                    },
+                  },
+                  { $group: { _id: null, total: { $sum: "$amount" } } },
+                ])
+                .toArray();
+
+              const totalSpent = spent[0]?.total || 0;
+
+              if (totalSpent > budget.limit) {
+                await createNotification(
+                  userId,
+                  "critical",
+                  "Budget Exceeded! 🚨",
+                  `You've exceeded your "${category || "Others"}" budget. Spent: ৳${totalSpent} / Limit: ৳${budget.limit}`
+                );
+              } else if (totalSpent >= budget.limit * 0.8) {
+                await createNotification(
+                  userId,
+                  "warning",
+                  "Budget Warning ⚠️",
+                  `You've used 80%+ of "${category || "Others"}" budget. Spent: ৳${totalSpent} / Limit: ৳${budget.limit}`
+                );
+              }
+            }
+          }
 
           return res.status(201).json({
             success: true,
@@ -704,6 +804,15 @@ async function run() {
           );
 
           if (result.modifiedCount === 1) {
+            await createNotification(
+              id,
+              isTransactionAllowed ? "success" : "warning",
+              isTransactionAllowed ? "Transactions Enabled" : "Transactions Disabled",
+              isTransactionAllowed
+                ? "Admin has enabled transactions on your account."
+                : "Admin has disabled transactions on your account. Contact admin for details."
+            );
+
             return res.json({
               success: true,
               message: "Transaction status updated successfully",
@@ -753,6 +862,13 @@ async function run() {
 
         const updatedUser = await usersCollection.findOne({ _id: userId });
 
+        await createNotification(
+          id,
+          "success",
+          "Credits Added",
+          `Admin added ${creditsToAdd} credits to your account. Balance: ${updatedUser.credits}`
+        );
+
         res.status(200).json({
           success: true,
           message: "Credits updated successfully",
@@ -793,6 +909,15 @@ async function run() {
         if (result.matchedCount === 0) {
           return res.status(404).json({ message: "User not found" });
         }
+
+        await createNotification(
+          id,
+          role === "admin" ? "success" : "info",
+          role === "admin" ? "Promoted to Admin" : "Role Updated",
+          role === "admin"
+            ? "You have been promoted to admin. You now have full access."
+            : "Your role has been updated to user."
+        );
 
         res.json({ success: true, message: `Role updated to ${role}` });
       } catch (error) {
@@ -836,6 +961,119 @@ async function run() {
           success: true,
           message: `User "${targetUser.fullName}" and all their data deleted`,
         });
+      } catch (error) {
+        res.status(500).json({ message: "Server error" });
+      }
+    });
+
+    // ─── Notifications: Get user notifications ───
+    app.get("/api/notifications", verifyToken, async (req, res) => {
+      try {
+        const userId = req.user.id;
+
+        // Monthly summary: auto-generate on first visit of new month
+        const now = new Date();
+        const currentMonth = now.getMonth(); // 0-indexed
+        const currentYear = now.getFullYear();
+        const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+        const prevMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+        const prevMonthName = new Date(prevMonthYear, prevMonth).toLocaleString("default", { month: "long" });
+
+        const summaryKey = `monthly-summary-${prevMonthYear}-${prevMonth}`;
+        const alreadySent = await notificationsCollection.findOne({
+          userId,
+          type: "info",
+          title: { $regex: /^Monthly Summary/ },
+          message: { $regex: new RegExp(prevMonthName) },
+        });
+
+        if (!alreadySent) {
+          const monthStr = `${prevMonthYear}-${String(prevMonth + 1).padStart(2, "0")}`;
+          const dateRegex = new RegExp(`^${monthStr}-`);
+
+          const income = await transactionsCollection.aggregate([
+            { $match: { userId, transactionType: "income", date: { $regex: dateRegex } } },
+            { $group: { _id: null, total: { $sum: "$amount" }, count: { $sum: 1 } } },
+          ]).toArray();
+
+          const expense = await transactionsCollection.aggregate([
+            { $match: { userId, transactionType: "expense", date: { $regex: dateRegex } } },
+            { $group: { _id: null, total: { $sum: "$amount" }, count: { $sum: 1 } } },
+          ]).toArray();
+
+          const totalIncome = income[0]?.total || 0;
+          const incomeCount = income[0]?.count || 0;
+          const totalExpense = expense[0]?.total || 0;
+          const expenseCount = expense[0]?.count || 0;
+          const net = totalIncome - totalExpense;
+
+          if (incomeCount > 0 || expenseCount > 0) {
+            await createNotification(
+              userId,
+              "info",
+              `Monthly Summary — ${prevMonthName} ${prevMonthYear}`,
+              `Income: ৳${totalIncome} (${incomeCount} txns) | Expense: ৳${totalExpense} (${expenseCount} txns) | Net: ৳${net}`
+            );
+          }
+        }
+
+        const notifications = await notificationsCollection
+          .find({ userId })
+          .sort({ createdAt: -1 })
+          .limit(20)
+          .toArray();
+
+        const unreadCount = await notificationsCollection.countDocuments({
+          userId,
+          read: false,
+        });
+
+        res.json({ success: true, notifications, unreadCount });
+      } catch (error) {
+        res.status(500).json({ message: "Server error" });
+      }
+    });
+
+    // ─── Notifications: Mark as read ───
+    app.patch("/api/notifications/read", verifyToken, async (req, res) => {
+      try {
+        const userId = req.user.id;
+        const { ids } = req.body;
+
+        if (ids && ids.length > 0) {
+          await notificationsCollection.updateMany(
+            { _id: { $in: ids.map((id) => new ObjectId(id)) }, userId },
+            { $set: { read: true } }
+          );
+        } else {
+          await notificationsCollection.updateMany(
+            { userId, read: false },
+            { $set: { read: true } }
+          );
+        }
+
+        res.json({ success: true, message: "Notifications marked as read" });
+      } catch (error) {
+        res.status(500).json({ message: "Server error" });
+      }
+    });
+
+    // ─── Notifications: Delete notification ───
+    app.delete("/api/notifications/:id", verifyToken, async (req, res) => {
+      try {
+        const userId = req.user.id;
+        const { id } = req.params;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).json({ message: "Invalid notification ID" });
+        }
+
+        await notificationsCollection.deleteOne({
+          _id: new ObjectId(id),
+          userId,
+        });
+
+        res.json({ success: true, message: "Notification deleted" });
       } catch (error) {
         res.status(500).json({ message: "Server error" });
       }
