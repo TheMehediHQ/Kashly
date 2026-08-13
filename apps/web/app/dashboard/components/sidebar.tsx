@@ -59,7 +59,7 @@ const Sidebar = () => {
   );
 
   return (
-    <>
+    <div className="hidden md:block">
       {/* Mobile Menu Toggle Button */}
       <button
         onClick={() => setIsMobileMenuOpen(true)}
@@ -202,7 +202,7 @@ const Sidebar = () => {
           </p>
         </div>
       </aside>
-    </>
+    </div>
   );
 };
 
