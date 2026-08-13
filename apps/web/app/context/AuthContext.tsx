@@ -2,42 +2,62 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth as useClerkAuth } from "@clerk/nextjs";
 import axios from "axios";
-
-// Global axios interceptor to handle 401 Unauthorized errors
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      if (typeof window !== "undefined" && window.location.pathname !== "/login") {
-        window.location.href = "/login";
-      }
-    }
-    return Promise.reject(error);
-  }
-);
 
 const AuthContext = createContext<any>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const { isSignedIn, isLoaded, getToken } = useClerkAuth();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`/api/me`, {
-        withCredentials: true,
-      })
-      .then((res) => {
+    if (!isLoaded) return;
+
+    if (!isSignedIn) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
+    const fetchUser = async () => {
+      try {
+        const token = await getToken();
+        const res = await axios.get(`/api/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setUser(res.data.user);
-      })
-      .catch(() => {
+      } catch {
         setUser(null);
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
-  }, []);
+      }
+    };
+
+    fetchUser();
+  }, [isSignedIn, isLoaded, getToken]);
+
+  // Attach Clerk token to all axios requests automatically
+  useEffect(() => {
+    const interceptor = axios.interceptors.request.use(async (config) => {
+      if (!config.headers.Authorization) {
+        try {
+          const token = await getToken();
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
+        } catch {
+          // token fetch failed, skip
+        }
+      }
+      return config;
+    });
+
+    return () => {
+      axios.interceptors.request.eject(interceptor);
+    };
+  }, [getToken]);
 
   return (
     <AuthContext.Provider value={{ user, setUser, loading }}>

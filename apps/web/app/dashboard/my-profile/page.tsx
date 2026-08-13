@@ -3,32 +3,25 @@
 
 import { useAuth } from "@/app/context/AuthContext";
 import React, { useState } from "react";
-import { 
-  LuUser, 
-  LuMail, 
-  LuPencil, 
-  LuX, 
+import {
+  LuUser,
+  LuMail,
+  LuPencil,
+  LuX,
   LuCamera,
   LuCircle,
   LuLoader,
-  LuStar,
-  LuLock,
-  LuEye,
-  LuEyeOff
+  LuStar
 } from "react-icons/lu";
 import Image from "next/image";
 import axios from "axios";
 
 const MyProfile = () => {
   const { user, setUser, loading } = useAuth();
-  
+
   const [isEditing, setIsEditing] = React.useState(false);
   const [fullName, setFullName] = React.useState(user?.fullName || "");
   const [photoURL, setPhotoURL] = React.useState(user?.photoURL || "");
-  const [oldPassword, setOldPassword] = React.useState("");
-  const [newPassword, setNewPassword] = React.useState("");
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
   const [isUploading, setIsUploading] = React.useState(false);
   const [uploadError, setUploadError] = React.useState<string>("");
   const [isSaving, setIsSaving] = React.useState(false);
@@ -67,26 +60,13 @@ const MyProfile = () => {
 
       setUser(response.data.user);
 
-      if (oldPassword && newPassword) {
-        await axios.put(
-          `/api/me/password`,
-          {
-            oldPassword,
-            newPassword,
-          },
-          { withCredentials: true }
-        );
-      }
-
       setIsEditing(false);
-      setOldPassword("");
-      setNewPassword("");
       setMessage({ type: "success", text: "Profile updated successfully!" });
       setTimeout(() => setMessage(null), 3000);
     } catch (error: any) {
-      setMessage({ 
-        type: "error", 
-        text: error.response?.data?.message || "Failed to update profile" 
+      setMessage({
+        type: "error",
+        text: error.response?.data?.message || "Failed to update profile"
       });
     } finally {
       setIsSaving(false);
@@ -96,10 +76,6 @@ const MyProfile = () => {
   const handleCancel = () => {
     setFullName(user?.fullName || "");
     setPhotoURL(user?.photoURL || "");
-    setOldPassword("");
-    setNewPassword("");
-    setShowOldPassword(false);
-    setShowNewPassword(false);
     setIsEditing(false);
     setMessage(null);
   };
@@ -351,48 +327,6 @@ const MyProfile = () => {
                   Email addresses are managed securely and cannot be changed directly.
                 </p>
               </div>
-
-              {/* Password Fields */}
-              {isEditing && (
-                <div className="space-y-3 pt-2">
-                  <label className="flex items-center gap-2 text-sm font-semibold text-slate-300">
-                    <LuLock size={18} className="text-[#BDFE00]" />
-                    Change Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      type={showOldPassword ? "text" : "password"}
-                      value={oldPassword}
-                      onChange={(e) => setOldPassword(e.target.value)}
-                      placeholder="Current password"
-                      className="w-full px-4 py-3 pr-10 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowOldPassword(!showOldPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer"
-                    >
-                      {showOldPassword ? <LuEyeOff size={18} /> : <LuEye size={18} />}
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type={showNewPassword ? "text" : "password"}
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="New password (min 8 characters)"
-                      className="w-full px-4 py-3 pr-10 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer"
-                    >
-                      {showNewPassword ? <LuEyeOff size={18} /> : <LuEye size={18} />}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Action Buttons */}

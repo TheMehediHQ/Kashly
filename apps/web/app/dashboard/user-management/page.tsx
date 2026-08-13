@@ -10,6 +10,9 @@ import {
   X,
   CheckCircle2,
   ArrowUpRight,
+  Shield,
+  ShieldOff,
+  Trash2,
 } from "lucide-react";
 
 interface UserData {
@@ -30,6 +33,7 @@ const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [amount, setAmount] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleteConfirm, setDeleteConfirm] = useState<UserData | null>(null);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -77,6 +81,51 @@ const UserManagement = () => {
           u._id === userId ? { ...u, isTransactionAllowed: currentStatus } : u
         )
       );
+    }
+  };
+
+  const handleRoleToggle = async (userId: string, currentRole: string) => {
+    const newRole = currentRole === "admin" ? "user" : "admin";
+
+    setUsers((prev) =>
+      prev.map((u) => (u._id === userId ? { ...u, role: newRole } : u))
+    );
+
+    try {
+      const res = await axios.patch(
+        `/api/admin/users/${userId}/role`,
+        { role: newRole },
+        { withCredentials: true }
+      );
+
+      if (res.data.success) {
+        toast.success(res.data.message);
+      }
+    } catch (error: any) {
+      const msg = error.response?.data?.message || "Failed to update role";
+      toast.error(msg);
+
+      setUsers((prev) =>
+        prev.map((u) => (u._id === userId ? { ...u, role: currentRole } : u))
+      );
+    }
+  };
+
+  const handleDeleteUser = async (user: UserData) => {
+    try {
+      const res = await axios.delete(`/api/admin/users/${user._id}`, {
+        withCredentials: true,
+      });
+
+      if (res.data.success) {
+        setUsers((prev) => prev.filter((u) => u._id !== user._id));
+        toast.success(res.data.message);
+      }
+    } catch (error: any) {
+      const msg = error.response?.data?.message || "Failed to delete user";
+      toast.error(msg);
+    } finally {
+      setDeleteConfirm(null);
     }
   };
 
@@ -186,16 +235,25 @@ const UserManagement = () => {
                     </div>
                   </div>
                 </div>
-                <button
-                  onClick={() => {
-                    setSelectedUser(user);
-                    setIsModalOpen(true);
-                  }}
-                  className="p-2.5 rounded-xl bg-[#BDFE00] text-black hover:bg-[#aef000] transition-all cursor-pointer shrink-0"
-                  title="Add Credits"
-                >
-                  <Plus size={18} strokeWidth={2.5} />
-                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => {
+                      setSelectedUser(user);
+                      setIsModalOpen(true);
+                    }}
+                    className="p-2.5 rounded-xl bg-[#BDFE00] text-black hover:bg-[#aef000] transition-all cursor-pointer"
+                    title="Add Credits"
+                  >
+                    <Plus size={18} strokeWidth={2.5} />
+                  </button>
+                  <button
+                    onClick={() => setDeleteConfirm(user)}
+                    className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all cursor-pointer"
+                    title="Delete User"
+                  >
+                    <Trash2 size={18} strokeWidth={2.5} />
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center justify-between pt-3 border-t border-white/5">
@@ -206,6 +264,21 @@ const UserManagement = () => {
                   </span>
                 </div>
 
+                <button
+                  onClick={() => handleRoleToggle(user._id, user.role)}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    user.role === "admin"
+                      ? "bg-[#1FBFD8]/10 border border-[#1FBFD8]/30 text-[#1FBFD8] hover:bg-[#1FBFD8]/20"
+                      : "bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10"
+                  }`}
+                  title={user.role === "admin" ? "Remove admin" : "Make admin"}
+                >
+                  {user.role === "admin" ? <Shield size={12} /> : <ShieldOff size={12} />}
+                  {user.role}
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-white/5">
                 <div className="flex items-center gap-3">
                   <span className={`text-[10px] font-mono uppercase tracking-wider ${user.isTransactionAllowed ? "text-[#BDFE00]" : "text-slate-500"}`}>
                     {user.isTransactionAllowed ? "Active" : "Locked"}
@@ -241,6 +314,7 @@ const UserManagement = () => {
             <thead>
               <tr className="text-[10px] uppercase tracking-widest font-mono text-slate-400 bg-white/5 border-b border-white/10">
                 <th className="px-6 py-4 border-b border-white/10">User Profile</th>
+                <th className="px-6 py-4 border-b border-white/10 text-center">Role</th>
                 <th className="px-6 py-4 border-b border-white/10 text-center">Status</th>
                 <th className="px-6 py-4 border-b border-white/10 text-center">Credits</th>
                 <th className="px-6 py-4 border-b border-white/10 text-right">Actions</th>
@@ -270,6 +344,21 @@ const UserManagement = () => {
                     </td>
 
                     <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => handleRoleToggle(user._id, user.role)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                          user.role === "admin"
+                            ? "bg-[#1FBFD8]/10 border border-[#1FBFD8]/30 text-[#1FBFD8] hover:bg-[#1FBFD8]/20"
+                            : "bg-white/5 border border-white/10 text-slate-400 hover:bg-white/10"
+                        }`}
+                        title={user.role === "admin" ? "Remove admin" : "Make admin"}
+                      >
+                        {user.role === "admin" ? <Shield size={12} /> : <ShieldOff size={12} />}
+                        {user.role}
+                      </button>
+                    </td>
+
+                    <td className="px-6 py-4 text-center">
                       <div className="flex flex-col items-center gap-1.5">
                         <button
                           onClick={() => handleToggleStatus(user._id, user.isTransactionAllowed)}
@@ -296,22 +385,31 @@ const UserManagement = () => {
                     </td>
 
                     <td className="px-6 py-4 text-right">
-                      <button
-                        onClick={() => {
-                          setSelectedUser(user);
-                          setIsModalOpen(true);
-                        }}
-                        className="p-2.5 rounded-xl bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_15px_rgba(189,254,0,0.3)] transition-all cursor-pointer"
-                        title="Add Credits"
-                      >
-                        <Plus size={16} strokeWidth={2.5} />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setIsModalOpen(true);
+                          }}
+                          className="p-2.5 rounded-xl bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_15px_rgba(189,254,0,0.3)] transition-all cursor-pointer"
+                          title="Add Credits"
+                        >
+                          <Plus size={16} strokeWidth={2.5} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirm(user)}
+                          className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all cursor-pointer"
+                          title="Delete User"
+                        >
+                          <Trash2 size={16} strokeWidth={2.5} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-slate-400">
+                  <td colSpan={5} className="px-6 py-12 text-center text-slate-400">
                     <p className="text-sm font-bold text-white">No users found</p>
                     <p className="text-xs text-slate-400 mt-1">Try adjusting your search criteria</p>
                   </td>
@@ -381,6 +479,49 @@ const UserManagement = () => {
                   Add Credits
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-sm rounded-3xl bg-[#0B0F17] border border-red-500/20 shadow-2xl p-6 sm:p-8 relative">
+            <button
+              onClick={() => setDeleteConfirm(null)}
+              className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="text-center mb-6">
+              <div className="w-14 h-14 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 text-red-400">
+                <Trash2 size={28} />
+              </div>
+              <h3 className="text-xl font-bold text-white">Delete User</h3>
+              <p className="text-sm text-slate-400 mt-2">
+                Are you sure you want to delete{" "}
+                <span className="text-white font-semibold">{deleteConfirm.fullName}</span>?
+              </p>
+              <p className="text-xs text-red-400/80 mt-2 font-mono">
+                This will permanently delete all their transactions, budgets, and account data.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="py-3 text-sm font-semibold rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteUser(deleteConfirm)}
+                className="py-3 text-sm font-semibold rounded-xl bg-red-500 text-white hover:bg-red-600 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all cursor-pointer"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>

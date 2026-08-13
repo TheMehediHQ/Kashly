@@ -17,6 +17,7 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
+import { useAuth } from "@/app/context/AuthContext";
 
 interface FormValues {
   amount: number;
@@ -37,11 +38,14 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   type,
   onSuccess,
 }) => {
+  const { user } = useAuth();
   const [open, setOpen] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
   const [isUploading, setIsUploading] = useState<boolean>(false);
+
+  const noCredits = user?.credits < 1;
 
   // Configuration based on type
   const isIncome = type === "income";
@@ -185,8 +189,18 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       {/* Trigger Button */}
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          if (noCredits) {
+            toast.error("No credits left. Please contact admin to add more credits.");
+            return;
+          }
+          setOpen(true);
+        }}
         className={`group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl py-3.5 transition-all active:scale-[0.98] shadow-lg cursor-pointer ${
+          noCredits
+            ? "opacity-40 cursor-not-allowed"
+            : ""
+        } ${
           isIncome
             ? "bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.25)]"
             : "bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"

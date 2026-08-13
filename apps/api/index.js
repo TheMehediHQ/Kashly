@@ -6,23 +6,12 @@ dotenv.config({
 });
 const express = require("express");
 const app = express();
-// Trust the first proxy hop so req.ip reflects the real client IP
-// (X-Forwarded-For) when running behind Vercel / any reverse proxy.
-// Required for express-rate-limit to key requests correctly on serverless.
 app.set("trust proxy", 1);
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const crypto = require("crypto");
-const nodemailer = require("nodemailer");
-const rateLimit = require("express-rate-limit");
-const { registerUser } = require("./api/register");
-const { verifyUser } = require("./api/verify");
-const { resendVerification } = require("./api/resendVerification");
-const { logoutUser } = require("./api/logoutUser");
-const { loginUser } = require("./api/loginUser");
+const { verifyToken: verifyClerkToken } = require("@clerk/backend");
+const { Webhook } = require("svix");
 const port = process.env.PORT || 5000;
 
 app.use(cookieParser());
@@ -39,75 +28,11 @@ app.use(
   }),
 );
 
-const loginIpLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { message: "Too many login attempts. Please try again later." },
-});
-
-const forgotPasswordIpLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: {
-    message: "Too many password reset requests. Please try again later.",
-  },
-});
-
-const accountAttemptStore = new Map();
-
-const normalizeEmail = (email) => {
-  if (!email || typeof email !== "string") return "";
-  return email.trim().toLowerCase();
-};
-
-const accountCooldownLimiter = ({ keyPrefix, maxAttempts, windowMs, message }) => {
-  return (req, res, next) => {
-    const email = normalizeEmail(req.body?.email);
-
-    if (!email) {
-      return next();
-    }
-
-    const key = `${keyPrefix}:${req.ip}:${email}`;
-    const now = Date.now();
-    const existing = accountAttemptStore.get(key);
-
-    if (!existing || existing.resetAt <= now) {
-      accountAttemptStore.set(key, { count: 1, resetAt: now + windowMs });
-      return next();
-    }
-
-    if (existing.count >= maxAttempts) {
-      return res.status(429).json({ message });
-    }
-
-    existing.count += 1;
-    accountAttemptStore.set(key, existing);
-    next();
-  };
-};
-
-const loginAccountLimiter = accountCooldownLimiter({
-  keyPrefix: "login",
-  maxAttempts: 8,
-  windowMs: 15 * 60 * 1000,
-  message: "Too many attempts for this account. Please try again later.",
-});
-
-const forgotPasswordAccountLimiter = accountCooldownLimiter({
-  keyPrefix: "forgot",
-  maxAttempts: 5,
-  windowMs: 15 * 60 * 1000,
-  message:
-    "Too many password reset requests for this account. Please try again later.",
-});
-
-const verifyToken = (req, res, next) => {
-  const token = req.cookies.token;
+const verifyToken = async (req, res, next) => {
+  let token = req.headers.authorization?.replace("Bearer ", "");
+  if (!token) {
+    token = req.cookies?.__session;
+  }
 
   if (!token) {
     return res.status(401).json({
@@ -117,11 +42,118 @@ const verifyToken = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    const payload = await verifyClerkToken(token, {
+      secretKey: process.env.CLERK_SECRET_KEY,
+    });
+    req.auth = { userId: payload.sub };
+
+    const My_Finance_db = client.db("My_Finance");
+    let appUser = await My_Finance_db
+      .collection("usersData")
+      .findOne({ clerkId: payload.sub });
+
+    // If found by clerkId but user has no real data, check for old user with same email to merge
+    if (appUser && !appUser.credits && appUser.credits !== 0) {
+      const { createClerkClient } = require("@clerk/backend");
+      const clerkClient = createClerkClient({
+        secretKey: process.env.CLERK_SECRET_KEY,
+      });
+      const clerkUser = await clerkClient.users.getUser(payload.sub);
+      const email = clerkUser.emailAddresses?.[0]?.emailAddress;
+
+      const oldUser = await My_Finance_db
+        .collection("usersData")
+        .findOne({ email, clerkId: { $exists: false } });
+
+      if (oldUser) {
+        // Move transactions and budgets from old user to clerk-linked user
+        await My_Finance_db.collection("transactions").updateMany(
+          { userId: oldUser._id.toString() },
+          { $set: { userId: appUser._id.toString() } }
+        );
+        await My_Finance_db.collection("budgets").updateMany(
+          { userId: oldUser._id.toString() },
+          { $set: { userId: appUser._id.toString() } }
+        );
+        // Copy over credits and settings from old user
+        await My_Finance_db.collection("usersData").updateOne(
+          { _id: appUser._id },
+          {
+            $set: {
+              credits: oldUser.credits || 1000,
+              role: oldUser.role || "user",
+              isTransactionAllowed: oldUser.isTransactionAllowed ?? true,
+              fullName: oldUser.fullName || appUser.fullName,
+              photoURL: oldUser.photoURL || appUser.photoURL,
+            },
+          }
+        );
+        // Remove the old duplicate user
+        await My_Finance_db.collection("usersData").deleteOne({ _id: oldUser._id });
+        // Re-fetch
+        appUser = await My_Finance_db
+          .collection("usersData")
+          .findOne({ _id: appUser._id });
+      }
+    }
+
+    // If not found by clerkId, try linking by email to existing user
+    if (!appUser) {
+      const { createClerkClient } = require("@clerk/backend");
+      const clerkClient = createClerkClient({
+        secretKey: process.env.CLERK_SECRET_KEY,
+      });
+      const clerkUser = await clerkClient.users.getUser(payload.sub);
+      const email = clerkUser.emailAddresses?.[0]?.emailAddress;
+
+      // Check if an existing user with this email exists (old auth system)
+      const existingUser = await My_Finance_db
+        .collection("usersData")
+        .findOne({ email });
+
+      if (existingUser) {
+        // Link Clerk account to existing MongoDB user
+        await My_Finance_db.collection("usersData").updateOne(
+          { _id: existingUser._id },
+          {
+            $set: {
+              clerkId: payload.sub,
+              isVerified: true,
+              ...(clerkUser.imageUrl && { photoURL: clerkUser.imageUrl }),
+            },
+          }
+        );
+        appUser = await My_Finance_db
+          .collection("usersData")
+          .findOne({ _id: existingUser._id });
+      } else {
+        // No existing user — create new one
+        const fullName =
+          [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") ||
+          email;
+
+        const result = await My_Finance_db.collection("usersData").insertOne({
+          clerkId: payload.sub,
+          fullName,
+          email,
+          role: "user",
+          isVerified: true,
+          isTransactionAllowed: true,
+          credits: 1000,
+          photoURL: clerkUser.imageUrl || "",
+          createdAt: new Date(),
+        });
+
+        appUser = await My_Finance_db
+          .collection("usersData")
+          .findOne({ _id: result.insertedId });
+      }
+    }
+
+    req.user = { id: appUser._id.toString(), ...appUser };
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 
@@ -145,152 +177,99 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
-    // Add your API Endpoints here
-    app.post("/api/register", (req, res) => {
-      registerUser(req, res, usersCollection);
-    });
-
-    app.get("/api/verify", (req, res) => {
-      verifyUser(req, res, usersCollection);
-    });
-
-    app.post("/api/resend-verification", (req, res) => {
-      resendVerification(req, res, usersCollection);
-    });
-
-    app.post("/api/login", loginIpLimiter, loginAccountLimiter, (req, res) => {
-      loginUser(req, res, usersCollection);
-    });
-
-    // Forgot Password
+    // ─── Clerk Webhook: sync users to MongoDB (raw body for Svix verification) ───
     app.post(
-      "/api/forgot-password",
-      forgotPasswordIpLimiter,
-      forgotPasswordAccountLimiter,
+      "/api/webhooks/clerk",
+      express.raw({ type: "application/json" }),
       async (req, res) => {
-      try {
-        const { email } = req.body;
-        if (!email) {
-          return res.status(400).json({ message: "Email is required" });
+        const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
+
+        if (!WEBHOOK_SECRET) {
+          return res.status(500).json({ message: "Webhook secret not configured" });
         }
 
-        const user = await usersCollection.findOne({ email });
-        if (!user) {
-          return res.json({
-            message: "If this account exists, a password reset link has been sent.",
+        const svix_id = req.headers["svix-id"];
+        const svix_timestamp = req.headers["svix-timestamp"];
+        const svix_signature = req.headers["svix-signature"];
+
+        if (!svix_id || !svix_timestamp || !svix_signature) {
+          return res.status(400).json({ message: "Missing Svix headers" });
+        }
+
+        let evt;
+        try {
+          const wh = new Webhook(WEBHOOK_SECRET);
+          evt = wh.verify(req.body, {
+            "svix-id": svix_id,
+            "svix-timestamp": svix_timestamp,
+            "svix-signature": svix_signature,
+          });
+        } catch (err) {
+          return res.status(400).json({ message: "Invalid webhook signature" });
+        }
+
+        const { type, data } = evt;
+
+      if (type === "user.created") {
+        const { id, email_addresses, first_name, last_name, image_url } = data;
+        const email = email_addresses?.[0]?.email_address;
+        const fullName = [first_name, last_name].filter(Boolean).join(" ") || email;
+
+        const existing = await usersCollection.findOne({ clerkId: id });
+        if (!existing) {
+          await usersCollection.insertOne({
+            clerkId: id,
+            fullName,
+            email,
+            role: "user",
+            isVerified: true,
+            isTransactionAllowed: true,
+            credits: 1000,
+            photoURL: image_url || "",
+            createdAt: new Date(),
           });
         }
-
-        const resetToken = crypto.randomBytes(32).toString("hex");
-        const resetTokenHash = crypto
-          .createHash("sha256")
-          .update(resetToken)
-          .digest("hex");
-        const resetTokenExpire = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
-
-        await usersCollection.updateOne(
-          { _id: user._id },
-          {
-            $set: {
-              resetToken: resetTokenHash,
-              resetTokenExpire,
-            },
-          }
-        );
-
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-
-        const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
-
-        await transporter.sendMail({
-          from: `"Finance App" <${process.env.EMAIL_USER}>`,
-          to: email,
-          subject: "Reset your password",
-          html: `
-            <div style="background-color: #f9fafb; padding: 40px 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1f2937;">
-              <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                <h1 style="font-size: 24px; font-weight: 700; color: #1f2937; margin-bottom: 16px;">Reset Your Password</h1>
-                <p style="font-size: 16px; line-height: 1.5; color: #6b7280; margin-bottom: 32px;">
-                  We received a request to reset your password for your Finance App account. Click the button below to reset your password.
-                </p>
-                
-                <div style="margin: 32px 0; text-align: center;">
-                  <a href="${resetLink}" 
-                     style="background-color: #4f46e5; color: #ffffff; padding: 14px 28px; font-weight: 600; text-decoration: none; border-radius: 6px; display: inline-block; font-size: 16px;">
-                    Reset Password
-                  </a>
-                </div>
-
-                <p style="font-size: 14px; line-height: 1.5; color: #6b7280; margin-bottom: 0;">
-                  This link will expire in 15 minutes. If you did not request a password reset, you can safely ignore this email.
-                </p>
-              </div>
-            </div>
-          `,
-        });
-
-        res.json({
-          message: "If this account exists, a password reset link has been sent.",
-        });
-      } catch (error) {
-        console.error("Forgot password error:", error);
-        res.status(500).json({ message: "Server error" });
       }
-      },
-    );
 
-    // Reset Password
-    app.post("/api/reset-password", async (req, res) => {
-      try {
-        const { token, newPassword } = req.body;
-        if (!token || !newPassword) {
-          return res.status(400).json({ message: "Token and new password are required" });
+      if (type === "user.updated") {
+        const { id, first_name, last_name, email_addresses, image_url } = data;
+        const fullName = [first_name, last_name].filter(Boolean).join(" ");
+        const email = email_addresses?.[0]?.email_address;
+
+        const updateFields = {};
+        if (fullName) updateFields.fullName = fullName;
+        if (email) updateFields.email = email;
+        if (image_url !== undefined) updateFields.photoURL = image_url;
+
+        if (Object.keys(updateFields).length > 0) {
+          await usersCollection.updateOne(
+            { clerkId: id },
+            { $set: updateFields }
+          );
         }
-
-        if (newPassword.length < 8) {
-          return res.status(400).json({ message: "Password must be at least 8 characters" });
-        }
-
-        const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
-
-        const user = await usersCollection.findOne({
-          resetToken: tokenHash,
-          resetTokenExpire: { $gt: new Date() },
-        });
-
-        if (!user) {
-          return res.status(400).json({ message: "Invalid or expired token" });
-        }
-
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-        await usersCollection.updateOne(
-          { _id: user._id },
-          {
-            $set: { password: hashedPassword },
-            $unset: { resetToken: "", resetTokenExpire: "" },
-          }
-        );
-
-        res.json({ message: "Password reset successful" });
-      } catch (error) {
-        console.error("Reset password error:", error);
-        res.status(500).json({ message: "Server error" });
       }
+
+      if (type === "user.deleted") {
+        const { id } = data;
+        const user = await usersCollection.findOne({ clerkId: id });
+        if (user) {
+          const userIdStr = user._id.toString();
+          await transactionsCollection.deleteMany({ userId: userIdStr });
+          await budgetsCollection.deleteMany({ userId: userIdStr });
+          await usersCollection.deleteOne({ clerkId: id });
+        }
+      }
+
+      res.status(200).json({ received: true });
     });
 
+    // ─── Get current user (by Clerk ID) ───
     app.get("/api/me", verifyToken, async (req, res) => {
       try {
-        const userId = req.user.id;
+        const clerkUserId = req.auth.userId;
 
         const user = await usersCollection.findOne(
-          { _id: new ObjectId(userId) },
+          { clerkId: clerkUserId },
           { projection: { password: 0 } },
         );
 
@@ -302,10 +281,11 @@ async function run() {
           message: "User data fetched",
           user: {
             id: user._id,
+            clerkId: user.clerkId,
             fullName: user.fullName,
             email: user.email,
             role: user.role,
-            credits: user.credits, // 🔥 now included
+            credits: user.credits,
             photoURL: user.photoURL,
           },
         });
@@ -313,8 +293,6 @@ async function run() {
         res.status(500).json({ message: "Server error" });
       }
     });
-
-    app.post("/api/logout", logoutUser);
 
     // Update User Profile
     app.put("/api/me", verifyToken, async (req, res) => {
@@ -363,44 +341,6 @@ async function run() {
       } catch (error) {
         console.error("Profile update error:", error);
         res.status(500).json({ message: "Server error", error: error.message });
-      }
-    });
-
-    // Update Password
-    app.put("/api/me/password", verifyToken, async (req, res) => {
-      try {
-        const userId = req.user.id;
-        const { oldPassword, newPassword } = req.body;
-
-        if (!oldPassword || !newPassword) {
-          return res.status(400).json({ message: "Old password and new password are required" });
-        }
-
-        if (newPassword.length < 8) {
-          return res.status(400).json({ message: "New password must be at least 8 characters" });
-        }
-
-        const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
-        }
-
-        const isMatch = await bcrypt.compare(oldPassword, user.password);
-        if (!isMatch) {
-          return res.status(400).json({ message: "Old password is incorrect" });
-        }
-
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-        await usersCollection.updateOne(
-          { _id: user._id },
-          { $set: { password: hashedPassword } }
-        );
-
-        res.json({ message: "Password updated successfully" });
-      } catch (error) {
-        console.error("Password update error:", error);
-        res.status(500).json({ message: "Server error" });
       }
     });
 
@@ -792,10 +732,10 @@ async function run() {
 
         const creditsToAdd = Math.round(Number(credits));
 
-        if (!id || isNaN(creditsToAdd) || creditsToAdd === 0) {
+        if (!id || isNaN(creditsToAdd) || creditsToAdd <= 0) {
           return res
             .status(400)
-            .json({ message: "Invalid ID or credit amount must not be 0" });
+            .json({ message: "Invalid ID or credit amount must be greater than 0" });
         }
 
         const userId = new ObjectId(id);
@@ -818,6 +758,84 @@ async function run() {
         });
       } catch (error) {
         res.status(500).json({ message: "Failed to update credits" });
+      }
+    });
+
+    // ─── Admin: Update user role ───
+    app.patch("/api/admin/users/:id/role", verifyToken, async (req, res) => {
+      try {
+        const requester = await usersCollection.findOne({
+          _id: new ObjectId(req.user.id),
+        });
+
+        if (!requester || requester.role !== "admin") {
+          return res.status(403).json({ message: "Access denied. Admins only." });
+        }
+
+        const { id } = req.params;
+        const { role } = req.body;
+
+        if (!["admin", "user"].includes(role)) {
+          return res.status(400).json({ message: "Role must be 'admin' or 'user'" });
+        }
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).json({ message: "Invalid user ID" });
+        }
+
+        const result = await usersCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { role } }
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json({ success: true, message: `Role updated to ${role}` });
+      } catch (error) {
+        res.status(500).json({ message: "Server error" });
+      }
+    });
+
+    // ─── Admin: Delete user + their data ───
+    app.delete("/api/admin/users/:id", verifyToken, async (req, res) => {
+      try {
+        const requester = await usersCollection.findOne({
+          _id: new ObjectId(req.user.id),
+        });
+
+        if (!requester || requester.role !== "admin") {
+          return res.status(403).json({ message: "Access denied. Admins only." });
+        }
+
+        const { id } = req.params;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).json({ message: "Invalid user ID" });
+        }
+
+        const targetUser = await usersCollection.findOne({ _id: new ObjectId(id) });
+        if (!targetUser) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        if (targetUser._id.toString() === requester._id.toString()) {
+          return res.status(400).json({ message: "Admin cannot delete themselves" });
+        }
+
+        const userObjId = new ObjectId(id);
+
+        await transactionsCollection.deleteMany({ userId: id });
+        await budgetsCollection.deleteMany({ userId: id });
+        await usersCollection.deleteOne({ _id: userObjId });
+
+        res.json({
+          success: true,
+          message: `User "${targetUser.fullName}" and all their data deleted`,
+        });
+      } catch (error) {
+        res.status(500).json({ message: "Server error" });
       }
     });
 

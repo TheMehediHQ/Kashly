@@ -3,14 +3,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  LuLayoutDashboard,
-  LuLogOut,
-  LuChevronDown,
-} from "react-icons/lu";
+import { LuLayoutDashboard, LuLogOut, LuChevronDown } from "react-icons/lu";
 import Image from "next/image";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
+import { useAuth as useClerkAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -19,10 +15,10 @@ const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { signOut } = useClerkAuth();
 
   const { user } = useAuth();
 
-  // Reset the error flag when the avatar URL changes
   useEffect(() => {
     setAvatarError(false);
   }, [user?.photoURL]);
@@ -47,14 +43,8 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post(
-        `/api/logout`,
-        {},
-        { withCredentials: true }
-      );
-
+      await signOut();
       toast.success("Logout successful");
-
       setTimeout(() => {
         router.push("/login");
       }, 1200);
