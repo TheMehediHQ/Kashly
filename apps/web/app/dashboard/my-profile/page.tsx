@@ -59,7 +59,7 @@ const MyProfile = () => {
         <div className="px-5 sm:px-8 -mt-10 pb-6">
           <div className="flex items-center gap-4">
             {/* Avatar */}
-            <div className=" overflow-hidden  shadow-xl">
+            <div className=" overflow-hidden rounded-xl shadow-xl">
               <UserButton
                 appearance={{
                   elements: {

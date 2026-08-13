@@ -32,32 +32,25 @@ const BottomNav = () => {
           const Icon = item.icon;
 
           return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className="relative flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-colors"
-            >
-              {isActive && (
-                <motion.div
-                  layoutId="bottomNavIndicator"
-                  className="absolute -top-1 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-[#BDFE00]"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-              <Icon
-                size={20}
-                className={`transition-colors ${
-                  isActive ? "text-[#BDFE00]" : "text-slate-500"
-                }`}
-              />
-              <span
-                className={`text-[9px] font-mono font-bold uppercase tracking-wider transition-colors ${
-                  isActive ? "text-[#BDFE00]" : "text-slate-500"
-                }`}
-              >
-                {item.name}
-              </span>
-            </Link>
+        <Link
+  key={item.name}
+  href={item.href}
+  className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-colors"
+>
+  <Icon
+    size={20}
+    className={`transition-colors ${
+      isActive ? "text-[#BDFE00]" : "text-slate-500"
+    }`}
+  />
+  <span
+    className={`text-[9px] font-mono font-bold uppercase tracking-wider transition-colors ${
+      isActive ? "text-[#BDFE00]" : "text-slate-500"
+    }`}
+  >
+    {item.name}
+  </span>
+</Link>
           );
         })}
       </div>
