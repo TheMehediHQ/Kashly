@@ -38,7 +38,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   type,
   onSuccess,
 }) => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [open, setOpen] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -173,6 +173,9 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
       if (res.data.success) {
         handleClose();
         toast.success(`${label} added successfully`);
+        if (user) {
+          setUser({ ...user, credits: (user.credits ?? 1) - 1 });
+        }
         onSuccess();
       }
     } catch (error: unknown) {

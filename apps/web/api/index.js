@@ -8,6 +8,7 @@
  * receives the original request path (e.g. /api/login), which matches the
  * routes defined in apps/api/index.js.
  */
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const app = require("@moneyflow/api");
 
 module.exports = app;
