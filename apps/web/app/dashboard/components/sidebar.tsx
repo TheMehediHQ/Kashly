@@ -198,7 +198,7 @@ const Sidebar = () => {
 
           {/* Copyright Tag */}
           <p className="text-center text-[10px] font-mono uppercase tracking-widest text-slate-500 pt-1">
-            © {new Date().getFullYear()} Kashly | All rights reserved
+            © {new Date().getFullYear()} Kashly 
           </p>
         </div>
       </aside>
