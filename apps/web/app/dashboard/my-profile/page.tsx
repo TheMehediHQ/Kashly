@@ -1,373 +1,260 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useAuth } from "@/app/context/AuthContext";
-import React, { useState } from "react";
+import React from "react";
 import {
-  LuUser,
   LuMail,
-  LuPencil,
-  LuX,
-  LuCamera,
-  LuCircle,
-  LuLoader,
-  LuStar
+  LuStar,
+  LuCreditCard,
+  LuShield,
+  LuCalendar,
+  LuCheck,
+  LuSettings,
+  LuUser,
+  LuZap,
 } from "react-icons/lu";
-import Image from "next/image";
-import axios from "axios";
+import { UserButton } from "@clerk/nextjs";
 
 const MyProfile = () => {
-  const { user, setUser, loading } = useAuth();
-
-  const [isEditing, setIsEditing] = React.useState(false);
-  const [fullName, setFullName] = React.useState(user?.fullName || "");
-  const [photoURL, setPhotoURL] = React.useState(user?.photoURL || "");
-  const [isUploading, setIsUploading] = React.useState(false);
-  const [uploadError, setUploadError] = React.useState<string>("");
-  const [isSaving, setIsSaving] = React.useState(false);
-  const [message, setMessage] = React.useState<{ type: "success" | "error"; text: string } | null>(null);
-  const [avatarError, setAvatarError] = React.useState(false);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-  const displayPhotoURL = isEditing ? photoURL : (user?.photoURL || "");
-  const displayFullName = isEditing ? fullName : (user?.fullName || "");
-
-  React.useEffect(() => {
-    setFullName(user?.fullName || "");
-    setPhotoURL(user?.photoURL || "");
-  }, [user]);
-
-  React.useEffect(() => {
-    setAvatarError(false);
-  }, [displayPhotoURL]);
-
-  const handleSaveProfile = async () => {
-    if (!fullName.trim()) {
-      setMessage({ type: "error", text: "Full name is required" });
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      const response = await axios.put(
-        `/api/me`,
-        {
-          fullName: fullName.trim(),
-          photoURL: photoURL || undefined,
-        },
-        { withCredentials: true }
-      );
-
-      setUser(response.data.user);
-
-      setIsEditing(false);
-      setMessage({ type: "success", text: "Profile updated successfully!" });
-      setTimeout(() => setMessage(null), 3000);
-    } catch (error: any) {
-      setMessage({
-        type: "error",
-        text: error.response?.data?.message || "Failed to update profile"
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setFullName(user?.fullName || "");
-    setPhotoURL(user?.photoURL || "");
-    setIsEditing(false);
-    setMessage(null);
-  };
-
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const preset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-
-    if (!preset || !cloudName) {
-      setUploadError("Upload service not configured");
-      return;
-    }
-
-    setIsUploading(true);
-    setUploadError("");
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", preset);
-
-    try {
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-        { method: "POST", body: formData },
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        setUploadError(data.error.message);
-        return;
-      }
-      setPhotoURL(data.secure_url);
-      setUploadError("");
-    } catch (err) {
-      setUploadError("Upload failed");
-    } finally {
-      setIsUploading(false);
-    }
-  };
+  const { user, loading } = useAuth();
 
   if (loading) {
     return (
-      <div className="w-full min-h-screen text-white">
-        <div className="max-w-5xl mx-auto space-y-6">
-          <div className="space-y-3">
-            <div className="h-10 w-56 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
-            <div className="h-5 w-72 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
+      <div className="w-full min-h-screen p-3 sm:p-6 lg:p-8 space-y-6">
+        <div className="space-y-3">
+          <div className="h-10 w-56 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
+          <div className="h-5 w-72 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-28 rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
+          ))}
+        </div>
+        <div className="h-64 rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full min-h-screen p-3 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-6 border-b border-white/10">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-2.5">
+            <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
+            ACCOUNT SETTINGS
           </div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
+            My Profile
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            View your account info and manage identity settings.
+          </p>
+        </div>
+      </div>
 
-          <div className="rounded-3xl border border-white/10 bg-white/5 overflow-hidden">
-            <div className="h-32 bg-white/5" />
-            <div className="px-6 sm:px-8 -mt-16 pb-8">
-              <div className="flex flex-col sm:flex-row gap-6 mb-8">
-                <div className="h-32 w-32 rounded-2xl bg-white/10 animate-pulse" />
-                <div className="flex-1 space-y-3 pt-16 sm:pt-4">
-                  <div className="h-8 w-48 rounded-lg bg-white/10 animate-pulse" />
-                  <div className="h-4 w-64 rounded bg-white/5 animate-pulse" />
-                </div>
+      {/* Profile Identity Card */}
+      <div className="rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-xl overflow-hidden">
+        <div className="h-24 bg-gradient-to-r from-[#BDFE00]/10 via-transparent to-[#1FBFD8]/10 border-b border-white/5" />
+        <div className="px-5 sm:px-6 -mt-12 pb-6">
+          <div className="flex flex-col sm:flex-row gap-5 items-start">
+            {/* Avatar */}
+            <div className="h-24 w-24 rounded-2xl overflow-hidden border-4 border-[#0B0F17] bg-slate-800 shadow-xl shrink-0">
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: "h-full w-full rounded-none",
+                  },
+                }}
+              />
+            </div>
+
+            {/* Info */}
+            <div className="flex-1 pt-2 sm:pt-8">
+              <h2 className="text-xl sm:text-2xl font-bold text-white mb-0.5">
+                {user?.fullName}
+              </h2>
+              <p className="text-sm text-slate-400 font-mono mb-3">
+                {user?.email}
+              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#BDFE00]/10 border border-[#BDFE00]/30 text-[#BDFE00] text-[10px] font-mono font-bold uppercase tracking-wider">
+                  <LuCheck size={10} /> Verified
+                </span>
+                {user?.role === "admin" && (
+                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#1FBFD8]/10 border border-[#1FBFD8]/30 text-[#1FBFD8] text-[10px] font-mono font-bold uppercase tracking-wider">
+                    <LuStar size={10} /> Admin
+                  </span>
+                )}
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono font-bold uppercase tracking-wider">
+                  Active
+                </span>
               </div>
+            </div>
 
-              <div className="h-px mb-8 bg-white/10" />
-
-              <div className="space-y-6 pb-8">
-                {Array.from({ length: 3 }).map((_, idx) => (
-                  <div key={idx} className="space-y-3">
-                    <div className="h-4 w-28 rounded bg-white/10 animate-pulse" />
-                    <div className="h-12 w-full rounded-xl bg-white/5 border border-white/10 animate-pulse" />
-                  </div>
-                ))}
+            {/* Manage Identity Button */}
+            <div className="sm:text-right shrink-0">
+              <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider mb-2">
+                Manage Identity
+              </p>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox: "h-8 w-8 rounded-lg",
+                    },
+                  }}
+                />
+                <span className="text-xs text-slate-400 font-mono hidden sm:inline">
+                  Name, Password, 2FA →
+                </span>
               </div>
             </div>
           </div>
         </div>
       </div>
-    );
-  }
 
-  const defaultAvatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email || "user"}`;
-
-  return (
-    <div className="w-full min-h-screen text-white">
-      <div className="max-w-5xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="pb-6 border-b border-white/10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-2">
-            <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
-            ACCOUNT SETTINGS
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Credits */}
+        <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+              Credits
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-[#1FBFD8]/10 flex items-center justify-center text-[#1FBFD8]">
+              <LuCreditCard size={16} />
+            </div>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-            My Profile
-          </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Manage and personalize your account details
+          <p className="text-2xl sm:text-3xl font-black text-[#1FBFD8] tracking-tight">
+            {user?.credits ?? 0}
+          </p>
+          <p className="text-[10px] font-mono text-slate-500 mt-1">
+            {user?.credits < 50 ? "Running low" : "1 credit per txn"}
           </p>
         </div>
 
-        {/* Alert Messages */}
-        {message && (
-          <div className={`p-4 rounded-xl flex items-center gap-3 border ${
-            message.type === "success"
-              ? "bg-[#BDFE00]/10 text-[#BDFE00] border-[#BDFE00]/30"
-              : "bg-red-500/10 text-red-400 border-red-500/30"
-          }`}>
-            <LuCircle size={18} />
-            <span className="font-medium text-sm">{message.text}</span>
+        {/* Role */}
+        <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+              Role
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-[#BDFE00]/10 flex items-center justify-center text-[#BDFE00]">
+              <LuShield size={16} />
+            </div>
           </div>
-        )}
+          <p className={`text-2xl sm:text-3xl font-black tracking-tight ${
+            user?.role === "admin" ? "text-[#BDFE00]" : "text-slate-400"
+          }`}>
+            {user?.role?.toUpperCase() || "USER"}
+          </p>
+          <p className="text-[10px] font-mono text-slate-500 mt-1">
+            {user?.role === "admin" ? "Full access" : "Standard access"}
+          </p>
+        </div>
 
-        {/* Main Profile Card */}
-        <div className="rounded-3xl border border-white/10 bg-slate-900/40 backdrop-blur-xl overflow-hidden shadow-2xl">
-          {/* Header Background */}
-          <div className="h-32 bg-gradient-to-r from-[#BDFE00]/10 via-transparent to-[#1FBFD8]/10 border-b border-white/5" />
+        {/* Transaction Status */}
+        <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+              Transactions
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+              <LuZap size={16} />
+            </div>
+          </div>
+          <p className={`text-2xl sm:text-3xl font-black tracking-tight ${
+            user?.isTransactionAllowed ? "text-emerald-400" : "text-rose-400"
+          }`}>
+            {user?.isTransactionAllowed ? "ACTIVE" : "LOCKED"}
+          </p>
+          <p className="text-[10px] font-mono text-slate-500 mt-1">
+            {user?.isTransactionAllowed ? "Can add transactions" : "Blocked by admin"}
+          </p>
+        </div>
 
-          {/* Profile Content */}
-          <div className="px-6 sm:px-8">
-            {/* Avatar and Basic Info */}
-            <div className="flex flex-col sm:flex-row gap-6 -mt-16 mb-8">
-              <div className="relative">
-                <div className="relative h-32 w-32 overflow-hidden rounded-2xl border-4 border-[#0B0F17] bg-slate-800 shadow-xl">
-                  <Image
-                    src={!avatarError && displayPhotoURL ? displayPhotoURL : defaultAvatar}
-                    alt="User Profile"
-                    fill
-                    className="object-cover"
-                    sizes="128px"
-                    priority
-                    unoptimized
-                    onError={() => setAvatarError(true)}
-                  />
-                </div>
-                {isEditing && (
-                  <>
-                    <button 
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isUploading}
-                      className="absolute bottom-2 right-2 p-2 rounded-full bg-[#BDFE00] text-black shadow-lg hover:bg-[#aef000] transition-all cursor-pointer disabled:opacity-50"
-                    >
-                      {isUploading ? (
-                        <LuLoader size={16} className="animate-spin" />
-                      ) : (
-                        <LuCamera size={16} />
-                      )}
-                    </button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarUpload}
-                      className="hidden"
-                    />
-                  </>
-                )}
+        {/* Member Since */}
+        <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+              Member Since
+            </span>
+            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
+              <LuCalendar size={16} />
+            </div>
+          </div>
+          <p className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            {user?.createdAt
+              ? new Date(user.createdAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  year: "numeric",
+                })
+              : "—"}
+          </p>
+          <p className="text-[10px] font-mono text-slate-500 mt-1">
+            Account creation date
+          </p>
+        </div>
+      </div>
+
+      {/* Account Details */}
+      <div className="rounded-2xl bg-slate-900/40 border border-white/10 backdrop-blur-xl overflow-hidden">
+        <div className="flex items-center gap-2 p-5 border-b border-white/10">
+          <LuSettings size={16} className="text-[#BDFE00]" />
+          <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+            Account Details
+          </h2>
+        </div>
+
+        <div className="divide-y divide-white/5">
+          {/* Full Name */}
+          <div className="flex items-center justify-between p-5 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#BDFE00]/10 flex items-center justify-center text-[#BDFE00]">
+                <LuUser size={16} />
               </div>
-
-              <div className="flex-1 flex flex-col justify-center">
-                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-1">
-                  {fullName || user?.fullName}
-                </h2>
-                <p className="text-sm text-slate-400 mb-3 font-mono">
-                  {user?.email}
-                </p>
-                <div className="flex items-center gap-2">
-                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/30 text-[#BDFE00] text-xs font-semibold">
-                    <LuCircle size={12} /> Verified
-                  </span>
-                  {user?.role === "admin" && (
-                    <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1FBFD8]/10 border border-[#1FBFD8]/30 text-[#1FBFD8] text-xs font-semibold">
-                      <LuStar size={12} /> Admin
-                    </span>
-                  )}
-                </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Full Name</p>
+                <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Managed via Clerk</p>
               </div>
             </div>
+            <span className="text-sm text-slate-300 font-medium">
+              {user?.fullName || "—"}
+            </span>
+          </div>
 
-            <div className="h-px mb-8 bg-white/10" />
-
-            {/* Editable Fields */}
-            <div className="space-y-6 pb-8">
-              {/* Full Name Field */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-semibold mb-2.5 text-slate-300">
-                  <LuUser size={18} className="text-[#BDFE00]" />
-                  Full Name
-                </label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Enter your full name"
-                    className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder:text-slate-500 focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
-                    autoFocus
-                  />
-                ) : (
-                  <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-medium">
-                    {displayFullName}
-                  </div>
-                )}
+          {/* Email */}
+          <div className="flex items-center justify-between p-5 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#1FBFD8]/10 flex items-center justify-center text-[#1FBFD8]">
+                <LuMail size={16} />
               </div>
-
-              {/* Photo URL Field */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-semibold mb-2.5 text-slate-300">
-                  <LuCamera size={18} className="text-[#BDFE00]" />
-                  Avatar
-                </label>
-                {isEditing ? (
-                  <div className="space-y-3">
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isUploading}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white font-medium transition-colors cursor-pointer disabled:opacity-50"
-                    >
-                      {isUploading ? (
-                        <>
-                          <LuLoader size={16} className="animate-spin text-[#BDFE00]" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <LuCamera size={16} className="text-[#BDFE00]" />
-                          Choose Image
-                        </>
-                      )}
-                    </button>
-                    {uploadError && (
-                      <p className="text-red-400 text-sm">{uploadError}</p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 text-sm">
-                    {displayPhotoURL ? "Custom avatar configured" : "Using default avatar"}
-                  </div>
-                )}
-              </div>
-
-              {/* Email Field */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-semibold mb-2.5 text-slate-300">
-                  <LuMail size={18} className="text-[#BDFE00]" />
-                  Email Address
-                </label>
-                <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-slate-400 cursor-not-allowed opacity-70">
-                  {user?.email}
-                </div>
-                <p className="text-xs text-slate-500 mt-2">
-                  Email addresses are managed securely and cannot be changed directly.
-                </p>
+                <p className="text-sm font-semibold text-white">Email Address</p>
+                <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Managed via Clerk</p>
               </div>
             </div>
+            <span className="text-sm text-slate-300 font-mono">
+              {user?.email || "—"}
+            </span>
+          </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 pb-8 pt-4 border-t border-white/10">
-              {isEditing ? (
-                <>
-                  <button
-                    onClick={handleSaveProfile}
-                    disabled={isSaving}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)] transition-all active:scale-95 cursor-pointer disabled:opacity-50"
-                  >
-                    {isSaving ? (
-                      <>
-                        <LuLoader size={18} className="animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <LuCircle size={18} />
-                        Save Changes
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    disabled={isSaving}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white font-semibold transition-all cursor-pointer disabled:opacity-50"
-                  >
-                    <LuX size={18} />
-                    Cancel
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)] transition-all active:scale-95 cursor-pointer"
-                >
-                  <LuPencil size={18} />
-                  Edit Profile
-                </button>
-              )}
+          {/* Security */}
+          <div className="flex items-center justify-between p-5 hover:bg-white/[0.02] transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
+                <LuShield size={16} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Security</p>
+                <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Password, 2FA, Sessions</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-md font-bold uppercase">
+                Secured
+              </span>
             </div>
           </div>
         </div>

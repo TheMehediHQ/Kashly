@@ -287,6 +287,8 @@ async function run() {
             role: user.role,
             credits: user.credits,
             photoURL: user.photoURL,
+            isTransactionAllowed: user.isTransactionAllowed ?? true,
+            createdAt: user.createdAt,
           },
         });
       } catch (error) {
