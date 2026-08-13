@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { LuGithub } from "react-icons/lu";
 
 export function HomePageClient() {
   return (
@@ -28,14 +29,35 @@ export function HomePageClient() {
           </p>
 
           {/* CTA Group */}
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#BDFE00] text-black font-semibold hover:bg-[#aef000] hover:shadow-[0_0_25px_rgba(189,254,0,0.4)] transition-all duration-300 transform active:scale-95">
-              Get Started For Free
-            </button>
-            <button className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 font-medium backdrop-blur-md transition-all duration-300">
-              Live Demo
-            </button>
-          </div>
+      
+
+
+<div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+  {/* Primary CTA */}
+  <button className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#BDFE00] text-black font-semibold hover:bg-[#aef000] hover:shadow-[0_0_25px_rgba(189,254,0,0.4)] transition-all duration-300 transform active:scale-95">
+    Get Started For Free
+  </button>
+
+  {/* GitHub Secondary CTA */}
+  <a
+    href="https://github.com/TheMehediHQ/Kashly" // আপনার গিটহাব লিংক দিন
+    target="_blank"
+    rel="noopener noreferrer"
+    className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-3.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white border border-white/10 hover:border-white/20 font-medium backdrop-blur-md transition-all duration-300 transform active:scale-95"
+  >
+    <LuGithub size={19} />
+    <span>Star on GitHub</span>
+  </a>
+</div>
+
+
+
+
+
+
+
+
+
         </div>
       </section>
 
