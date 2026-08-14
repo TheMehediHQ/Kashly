@@ -240,10 +240,10 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   return (
     <>
       <div
-        className="fixed inset-0 z-40 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+        className="fixed inset-0 z-60 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
         onClick={handleClose}
       />
-      <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center overflow-y-auto p-3 sm:p-4 pointer-events-none">
+      <div className="fixed inset-0 z-60 flex items-start sm:items-center justify-center overflow-y-auto p-3 sm:p-4 pointer-events-none">
         <div
           className="pointer-events-auto relative w-full max-w-md rounded-3xl border border-white/10 bg-[#0B0F17] shadow-2xl overflow-hidden max-h-[calc(100vh-1.5rem)] sm:max-h-[90vh]"
           onClick={(e) => e.stopPropagation()}

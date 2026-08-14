@@ -166,10 +166,10 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
   return (
     <>
       <div
-        className="fixed inset-0 z-40 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+        className="fixed inset-0 z-60 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
         onClick={onClose}
       />
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+      <div className="fixed inset-0 z-60 flex items-center justify-center p-4 pointer-events-none">
         <div className="pointer-events-auto rounded-3xl bg-[#0B0F17] border border-white/10 shadow-2xl w-full max-w-md overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">

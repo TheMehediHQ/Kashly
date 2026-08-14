@@ -222,12 +222,12 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+            className="fixed inset-0 z-60 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
             onClick={handleClose}
           />
 
           {/* Modal Container */}
-          <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-4 pointer-events-none overflow-y-auto">
+          <div className="fixed inset-0 z-60 flex items-start sm:items-center justify-center p-3 sm:p-4 pointer-events-none overflow-y-auto">
             <div
               className="pointer-events-auto relative w-full max-w-md rounded-3xl bg-[#0B0F17]/95 border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden max-h-[calc(100vh-1.5rem)] sm:max-h-[90vh]"
               onClick={(e) => e.stopPropagation()}

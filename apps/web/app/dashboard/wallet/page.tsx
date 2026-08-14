@@ -40,7 +40,7 @@ const Wallet = () => {
     setSummaryLoading(true);
 
     try {
-      const res = await axios.get(`/api/summary`, {
+      const res = await axios.get("/api/summary", {
         withCredentials: true,
       });
 
@@ -60,55 +60,103 @@ const Wallet = () => {
   }, [fetchSummary, refreshKey]);
 
   return (
-    <div className="min-h-screen w-full bg-[#0B0F17] text-white p-3 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
-      {/* Header & Main Page Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10">
+    <div className="min-h-screen w-full space-y-6 bg-[#0B0F17] p-3 text-white sm:space-y-8 sm:p-6 lg:p-8">
+
+      {/* =========================
+          HEADER
+      ========================== */}
+      <div className="flex flex-col justify-between gap-4 border-b border-white/10 pb-6 md:flex-row md:items-center">
+
+        {/* Header Content */}
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-2.5">
-            <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
+          <div className="mb-2.5 inline-flex items-center gap-2 rounded-full border border-[#BDFE00]/20 bg-[#BDFE00]/10 px-3 py-1 text-xs font-mono tracking-wide text-[#BDFE00]">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-[#BDFE00]" />
             FINANCIAL OVERVIEW
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white">
+
+          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-4xl">
             Wallet &amp; Cash Flow
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Monitor real-time balance, log income and expenses, and review recent activity.
+
+          <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+            Monitor real-time balance, log income and expenses, and review
+            recent activity.
           </p>
         </div>
 
-        {/* Top Right Quick Links */}
+        {/* Top Right Controls */}
         <div className="flex items-center gap-3 self-start md:self-auto">
+
+          {/* Budgets */}
           <Link
             href="/dashboard/budgets"
-            className="inline-flex items-center justify-center h-10 px-4 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer text-xs font-semibold uppercase tracking-wider gap-2 shadow-sm active:scale-95"
+            className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 text-xs font-semibold uppercase tracking-wider text-slate-300 shadow-sm transition-all hover:bg-white/10 hover:text-white active:scale-95"
             title="View budget history"
           >
             <FiArchive className="h-4 w-4 text-[#BDFE00]" />
             <span>Budgets</span>
           </Link>
 
+          {/* Refresh */}
           <button
+            type="button"
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-all cursor-pointer shadow-sm active:scale-95 disabled:opacity-50"
+            className="inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-300 shadow-sm transition-all hover:bg-white/10 hover:text-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             title="Refresh"
           >
             <FiRefreshCw
-              className={`h-4 w-4 ${isRefreshing ? "animate-spin text-[#BDFE00]" : ""}`}
+              className={`h-4 w-4 ${
+                isRefreshing
+                  ? "animate-spin text-[#BDFE00]"
+                  : ""
+              }`}
             />
           </button>
         </div>
       </div>
 
-      {/* Main Balance Hero Card */}
+      {/* =========================
+          MAIN BALANCE
+      ========================== */}
       <div className="w-full">
-        <MainBalance refreshKey={refreshKey} onRefresh={handleRefresh} />
+        <MainBalance refreshKey={refreshKey} />
       </div>
 
-  
+      {/* =========================
+          TRANSACTION ACTIONS
+      ========================== */}
+     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  {/* Left: Title */}
+  <div>
+    <h2 className="text-2xl font-bold text-white">
+      Monthly Cash Flow
+    </h2>
 
-      {/* Income and Expense Overview Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <p className="mt-0.5 text-xs text-slate-400">
+      Active spending and earning flow for current month
+    </p>
+  </div>
+
+  {/* Right: Actions */}
+  <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+    <TransactionModal
+      type="income"
+      onSuccess={handleRefresh}
+    />
+
+    <TransactionModal
+      type="expense"
+      onSuccess={handleRefresh}
+    />
+  </div>
+</div>
+
+      {/* =========================
+          INCOME & EXPENSE OVERVIEW
+      ========================== */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+
         <LastMonthIncome
           income={summary?.thisMonthIncome}
           count={summary?.incomeTransactions}
@@ -120,20 +168,26 @@ const Wallet = () => {
           count={summary?.expenseTransactions}
           loading={summaryLoading}
         />
+
       </div>
 
-      {/* Budget Overview Widget */}
+      {/* =========================
+          BUDGET OVERVIEW
+      ========================== */}
       <div className="w-full">
         <BudgetOverview refreshKey={refreshKey} />
       </div>
 
-      {/* Transactions History Table */}
+      {/* =========================
+          TRANSACTION HISTORY
+      ========================== */}
       <div className="w-full pt-2">
         <TransactionHistory
           refreshKey={refreshKey}
           onRefresh={handleRefresh}
         />
       </div>
+
     </div>
   );
 };
