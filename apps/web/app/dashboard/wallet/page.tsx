@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
@@ -62,7 +61,7 @@ const Wallet = () => {
 
   return (
     <div className="min-h-screen w-full bg-[#0B0F17] text-white p-3 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
-      {/* Header & Actions */}
+      {/* Header & Main Page Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-2.5">
@@ -77,7 +76,7 @@ const Wallet = () => {
           </p>
         </div>
 
-        {/* Top Control Buttons */}
+        {/* Top Right Quick Links */}
         <div className="flex items-center gap-3 self-start md:self-auto">
           <Link
             href="/dashboard/budgets"
@@ -101,18 +100,14 @@ const Wallet = () => {
         </div>
       </div>
 
-      {/* Main Balance Card */}
+      {/* Main Balance Hero Card */}
       <div className="w-full">
         <MainBalance refreshKey={refreshKey} onRefresh={handleRefresh} />
       </div>
 
-      {/* Quick Action Modals (Add Income & Add Expense) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <TransactionModal type="income" onSuccess={handleRefresh} />
-        <TransactionModal type="expense" onSuccess={handleRefresh} />
-      </div>
+  
 
-      {/* Income and Expense Overview Cards */}
+      {/* Income and Expense Overview Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <LastMonthIncome
           income={summary?.thisMonthIncome}
@@ -132,7 +127,7 @@ const Wallet = () => {
         <BudgetOverview refreshKey={refreshKey} />
       </div>
 
-      {/* Transactions History Ledger */}
+      {/* Transactions History Table */}
       <div className="w-full pt-2">
         <TransactionHistory
           refreshKey={refreshKey}

@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { useForm, SubmitHandler } from "react-hook-form";
 import {
   FiPlusCircle,
+  FiMinusCircle,
   FiX,
   FiCalendar,
   FiUploadCloud,
@@ -189,39 +190,32 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
 
   return (
     <>
-      {/* Trigger Button */}
+      {/* Compact SaaS Pill Trigger Button */}
       <button
         type="button"
         onClick={() => {
           if (noCredits) {
-            toast.error("No credits left. Please contact admin to add more credits.");
+            toast.error(
+              "No credits left. Please contact admin to add more credits."
+            );
             return;
           }
           setOpen(true);
         }}
-        className={`group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl py-3.5 transition-all active:scale-[0.98] shadow-lg cursor-pointer ${
-          noCredits
-            ? "opacity-40 cursor-not-allowed"
-            : ""
+        className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border font-mono text-xs font-semibold tracking-wider transition-all duration-200 cursor-pointer active:scale-95 shadow-md ${
+          noCredits ? "opacity-40 cursor-not-allowed" : ""
         } ${
           isIncome
-            ? "bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.25)]"
-            : "bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"
+            ? "border-[#BDFE00]/30 bg-[#BDFE00]/10 hover:bg-[#BDFE00]/20 text-[#BDFE00] hover:shadow-[0_0_15px_rgba(189,254,0,0.15)]"
+            : "border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:shadow-[0_0_15px_rgba(244,63,94,0.15)]"
         }`}
       >
-        <div
-          className={`flex h-6 w-6 items-center justify-center rounded-full transition-colors ${
-            isIncome ? "bg-black/10 text-black" : "bg-white/10 text-[#BDFE00]"
-          }`}
-        >
-          <FiPlusCircle
-            size={16}
-            className="transition-transform duration-300 group-hover:rotate-90"
-          />
-        </div>
-        <span className="text-xs font-bold uppercase tracking-wider font-mono">
-          Add {label}
-        </span>
+        {isIncome ? (
+          <FiPlusCircle className="w-4 h-4 text-[#BDFE00]" />
+        ) : (
+          <FiMinusCircle className="w-4 h-4 text-rose-400" />
+        )}
+        <span>ADD {label.toUpperCase()}</span>
       </button>
 
       {open && (
@@ -235,7 +229,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
           {/* Modal Container */}
           <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-3 sm:p-4 pointer-events-none overflow-y-auto">
             <div
-              className="pointer-events-auto relative w-full max-w-md rounded-3xl bg-[#0B0F17] border border-white/10 shadow-2xl overflow-hidden max-h-[calc(100vh-1.5rem)] sm:max-h-[90vh]"
+              className="pointer-events-auto relative w-full max-w-md rounded-3xl bg-[#0B0F17]/95 border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden max-h-[calc(100vh-1.5rem)] sm:max-h-[90vh]"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="overflow-y-auto max-h-[calc(100vh-1.5rem)] sm:max-h-[90vh] p-5 sm:p-7">
@@ -250,9 +244,19 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
 
                 {/* Header Badge */}
                 <div className="mb-6 text-center">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-2">
-                    <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
-                    NEW TRANSACTION
+                  <div
+                    className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-wide mb-2 ${
+                      isIncome
+                        ? "bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00]"
+                        : "bg-rose-500/10 border border-rose-500/20 text-rose-400"
+                    }`}
+                  >
+                    <span
+                      className={`w-2 h-2 rounded-full animate-pulse ${
+                        isIncome ? "bg-[#BDFE00]" : "bg-rose-500"
+                      }`}
+                    />
+                    NEW {label.toUpperCase()}
                   </div>
                   <h3 className="text-xl font-bold text-white">Add {label}</h3>
                 </div>
@@ -315,7 +319,9 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                   {/* Amount Display */}
                   <div
                     className={`rounded-2xl p-4 border transition-all bg-slate-900/50 ${
-                      errors.amount ? "border-rose-500/80" : "border-white/10 focus-within:border-[#BDFE00]/60"
+                      errors.amount
+                        ? "border-rose-500/80"
+                        : "border-white/10 focus-within:border-[#BDFE00]/60"
                     }`}
                   >
                     <p className="text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-1">
@@ -363,7 +369,11 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                         className="w-full appearance-none rounded-xl bg-white/5 border border-white/10 pl-10 pr-8 py-3 text-xs font-semibold text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
                       >
                         {categories.map((cat) => (
-                          <option key={cat} value={cat} className="bg-[#0B0F17] text-white">
+                          <option
+                            key={cat}
+                            value={cat}
+                            className="bg-[#0B0F17] text-white"
+                          >
                             {cat}
                           </option>
                         ))}
@@ -378,13 +388,33 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                         {...register("method", { required: true })}
                         className="w-full appearance-none rounded-xl bg-white/5 border border-white/10 pl-10 pr-8 py-3 text-xs font-semibold text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
                       >
-                        <option value="Cash" className="bg-[#0B0F17] text-white">Cash</option>
-                        <option value="bKash" className="bg-[#0B0F17] text-white">bKash</option>
-                        <option value="Nagad" className="bg-[#0B0F17] text-white">Nagad</option>
-                        <option value="Rocket" className="bg-[#0B0F17] text-white">Rocket</option>
-                        <option value="Bank" className="bg-[#0B0F17] text-white">Bank Transfer</option>
-                        <option value="Card" className="bg-[#0B0F17] text-white">Card</option>
-                        <option value="Other" className="bg-[#0B0F17] text-white">Other</option>
+                        <option value="Cash" className="bg-[#0B0F17] text-white">
+                          Cash
+                        </option>
+                        <option value="bKash" className="bg-[#0B0F17] text-white">
+                          bKash
+                        </option>
+                        <option value="Nagad" className="bg-[#0B0F17] text-white">
+                          Nagad
+                        </option>
+                        <option
+                          value="Rocket"
+                          className="bg-[#0B0F17] text-white"
+                        >
+                          Rocket
+                        </option>
+                        <option value="Bank" className="bg-[#0B0F17] text-white">
+                          Bank Transfer
+                        </option>
+                        <option value="Card" className="bg-[#0B0F17] text-white">
+                          Card
+                        </option>
+                        <option
+                          value="Other"
+                          className="bg-[#0B0F17] text-white"
+                        >
+                          Other
+                        </option>
                       </select>
                       <FiChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                     </div>
@@ -426,14 +456,18 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
                     <button
                       type="button"
                       onClick={handleClose}
-                      className="py-3 text-xs font-semibold rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer uppercase tracking-wider"
+                      className="py-3 text-xs font-mono font-semibold rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer uppercase tracking-wider"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={isUploading}
-                      className="py-3 text-xs font-semibold rounded-xl bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)] transition-all cursor-pointer uppercase tracking-wider disabled:opacity-50"
+                      className={`py-3 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer uppercase tracking-wider disabled:opacity-50 ${
+                        isIncome
+                          ? "bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)]"
+                          : "bg-rose-500 text-white hover:bg-rose-600 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)]"
+                      }`}
                     >
                       {isUploading ? "Uploading..." : `Save ${label}`}
                     </button>
