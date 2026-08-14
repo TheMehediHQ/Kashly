@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { UserButton } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import { LuBell, LuCheck, LuTrash2, LuX } from "react-icons/lu";
@@ -16,17 +16,28 @@ type Notification = {
   createdAt: string;
 };
 
+const timeAgo = (dateStr: string, now: number) => {
+  const diff = now - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+};
+
 const Header = () => {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [now] = useState(() => Date.now());
   const notifRef = useRef<HTMLDivElement>(null);
 
   const currentMonth = new Date().toLocaleString("default", { month: "long" });
   const currentYear = new Date().getFullYear();
 
-  const fetchNotifications = useCallback(async () => {
+  const fetchNotifications = async () => {
     try {
       const res = await axios.get("/api/notifications");
       if (res.data.success) {
@@ -36,13 +47,7 @@ const Header = () => {
     } catch {
       // silent
     }
-  }, []);
-
-  useEffect(() => {
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
-  }, [fetchNotifications]);
+  };
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -73,16 +78,6 @@ const Header = () => {
     } catch {
       // silent
     }
-  };
-
-  const timeAgo = (dateStr: string) => {
-    const diff = Date.now() - new Date(dateStr).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return "Just now";
-    if (mins < 60) return `${mins}m ago`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours}h ago`;
-    return `${Math.floor(hours / 24)}d ago`;
   };
 
   const typeStyles = {
@@ -185,7 +180,7 @@ const Header = () => {
                               {notif.message}
                             </p>
                             <p className="text-[9px] font-mono text-slate-600 mt-1">
-                              {timeAgo(notif.createdAt)}
+                              {timeAgo(notif.createdAt, now)}
                             </p>
                           </div>
                           <button

@@ -9,22 +9,30 @@ import {
   LuWallet,
   LuArchive,
   LuUser,
+  LuSettings,
 } from "react-icons/lu";
+import { useAuth } from "@/app/context/AuthContext";
 
 const navItems = [
   { name: "Home", href: "/dashboard", icon: LuLayoutDashboard },
   { name: "Wallet", href: "/dashboard/wallet", icon: LuWallet },
   { name: "Budgets", href: "/dashboard/budgets", icon: LuArchive },
   { name: "Profile", href: "/dashboard/my-profile", icon: LuUser },
+  { name: "Settings", href: "/dashboard/user-management", icon: LuSettings, adminOnly: true },
 ];
 
 const BottomNav = () => {
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  const visibleItems = navItems.filter(
+    (item) => !item.adminOnly || user?.role === "admin"
+  );
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t border-white/10 bg-[#0B0F17]/95 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]">
       <div className="flex items-center justify-around px-2 py-2">
-        {navItems.map((item) => {
+        {visibleItems.map((item) => {
           const isActive =
             item.href === "/dashboard"
               ? pathname === "/dashboard"

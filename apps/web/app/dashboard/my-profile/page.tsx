@@ -216,9 +216,9 @@ const MyProfile = () => {
                 <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Managed via Clerk</p>
               </div>
             </div>
-            <span className="text-sm text-slate-300 font-mono">
-              {user?.email || "—"}
-            </span>
+           <span className="text-sm text-slate-300 font-mono break-all line-clamp-2">
+  {user?.email || "—"}
+</span>
           </div>
 
           {/* Security */}
