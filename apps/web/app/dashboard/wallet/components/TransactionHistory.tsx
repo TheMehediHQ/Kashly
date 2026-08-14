@@ -16,7 +16,6 @@ import {
   FiEdit2,
   FiTrash2,
   FiRefreshCw,
-  FiPrinter,
 } from "react-icons/fi";
 import Swal from "sweetalert2";
 import EditTransactionModal from "./EditTransactionModal";
@@ -130,6 +129,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1);
     fetchTransactions(type, month, year, 1);
     fetchSummary(month, year);
@@ -181,24 +181,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const getMonthName = (monthNum: string) => {
-    const months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    return months[parseInt(monthNum)] || "";
-  };
-
-  const getPeriodLabel = (): string => {
-    if (month && year) {
-      return `${getMonthName(month)} ${year}`;
-    } else if (year && !month) {
-      return `Year ${year}`;
-    }
-    return "All Time";
-  };
-
   if (loading && transactions.length === 0) {
     return (
       <div className="w-full space-y-6">
@@ -235,224 +217,10 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 
   return (
     <div className="w-full">
-      <style>{`
-        @media print {
-          * {
-            margin: 0;
-            padding: 0;
-          }
-          
-          body {
-            background: white;
-            color: #2d3748;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-            padding: 40px;
-            line-height: 1.6;
-          }
-
-          .print-hidden {
-            display: none !important;
-          }
-
-          .print-container {
-            background: white;
-            padding: 0;
-            max-width: 950px;
-            margin: 0 auto;
-          }
-
-          /* Header */
-          .report-header {
-            text-align: center;
-            border-bottom: 2px solid #e2e8f0;
-            padding: 50px 0 45px 0;
-            margin-bottom: 60px;
-            page-break-after: avoid;
-          }
-
-          .report-header h1 {
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-            color: #1a202c;
-          }
-
-          .report-header p {
-            font-size: 14px;
-            color: #718096;
-            margin: 6px 0;
-            line-height: 1.7;
-            font-weight: 500;
-          }
-
-          .period-info {
-            font-size: 15px;
-            font-weight: 700;
-            margin-top: 20px;
-            color: #2d3748;
-            padding-top: 18px;
-            border-top: 1px solid #e2e8f0;
-            letter-spacing: 0.3px;
-          }
-
-          /* Summary Section */
-          .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            margin-bottom: 60px;
-            page-break-inside: avoid;
-          }
-
-          .summary-card {
-            border: 1px solid #cbd5e0;
-            padding: 32px 28px;
-            text-align: center;
-            page-break-inside: avoid;
-            background-color: #f7fafc;
-            border-radius: 4px;
-          }
-
-          .summary-card-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: #4a5568;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 14px;
-          }
-
-          .summary-card-value {
-            font-size: 24px;
-            font-weight: 800;
-            color: #1a202c;
-            line-height: 1.2;
-            margin-bottom: 6px;
-          }
-
-          .summary-card-income .summary-card-value {
-            color: #047857;
-            font-size: 26px;
-          }
-
-          .summary-card-expense .summary-card-value {
-            color: #dc2626;
-            font-size: 26px;
-          }
-
-          /* Transactions Table */
-          .transactions-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 40px;
-            margin-bottom: 50px;
-            font-size: 13px;
-            page-break-inside: avoid;
-          }
-
-          .transactions-table thead {
-            background-color: #edf2f7;
-            border-top: 2px solid #cbd5e0;
-            border-bottom: 2px solid #cbd5e0;
-          }
-
-          .transactions-table th {
-            padding: 18px 14px;
-            text-align: left;
-            font-weight: 800;
-            color: #1a202c;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 1px;
-          }
-
-          .transactions-table td {
-            padding: 16px 14px;
-            border-bottom: 1px solid #e2e8f0;
-            line-height: 1.6;
-            color: #4a5568;
-          }
-
-          .transactions-table tr:nth-child(even) {
-            background-color: #f9fafb;
-          }
-
-          .transactions-table tbody tr:last-child td {
-            border-bottom: 2px solid #cbd5e0;
-          }
-
-          .transaction-amount {
-            font-weight: 800;
-            text-align: right;
-            font-size: 14px;
-          }
-
-          .transaction-amount.income {
-            color: #047857;
-          }
-
-          .transaction-amount.expense {
-            color: #dc2626;
-          }
-
-          /* Footer */
-          .print-footer {
-            margin-top: 60px;
-            padding: 40px 0;
-            border-top: 2px solid #e2e8f0;
-            text-align: center;
-            font-size: 12px;
-            color: #718096;
-          }
-
-          .footer-line {
-            margin: 8px 0;
-            line-height: 1.8;
-          }
-
-          .footer-line:first-child {
-            font-weight: 700;
-            color: #2d3748;
-            font-size: 13px;
-            margin-bottom: 12px;
-            letter-spacing: 0.3px;
-          }
-
-          button, select, .print-controls {
-            display: none !important;
-          }
-
-          .modal, .image-modal {
-            display: none !important;
-          }
-
-          /* Page breaks */
-          .transaction-card {
-            page-break-inside: avoid;
-          }
-
-          @page {
-            margin: 25mm;
-            size: A4;
-          }
-
-          h2 {
-            font-size: 18px;
-            font-weight: 800;
-            margin: 60px 0 30px 0;
-            padding: 0 0 16px 0;
-            border-bottom: 2px solid #e2e8f0;
-            color: #1a202c;
-            letter-spacing: -0.3px;
-          }
-        }
-      `}</style>
-
       {/* IMAGE PREVIEW MODAL */}
       {selectedImg && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md print-hidden"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md"
           onClick={() => setSelectedImg(null)}
         >
           <button
@@ -487,7 +255,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 
       {/* HEADER & FILTERS */}
       <div className="mb-6 flex flex-col gap-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10 print-hidden">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
           <div>
             <h2 className="text-2xl font-bold text-white tracking-tight">
               Transaction History
@@ -576,13 +344,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                 <FiRefreshCw className={isRefreshing ? "animate-spin" : ""} size={16} />
               </button>
 
-              <button
-                onClick={handlePrint}
-                className="p-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                title="Print Report"
-              >
-                <FiPrinter size={16} />
-              </button>
             </div>
           </div>
         </div>
@@ -683,7 +444,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                     </h3>
                     {transaction.note && (
                       <p className="max-w-xs truncate text-xs italic text-slate-400 sm:max-w-sm mt-0.5">
-                        "{transaction.note}"
+                        &quot;{transaction.note}&quot;
                       </p>
                     )}
                   </div>
@@ -699,7 +460,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-1.5 print-hidden">
+                  <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => handleEdit(transaction)}
                       className="rounded-xl p-2 bg-white/5 border border-white/10 text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
@@ -728,7 +489,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 
         {/* LOAD MORE BUTTON */}
         {hasMore && transactions.length > 0 && (
-          <div className="flex justify-center pt-4 print-hidden">
+          <div className="flex justify-center pt-4">
             <button
               onClick={loadMore}
               disabled={isLoadingMore}
@@ -738,21 +499,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             </button>
           </div>
         )}
-      </div>
-
-      {/* PRINT REPORT FOOTER */}
-      <div className="print-hidden" style={{ display: "none" }}>
-        <div className="print-footer">
-          <div className="footer-line">
-            End of Financial Report
-          </div>
-          <div className="footer-line">
-            This document is auto-generated and contains confidential financial information.
-          </div>
-          <div className="footer-line">
-            © {new Date().getFullYear()} Kashly | All rights reserved
-          </div>
-        </div>
       </div>
 
       {/* Edit Modal */}
