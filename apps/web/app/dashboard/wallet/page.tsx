@@ -126,7 +126,7 @@ const Wallet = () => {
       {/* =========================
           TRANSACTION ACTIONS
       ========================== */}
-     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+     <div className="border-b border-white/10 pb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
   {/* Left: Title */}
   <div>
     <h2 className="text-2xl font-bold text-white">
@@ -139,7 +139,7 @@ const Wallet = () => {
   </div>
 
   {/* Right: Actions */}
-  <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+  <div className="flex flex-wrap items-center gap-3 sm:justify-end ">
     <TransactionModal
       type="income"
       onSuccess={handleRefresh}
