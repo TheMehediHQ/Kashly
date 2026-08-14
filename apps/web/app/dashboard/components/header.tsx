@@ -133,7 +133,7 @@ const Header = () => {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 8, scale: 0.96 }}
                 transition={{ duration: 0.15 }}
-                className="absolute right-0 mt-2 w-80 sm:w-96 origin-top-right rounded-2xl border border-white/10 bg-[#0B0F17] shadow-2xl overflow-hidden"
+                className="absolute right-0 mt-2 w-[calc(100vw-2rem)] max-w-96 sm:w-96 origin-top-right rounded-2xl border border-white/10 bg-[#0B0F17] shadow-2xl overflow-hidden"
               >
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-white/10">
