@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LuBell, LuCheck, LuTrash2, LuX } from "react-icons/lu";
 import { useAuth } from "@/app/context/AuthContext";
 import axios from "axios";
+import Link from "next/dist/client/link";
+import Image from "next/image";
 
 type Notification = {
   _id: string;
@@ -89,6 +91,30 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-white/10 bg-[#0B0F17]/80 backdrop-blur-xl px-4 sm:px-6 lg:px-8 h-16">
+      <Link
+  href="/"
+  className="flex md:hidden items-center gap-2.5 group"
+>
+  <div className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden shrink-0">
+    <Image
+      src="/kashly.svg"
+      alt="Kashly Logo"
+      width={36}
+      height={36}
+      className="object-contain group-hover:scale-105 transition-transform"
+      priority
+    />
+  </div>
+
+  <span className="text-xl font-bold tracking-tight text-white">
+    <span className="text-[#BDFE00]">Kashly</span>
+  </span>
+</Link>
+      
+      
+      
+      
+      
       {/* Left */}
       <div className="flex items-center gap-4">
         <div className="hidden sm:block">
