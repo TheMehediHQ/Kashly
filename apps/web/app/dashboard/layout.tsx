@@ -42,7 +42,7 @@ export default function DashboardLayout({
         <Header />
 
         {/* Page Content — bottom padding for mobile nav */}
-        <main className="min-h-[calc(100vh-4rem)] pb-20 md:pb-0">
+        <main className="min-h-[calc(100vh-4rem)] pb-24 md:pb-0">
           <div>{children}</div>
         </main>
       </div>
