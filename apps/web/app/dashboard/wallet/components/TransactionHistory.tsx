@@ -7,11 +7,6 @@ import React, { useEffect, useState } from "react";
 import {
   FiArrowUpRight,
   FiArrowDownLeft,
-  FiShoppingBag,
-  FiCoffee,
-  FiHome,
-  FiTruck,
-  FiFileText,
   FiX,
   FiEdit2,
   FiTrash2,
@@ -41,15 +36,6 @@ interface TransactionHistoryProps {
   refreshKey: number;
   onRefresh: () => void;
 }
-
-const getCategoryIcon = (category: string) => {
-  const cat = category.toLowerCase();
-  if (cat.includes("food") || cat.includes("coffee")) return <FiCoffee />;
-  if (cat.includes("shop")) return <FiShoppingBag />;
-  if (cat.includes("rent") || cat.includes("home")) return <FiHome />;
-  if (cat.includes("transport") || cat.includes("travel")) return <FiTruck />;
-  return <FiFileText />;
-};
 
 const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   refreshKey,
@@ -417,13 +403,15 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                       />
                     ) : (
                       <div
-                        className={`flex h-full w-full items-center justify-center rounded-xl text-xl ${
+                        className={`flex h-full w-full flex-col items-center justify-center rounded-xl border border-dashed ${
                           isIncome
-                            ? "bg-[#BDFE00]/10 text-[#BDFE00]"
-                            : "bg-rose-500/10 text-rose-400"
+                            ? "border-[#BDFE00]/20 bg-[#BDFE00]/5 text-[#BDFE00]/40"
+                            : "border-rose-500/20 bg-rose-500/5 text-rose-400/40"
                         }`}
                       >
-                        {getCategoryIcon(transaction.category)}
+                        <span className="text-[7px] font-mono font-bold uppercase tracking-wider">
+                          No Image
+                        </span>
                       </div>
                     )}
                     <div
