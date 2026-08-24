@@ -16,24 +16,7 @@ import {
 import { UserButton } from "@clerk/nextjs";
 
 const MyProfile = () => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="w-full min-h-screen p-3 sm:p-6 lg:p-8 space-y-6">
-        <div className="space-y-3">
-          <div className="h-10 w-56 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
-          <div className="h-5 w-72 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-28 rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
-          ))}
-        </div>
-        <div className="h-64 rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
-      </div>
-    );
-  }
+  const { user } = useAuth();
 
   return (
     <div className="w-full min-h-screen p-3 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">

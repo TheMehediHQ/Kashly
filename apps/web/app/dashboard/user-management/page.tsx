@@ -167,19 +167,6 @@ const UserManagement = () => {
       u.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading && users.length === 0) {
-    return (
-      <div className="w-full min-h-screen text-white p-3 sm:p-6 lg:p-8 space-y-6">
-        <div className="space-y-3">
-          <div className="h-8 w-56 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
-          <div className="h-4 w-48 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
-        </div>
-        <div className="h-12 w-full rounded-2xl bg-white/5 border border-white/10 animate-pulse" />
-        <div className="h-[420px] w-full rounded-3xl bg-white/5 border border-white/10 animate-pulse" />
-      </div>
-    );
-  }
-
   return (
     <div className="w-full min-h-screen text-white space-y-6 sm:space-y-8 p-3 sm:p-6 lg:p-8">
       {/* Header */}
