@@ -7,6 +7,7 @@ import { HowItWorksSection } from "./components/home/HowItWorksSection";
 import { AppPreviewSection } from "./components/home/AppPreviewSection";
 import { WhyChooseSection } from "./components/home/WhyChooseSection";
 import { FAQSection } from "./components/home/FAQSection";
+import { PricingSection } from "./components/home/PricingSection";
 
 export function HomePageClient() {
   return (
@@ -20,6 +21,7 @@ export function HomePageClient() {
       <FeaturesSection />
       <HowItWorksSection />
       <AppPreviewSection />
+      <PricingSection />
       <WhyChooseSection />
       <FAQSection />
     </main>
