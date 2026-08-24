@@ -199,7 +199,39 @@ const UserManagement = () => {
 
       {/* Mobile Cards View */}
       <div className="block md:hidden space-y-4">
-        {filteredUsers.length > 0 ? (
+        {loading ? (
+          <>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="rounded-2xl p-5 bg-slate-900/40 border border-white/10 backdrop-blur-xl space-y-4 shadow-lg animate-pulse"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="h-11 w-11 rounded-xl bg-white/10 shrink-0" />
+                    <div className="min-w-0 space-y-2">
+                      <div className="h-4 w-32 rounded bg-white/10" />
+                      <div className="h-3 w-40 rounded bg-white/5" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="p-2.5 rounded-xl bg-white/10" />
+                    <div className="p-2.5 rounded-xl bg-white/10" />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-3 border-t border-white/5">
+                  <div className="h-6 w-20 rounded-lg bg-white/10" />
+                  <div className="h-6 w-16 rounded-lg bg-white/10" />
+                </div>
+
+                <div className="flex items-center justify-between pt-3 border-t border-white/5">
+                  <div className="h-6 w-24 rounded-full bg-white/10" />
+                </div>
+              </div>
+            ))}
+          </>
+        ) : filteredUsers.length > 0 ? (
           filteredUsers.map((user) => (
             <div
               key={user._id}
@@ -308,7 +340,39 @@ const UserManagement = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {filteredUsers.length > 0 ? (
+              {loading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-white/10 shrink-0" />
+                        <div className="min-w-0 space-y-2">
+                          <div className="h-4 w-32 rounded bg-white/10" />
+                          <div className="h-3 w-40 rounded bg-white/5" />
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="h-7 w-16 rounded-lg bg-white/10 mx-auto" />
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex flex-col items-center gap-1.5">
+                        <div className="h-6 w-11 rounded-full bg-white/10" />
+                        <div className="h-2 w-10 rounded bg-white/5" />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="h-6 w-12 rounded-lg bg-white/10 mx-auto" />
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <div className="p-2.5 rounded-xl bg-white/10" />
+                        <div className="p-2.5 rounded-xl bg-white/10" />
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
                   <tr key={user._id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="px-6 py-4">
