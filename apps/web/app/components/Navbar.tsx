@@ -45,6 +45,12 @@ const Navbar = () => {
             >
               FAQ
             </Link>
+            <Link
+              href="/contact"
+              className="text-sm font-medium text-slate-300 hover:text-[#BDFE00] transition-colors"
+            >
+              Contact
+            </Link>
           </div>
 
           {/* Right Section: Profile & Login */}
