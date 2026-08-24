@@ -19,6 +19,7 @@ import {
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import { useAuth } from "@/app/context/AuthContext";
+import NoCreditsModal from "./NoCreditsModal";
 
 interface FormValues {
   amount: number;
@@ -41,6 +42,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
 }) => {
   const { user, setUser } = useAuth();
   const [open, setOpen] = useState<boolean>(false);
+  const [showNoCreditsModal, setShowNoCreditsModal] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
@@ -195,9 +197,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         type="button"
         onClick={() => {
           if (noCredits) {
-            toast.error(
-              "No credits left. Please contact admin to add more credits."
-            );
+            setShowNoCreditsModal(true);
             return;
           }
           setOpen(true);
@@ -217,6 +217,12 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         )}
         <span>ADD {label.toUpperCase()}</span>
       </button>
+
+      {/* No Credits Modal */}
+      <NoCreditsModal
+        isOpen={showNoCreditsModal}
+        onClose={() => setShowNoCreditsModal(false)}
+      />
 
       {open && (
         <>
