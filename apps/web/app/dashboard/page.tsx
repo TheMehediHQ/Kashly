@@ -110,77 +110,123 @@ const DashboardPage = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Balance */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#BDFE00]/10 via-slate-900/60 to-slate-900/40 border border-[#BDFE00]/20 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
-              Total Balance
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-[#BDFE00]/10 flex items-center justify-center text-[#BDFE00]">
-              <IoWallet size={16} />
+        {loading ? (
+          <>
+            {/* Balance Skeleton */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#BDFE00]/10 via-slate-900/60 to-slate-900/40 border border-[#BDFE00]/20 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-3 w-20 rounded bg-white/10 animate-pulse" />
+                <div className="w-8 h-8 rounded-lg bg-[#BDFE00]/10 animate-pulse" />
+              </div>
+              <div className="h-8 w-32 rounded bg-white/10 animate-pulse" />
+              <div className="h-2 w-24 rounded bg-white/5 animate-pulse mt-2" />
             </div>
-          </div>
-          <p className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            {formatCurrency(balance.balance)}
-          </p>
-          <p className="text-[10px] font-mono text-slate-500 mt-1">
-            All time net balance
-          </p>
-        </div>
 
-        {/* Income */}
-        <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
-              Monthly Income
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-              <LuTrendingUp size={16} />
+            {/* Income Skeleton */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-3 w-24 rounded bg-white/10 animate-pulse" />
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 animate-pulse" />
+              </div>
+              <div className="h-8 w-28 rounded bg-white/10 animate-pulse" />
+              <div className="h-2 w-20 rounded bg-white/5 animate-pulse mt-2" />
             </div>
-          </div>
-          <p className="text-2xl sm:text-3xl font-black text-emerald-400 tracking-tight">
-            {formatCurrency(summary.thisMonthIncome)}
-          </p>
-          <p className="text-[10px] font-mono text-slate-500 mt-1">
-            {summary.incomeTransactions} transactions
-          </p>
-        </div>
 
-        {/* Expense */}
-        <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
-              Monthly Expense
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-400">
-              <LuTrendingDown size={16} />
+            {/* Expense Skeleton */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-3 w-24 rounded bg-white/10 animate-pulse" />
+                <div className="w-8 h-8 rounded-lg bg-rose-500/10 animate-pulse" />
+              </div>
+              <div className="h-8 w-28 rounded bg-white/10 animate-pulse" />
+              <div className="h-2 w-20 rounded bg-white/5 animate-pulse mt-2" />
             </div>
-          </div>
-          <p className="text-2xl sm:text-3xl font-black text-rose-400 tracking-tight">
-            {formatCurrency(summary.thisMonthExpense)}
-          </p>
-          <p className="text-[10px] font-mono text-slate-500 mt-1">
-            {summary.expenseTransactions} transactions
-          </p>
-        </div>
 
-        {/* Credits */}
-        <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
-              Credits Left
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-[#1FBFD8]/10 flex items-center justify-center text-[#1FBFD8]">
-              <LuCreditCard size={16} />
+            {/* Credits Skeleton */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-3 w-20 rounded bg-white/10 animate-pulse" />
+                <div className="w-8 h-8 rounded-lg bg-[#1FBFD8]/10 animate-pulse" />
+              </div>
+              <div className="h-8 w-16 rounded bg-white/10 animate-pulse" />
+              <div className="h-2 w-28 rounded bg-white/5 animate-pulse mt-2" />
             </div>
-          </div>
-          <p className="text-2xl sm:text-3xl font-black text-[#1FBFD8] tracking-tight">
-            {user?.credits ?? 0}
-          </p>
-          <p className="text-[10px] font-mono text-slate-500 mt-1">
-            {user?.credits < 50 ? "Running low — contact admin" : "Per txn: 1 credit"}
-          </p>
-        </div>
+          </>
+        ) : (
+          <>
+            {/* Balance */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#BDFE00]/10 via-slate-900/60 to-slate-900/40 border border-[#BDFE00]/20 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+                  Total Balance
+                </span>
+                <div className="w-8 h-8 rounded-lg bg-[#BDFE00]/10 flex items-center justify-center text-[#BDFE00]">
+                  <IoWallet size={16} />
+                </div>
+              </div>
+              <p className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                {formatCurrency(balance.balance)}
+              </p>
+              <p className="text-[10px] font-mono text-slate-500 mt-1">
+                All time net balance
+              </p>
+            </div>
+
+            {/* Income */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+                  Monthly Income
+                </span>
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                  <LuTrendingUp size={16} />
+                </div>
+              </div>
+              <p className="text-2xl sm:text-3xl font-black text-emerald-400 tracking-tight">
+                {formatCurrency(summary.thisMonthIncome)}
+              </p>
+              <p className="text-[10px] font-mono text-slate-500 mt-1">
+                {summary.incomeTransactions} transactions
+              </p>
+            </div>
+
+            {/* Expense */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+                  Monthly Expense
+                </span>
+                <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-400">
+                  <LuTrendingDown size={16} />
+                </div>
+              </div>
+              <p className="text-2xl sm:text-3xl font-black text-rose-400 tracking-tight">
+                {formatCurrency(summary.thisMonthExpense)}
+              </p>
+              <p className="text-[10px] font-mono text-slate-500 mt-1">
+                {summary.expenseTransactions} transactions
+              </p>
+            </div>
+
+            {/* Credits */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+                  Credits Left
+                </span>
+                <div className="w-8 h-8 rounded-lg bg-[#1FBFD8]/10 flex items-center justify-center text-[#1FBFD8]">
+                  <LuCreditCard size={16} />
+                </div>
+              </div>
+              <p className="text-2xl sm:text-3xl font-black text-[#1FBFD8] tracking-tight">
+                {user?.credits ?? 0}
+              </p>
+              <p className="text-[10px] font-mono text-slate-500 mt-1">
+                {user?.credits < 50 ? "Running low — contact admin" : "Per txn: 1 credit"}
+              </p>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Main Content Grid */}
@@ -203,7 +249,18 @@ const DashboardPage = () => {
           </div>
 
           <div className="divide-y divide-white/5">
-            {recentTxns.length > 0 ? (
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4 p-4 animate-pulse">
+                  <div className="h-10 w-10 rounded-xl bg-white/5" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 w-24 rounded bg-white/5" />
+                    <div className="h-2 w-16 rounded bg-white/5" />
+                  </div>
+                  <div className="h-4 w-20 rounded bg-white/5" />
+                </div>
+              ))
+            ) : recentTxns.length > 0 ? (
               recentTxns.map((txn) => (
                 <div
                   key={txn._id}
