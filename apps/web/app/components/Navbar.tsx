@@ -33,18 +33,18 @@ const Navbar = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
-            <a
+            <Link
               href="/#features"
               className="text-sm font-medium text-slate-300 hover:text-[#BDFE00] transition-colors"
             >
               Features
-            </a>
-            <a
+            </Link>
+            <Link
               href="/#faq"
               className="text-sm font-medium text-slate-300 hover:text-[#BDFE00] transition-colors"
             >
               FAQ
-            </a>
+            </Link>
           </div>
 
           {/* Right Section: Profile & Login */}
