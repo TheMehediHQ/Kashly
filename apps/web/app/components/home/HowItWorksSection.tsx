@@ -4,7 +4,7 @@ import React from "react";
 
 export function HowItWorksSection() {
   return (
-    <section className="w-full py-16 md:py-24 px-4 border-t border-white/5 relative z-10">
+    <section className="w-full py-16 md:py-24 px-4 relative z-10">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
