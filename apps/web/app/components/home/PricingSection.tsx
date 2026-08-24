@@ -51,10 +51,6 @@ export function PricingSection() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-xs font-mono tracking-wide text-[#BDFE00] mb-4">
-            <LuZap className="w-3 h-3" />
-            CREDIT PACKS
-          </div>
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-2">
             Simple, Transparent Pricing
           </h2>
