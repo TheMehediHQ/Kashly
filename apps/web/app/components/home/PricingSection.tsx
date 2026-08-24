@@ -136,7 +136,7 @@ export function PricingSection() {
               {/* CTA Button */}
               <button
                 onClick={() => handleGetStarted(plan.credits, plan.price)}
-                className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 ${
+                className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-300 cursor-pointer ${
                   plan.popular
                     ? "bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)]"
                     : "bg-white/5 border border-white/10 text-white hover:bg-white/10 hover:border-white/20"
