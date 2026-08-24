@@ -31,6 +31,22 @@ const Navbar = () => {
             </span>
           </Link>
 
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center gap-6">
+            <a
+              href="/#features"
+              className="text-sm font-medium text-slate-300 hover:text-[#BDFE00] transition-colors"
+            >
+              Features
+            </a>
+            <a
+              href="/#faq"
+              className="text-sm font-medium text-slate-300 hover:text-[#BDFE00] transition-colors"
+            >
+              FAQ
+            </a>
+          </div>
+
           {/* Right Section: Profile & Login */}
           <div className="flex items-center gap-3">
             {user ? (
