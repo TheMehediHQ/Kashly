@@ -40,6 +40,12 @@ const Navbar = () => {
               Features
             </Link>
             <Link
+              href="/#pricing"
+              className="text-sm font-medium text-slate-300 hover:text-[#BDFE00] transition-colors"
+            >
+              Pricing
+            </Link>
+            <Link
               href="/#faq"
               className="text-sm font-medium text-slate-300 hover:text-[#BDFE00] transition-colors"
             >

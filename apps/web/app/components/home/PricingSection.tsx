@@ -47,7 +47,7 @@ export function PricingSection() {
   ];
 
   return (
-    <section className="w-full py-16 md:py-24 px-4 border-t border-white/5 relative z-10">
+    <section id="pricing" className="w-full py-16 md:py-24 px-4 border-t border-white/5 relative z-10">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
