@@ -16,7 +16,7 @@ import {
 import { UserButton } from "@clerk/nextjs";
 
 const MyProfile = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   return (
     <div className="w-full min-h-screen p-3 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
@@ -43,36 +43,53 @@ const MyProfile = () => {
           <div className="flex items-center gap-4">
             {/* Avatar */}
             <div className=" overflow-hidden  shadow-xl">
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: "h-full w-full rounded-none",
-                  },
-                }}
-              />
+              {loading ? (
+                <div className="w-20 h-20 rounded-full bg-white/10 animate-pulse" />
+              ) : (
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox: "h-full w-full rounded-none",
+                    },
+                  }}
+                />
+              )}
             </div>
 
             {/* Info */}
             <div className="flex-1 min-w-0">
-              <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight truncate">
-  {user?.fullName}
-</h2>
-              <p className="text-xs text-slate-500 font-mono truncate">
-                {user?.email}
-              </p>
-              <div className="flex items-center gap-1.5 flex-wrap mt-2">
-                <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00] text-[9px] font-mono font-bold uppercase tracking-wider">
-                  <LuCheck size={9} /> Verified
-                </span>
-                {user?.role === "admin" && (
-                  <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#1FBFD8]/10 border border-[#1FBFD8]/20 text-[#1FBFD8] text-[9px] font-mono font-bold uppercase tracking-wider">
-                    <LuStar size={9} /> Admin
-                  </span>
-                )}
-                <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-mono font-bold uppercase tracking-wider">
-                  Active
-                </span>
-              </div>
+              {loading ? (
+                <div className="space-y-2">
+                  <div className="h-8 w-48 rounded-xl bg-white/10 animate-pulse" />
+                  <div className="h-4 w-64 rounded bg-white/5 animate-pulse" />
+                  <div className="flex gap-2 mt-2">
+                    <div className="h-5 w-16 rounded-md bg-white/5 animate-pulse" />
+                    <div className="h-5 w-16 rounded-md bg-white/5 animate-pulse" />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight truncate">
+                    {user?.fullName}
+                  </h2>
+                  <p className="text-xs text-slate-500 font-mono truncate">
+                    {user?.email}
+                  </p>
+                  <div className="flex items-center gap-1.5 flex-wrap mt-2">
+                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00] text-[9px] font-mono font-bold uppercase tracking-wider">
+                      <LuCheck size={9} /> Verified
+                    </span>
+                    {user?.role === "admin" && (
+                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#1FBFD8]/10 border border-[#1FBFD8]/20 text-[#1FBFD8] text-[9px] font-mono font-bold uppercase tracking-wider">
+                        <LuStar size={9} /> Admin
+                      </span>
+                    )}
+                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-mono font-bold uppercase tracking-wider">
+                      Active
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -80,86 +97,132 @@ const MyProfile = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Credits */}
-        <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
-              Credits
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-[#1FBFD8]/10 flex items-center justify-center text-[#1FBFD8]">
-              <LuCreditCard size={16} />
+        {loading ? (
+          <>
+            {/* Credits Skeleton */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-3 w-16 rounded bg-white/10 animate-pulse" />
+                <div className="w-8 h-8 rounded-lg bg-[#1FBFD8]/10 animate-pulse" />
+              </div>
+              <div className="h-8 w-20 rounded bg-white/10 animate-pulse" />
+              <div className="h-2 w-24 rounded bg-white/5 animate-pulse mt-2" />
             </div>
-          </div>
-          <p className="text-2xl sm:text-3xl font-black text-[#1FBFD8] tracking-tight">
-            {user?.credits ?? 0}
-          </p>
-          <p className="text-[10px] font-mono text-slate-500 mt-1">
-            {user?.credits < 50 ? "Running low" : "1 credit per txn"}
-          </p>
-        </div>
 
-        {/* Role */}
-        <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
-              Role
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-[#BDFE00]/10 flex items-center justify-center text-[#BDFE00]">
-              <LuShield size={16} />
+            {/* Role Skeleton */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-3 w-12 rounded bg-white/10 animate-pulse" />
+                <div className="w-8 h-8 rounded-lg bg-[#BDFE00]/10 animate-pulse" />
+              </div>
+              <div className="h-8 w-16 rounded bg-white/10 animate-pulse" />
+              <div className="h-2 w-20 rounded bg-white/5 animate-pulse mt-2" />
             </div>
-          </div>
-          <p className={`text-2xl sm:text-3xl font-black tracking-tight ${
-            user?.role === "admin" ? "text-[#BDFE00]" : "text-slate-400"
-          }`}>
-            {user?.role?.toUpperCase() || "USER"}
-          </p>
-          <p className="text-[10px] font-mono text-slate-500 mt-1">
-            {user?.role === "admin" ? "Full access" : "Standard access"}
-          </p>
-        </div>
 
-        {/* Transaction Status */}
-        <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
-              Transactions
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-              <LuZap size={16} />
+            {/* Transaction Status Skeleton */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-3 w-24 rounded bg-white/10 animate-pulse" />
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 animate-pulse" />
+              </div>
+              <div className="h-8 w-20 rounded bg-white/10 animate-pulse" />
+              <div className="h-2 w-28 rounded bg-white/5 animate-pulse mt-2" />
             </div>
-          </div>
-          <p className={`text-2xl sm:text-3xl font-black tracking-tight ${
-            user?.isTransactionAllowed ? "text-emerald-400" : "text-rose-400"
-          }`}>
-            {user?.isTransactionAllowed ? "ACTIVE" : "LOCKED"}
-          </p>
-          <p className="text-[10px] font-mono text-slate-500 mt-1">
-            {user?.isTransactionAllowed ? "Can add transactions" : "Blocked by admin"}
-          </p>
-        </div>
 
-        {/* Member Since */}
-        <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
-              Member Since
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
-              <LuCalendar size={16} />
+            {/* Member Since Skeleton */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-3 w-24 rounded bg-white/10 animate-pulse" />
+                <div className="w-8 h-8 rounded-lg bg-purple-500/10 animate-pulse" />
+              </div>
+              <div className="h-8 w-24 rounded bg-white/10 animate-pulse" />
+              <div className="h-2 w-28 rounded bg-white/5 animate-pulse mt-2" />
             </div>
-          </div>
-          <p className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            {user?.createdAt
-              ? new Date(user.createdAt).toLocaleDateString("en-US", {
-                  month: "short",
-                  year: "numeric",
-                })
-              : "—"}
-          </p>
-          <p className="text-[10px] font-mono text-slate-500 mt-1">
-            Account creation date
-          </p>
-        </div>
+          </>
+        ) : (
+          <>
+            {/* Credits */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+                  Credits
+                </span>
+                <div className="w-8 h-8 rounded-lg bg-[#1FBFD8]/10 flex items-center justify-center text-[#1FBFD8]">
+                  <LuCreditCard size={16} />
+                </div>
+              </div>
+              <p className="text-2xl sm:text-3xl font-black text-[#1FBFD8] tracking-tight">
+                {user?.credits ?? 0}
+              </p>
+              <p className="text-[10px] font-mono text-slate-500 mt-1">
+                {user?.credits < 50 ? "Running low" : "1 credit per txn"}
+              </p>
+            </div>
+
+            {/* Role */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+                  Role
+                </span>
+                <div className="w-8 h-8 rounded-lg bg-[#BDFE00]/10 flex items-center justify-center text-[#BDFE00]">
+                  <LuShield size={16} />
+                </div>
+              </div>
+              <p className={`text-2xl sm:text-3xl font-black tracking-tight ${
+                user?.role === "admin" ? "text-[#BDFE00]" : "text-slate-400"
+              }`}>
+                {user?.role?.toUpperCase() || "USER"}
+              </p>
+              <p className="text-[10px] font-mono text-slate-500 mt-1">
+                {user?.role === "admin" ? "Full access" : "Standard access"}
+              </p>
+            </div>
+
+            {/* Transaction Status */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+                  Transactions
+                </span>
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                  <LuZap size={16} />
+                </div>
+              </div>
+              <p className={`text-2xl sm:text-3xl font-black tracking-tight ${
+                user?.isTransactionAllowed ? "text-emerald-400" : "text-rose-400"
+              }`}>
+                {user?.isTransactionAllowed ? "ACTIVE" : "LOCKED"}
+              </p>
+              <p className="text-[10px] font-mono text-slate-500 mt-1">
+                {user?.isTransactionAllowed ? "Can add transactions" : "Blocked by admin"}
+              </p>
+            </div>
+
+            {/* Member Since */}
+            <div className="rounded-2xl bg-slate-900/40 border border-white/10 p-5 backdrop-blur-xl">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+                  Member Since
+                </span>
+                <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
+                  <LuCalendar size={16} />
+                </div>
+              </div>
+              <p className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                {user?.createdAt
+                  ? new Date(user.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      year: "numeric",
+                    })
+                  : "—"}
+              </p>
+              <p className="text-[10px] font-mono text-slate-500 mt-1">
+                Account creation date
+              </p>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Account Details */}
