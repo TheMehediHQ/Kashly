@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { LuHome, LuArrowLeft, LuSearch } from "react-icons/lu";
+import { LuHouse, LuArrowLeft, LuSearch } from "react-icons/lu";
 
 export default function NotFound() {
   return (
@@ -46,7 +46,7 @@ export default function NotFound() {
             href="/"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-[#BDFE00] text-black font-semibold hover:bg-[#aef000] hover:shadow-[0_0_25px_rgba(189,254,0,0.4)] transition-all duration-300 transform active:scale-95"
           >
-            <LuHome className="w-5 h-5" />
+            <LuHouse className="w-5 h-5" />
             <span>Go Home</span>
           </Link>
 
