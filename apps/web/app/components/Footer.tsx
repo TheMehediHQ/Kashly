@@ -96,24 +96,12 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-white/10">
+        <div className="pt-8 ">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono">
             <p className="text-slate-400">
               &copy; {currentYear} <span className="text-[#BDFE00] font-semibold">Kashly</span>. All rights reserved.
             </p>
-            <div className="flex items-center gap-2 text-slate-500">
-              <span>Made with</span>
-              <LuHeart className="w-3 h-3 text-rose-400 fill-rose-400" />
-              <span>by</span>
-              <a
-                href="https://github.com/TheMehediHQ"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#BDFE00] hover:underline"
-              >
-                Mehedi Hasan
-              </a>
-            </div>
+           
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#BDFE00] animate-pulse" />
               <span className="text-slate-500">System Operational</span>
