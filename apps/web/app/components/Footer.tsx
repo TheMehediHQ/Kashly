@@ -99,7 +99,10 @@ export default function Footer() {
         <div className="pt-8 ">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono">
             <p className="text-slate-400">
-              &copy; {currentYear} <span className="text-[#BDFE00] font-semibold">Kashly</span>. All rights reserved.
+              &copy; {currentYear} <span className="text-[#BDFE00] font-semibold">Kashly</span>.{" "}
+              <Link href="https://github.com/TheMehediHQ/Kashly/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="hover:text-[#BDFE00] transition-colors">
+                MIT License
+              </Link>
             </p>
            
             <div className="flex items-center gap-1.5">

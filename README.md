@@ -18,6 +18,12 @@
 </p>
 
 <p align="center">
+  <a href="CONTRIBUTING.md">Contributing</a> •
+  <a href="CODE_OF_CONDUCT.md">Code of Conduct</a> •
+  <a href="SECURITY.md">Security Policy</a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" />
   <img src="https://img.shields.io/badge/Bun-1.3+-black" alt="Bun" />
   <img src="https://img.shields.io/badge/Next.js-16-black" alt="Next.js" />
@@ -265,6 +271,20 @@ Contributions are welcome! Here's how to get started:
 8. **Push** and open a **Pull Request**
 
 Please follow the existing code style and keep commit messages conventional.
+
+By contributing, you agree that your contributions are licensed under the MIT License.
+
+---
+
+## Code of Conduct
+
+This project adheres to the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Report unacceptable behavior via the project's security contact.
+
+---
+
+## Security
+
+Found a vulnerability? Please read our [Security Policy](SECURITY.md) and report it privately rather than opening a public issue.
 
 ---
 
