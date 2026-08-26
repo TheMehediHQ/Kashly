@@ -33,31 +33,32 @@ const Wallet = () => {
 
   const handleRefresh = useCallback((): void => {
     setIsRefreshing(true);
+    setSummaryLoading(true);
     setRefreshKey((prev) => prev + 1);
   }, []);
 
-  const fetchSummary = useCallback(async () => {
-    setSummaryLoading(true);
-
-    try {
-      const res = await axios.get("/api/summary", {
-        withCredentials: true,
-      });
-
-      if (res.data?.success && res.data?.data) {
-        setSummary(res.data.data);
-      }
-    } catch (error) {
-      console.error("Summary fetch error:", error);
-    } finally {
-      setSummaryLoading(false);
-      setIsRefreshing(false);
-    }
-  }, []);
-
   useEffect(() => {
-    fetchSummary();
-  }, [fetchSummary, refreshKey]);
+    let active = true;
+    axios
+      .get("/api/summary", { withCredentials: true })
+      .then((res) => {
+        if (res.data?.success && res.data?.data) {
+          setSummary(res.data.data);
+        }
+      })
+      .catch((error) => {
+        console.error("Summary fetch error:", error);
+      })
+      .finally(() => {
+        if (active) {
+          setSummaryLoading(false);
+          setIsRefreshing(false);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [refreshKey]);
 
   return (
     <div className="min-h-screen w-full space-y-6 bg-[#0B0F17] p-3 text-white sm:space-y-8 sm:p-6 lg:p-8">

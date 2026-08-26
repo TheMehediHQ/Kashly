@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import axios from "axios";
 
@@ -24,40 +24,40 @@ const MainBalance: React.FC<MainBalanceProps> = ({ refreshKey }) => {
     balance: 0,
   });
 
-  const fetchBalance = useCallback(async () => {
-    setLoading(true);
-
-    try {
-      const res = await axios.get("/api/balance", {
-        withCredentials: true,
-      });
-
-      if (res.data) {
-        setData({
-          income:
-            typeof res.data.income === "number"
-              ? res.data.income
-              : 0,
-          expense:
-            typeof res.data.expense === "number"
-              ? res.data.expense
-              : 0,
-          balance:
-            typeof res.data.balance === "number"
-              ? res.data.balance
-              : 0,
-        });
-      }
-    } catch (error) {
-      console.error("Failed to fetch balance data:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    fetchBalance();
-  }, [fetchBalance, refreshKey]);
+    let active = true;
+    axios
+      .get("/api/balance", { withCredentials: true })
+      .then((res) => {
+        if (res.data) {
+          setData({
+            income:
+              typeof res.data.income === "number"
+                ? res.data.income
+                : 0,
+            expense:
+              typeof res.data.expense === "number"
+                ? res.data.expense
+                : 0,
+            balance:
+              typeof res.data.balance === "number"
+                ? res.data.balance
+                : 0,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to fetch balance data:", error);
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [refreshKey]);
 
   return (
     <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-900/40 p-6 shadow-2xl backdrop-blur-xl transition-all sm:p-8">
