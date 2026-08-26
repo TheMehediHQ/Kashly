@@ -29,26 +29,53 @@ interface BudgetModalProps {
 }
 
 const expenseCategories = [
+  // Housing & Bills
   "House Rent",
   "Utilities",
   "Mobile & Internet",
+
+  // Financial Obligations
   "Loan/EMI",
   "Subscriptions",
+
+  // Food & Daily Essentials
   "Groceries",
-  "Transport",
-  "Healthcare",
-  "Education",
-  "Personal Care",
   "Dining",
+  "Tea",
+
+  // Transportation
+  "Transport",
+
+  // Health & Personal
+  "Healthcare",
+  "Personal Care",
+  "Cosmetics",
+  "Haircut",
+  "Beard Care",
+
+  // Education & Family
+  "Education",
+  "Family Support",
+
+  // Lifestyle & Shopping
+  "Clothing",
+  "Shoes",
   "Shopping",
   "Gadgets",
+  "Gifts",
   "Entertainment",
   "Travel",
-  "Family Support",
+
+  // Religious & Giving
   "Religious/Charity",
-  "Savings",
+  "Donation (3% Income)",
+
+  // Savings & Investments
+  "Savings (10% Income)",
   "Emergency Fund",
   "Investment",
+
+  // Other
   "Miscellaneous",
 ];
 

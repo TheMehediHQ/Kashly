@@ -68,27 +68,54 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         "Other Income",
       ]
     : [
-        "House Rent",
-        "Utilities",
-        "Mobile & Internet",
-        "Loan/EMI",
-        "Subscriptions",
-        "Groceries",
-        "Transport",
-        "Healthcare",
-        "Education",
-        "Personal Care",
-        "Dining",
-        "Shopping",
-        "Gadgets",
-        "Entertainment",
-        "Travel",
-        "Family Support",
-        "Religious/Charity",
-        "Savings",
-        "Emergency Fund",
-        "Investment",
-        "Miscellaneous",
+         // Housing & Bills
+  "House Rent",
+  "Utilities",
+  "Mobile & Internet",
+
+  // Financial Obligations
+  "Loan/EMI",
+  "Subscriptions",
+
+  // Food & Daily Essentials
+  "Groceries",
+  "Dining",
+  "Tea",
+
+  // Transportation
+  "Transport",
+
+  // Health & Personal
+  "Healthcare",
+  "Personal Care",
+  "Cosmetics",
+  "Haircut",
+  "Beard Care",
+
+  // Education & Family
+  "Education",
+  "Family Support",
+
+  // Lifestyle & Shopping
+  "Clothing",
+  "Shoes",
+  "Shopping",
+  "Gadgets",
+  "Gifts",
+  "Entertainment",
+  "Travel",
+
+  // Religious & Giving
+  "Religious/Charity",
+  "Donation (3% Income)",
+
+  // Savings & Investments
+  "Savings (10% Income)",
+  "Emergency Fund",
+  "Investment",
+
+  // Other
+  "Miscellaneous",
       ];
 
   const {
