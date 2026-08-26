@@ -2,7 +2,7 @@
 
 import axios, { AxiosError } from "axios";
 import Image from "next/image";
-import React, { useState, useRef, useEffect, ChangeEvent } from "react";
+import React, { useState, useRef, ChangeEvent } from "react";
 import { format } from "date-fns";
 import { useForm, SubmitHandler } from "react-hook-form";
 import {
@@ -75,12 +75,13 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   initialTransaction,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(
+    initialTransaction?.attachment ?? null
+  );
 
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [transactionType, setTransactionType] = useState<"income" | "expense">(
-    "expense"
-  );
+  const transactionType: "income" | "expense" =
+    initialTransaction?.transactionType ?? "expense";
 
   const isIncome = transactionType === "income";
   const label = isIncome ? "Income" : "Expense";
@@ -98,28 +99,55 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     "Other Income",
   ];
   const expenseCategories = [
-    "House Rent",
-    "Utilities",
-    "Mobile & Internet",
-    "Loan/EMI",
-    "Subscriptions",
-    "Groceries",
-    "Transport",
-    "Healthcare",
-    "Education",
-    "Personal Care",
-    "Dining",
-    "Shopping",
-    "Gadgets",
-    "Entertainment",
-    "Travel",
-    "Family Support",
-    "Religious/Charity",
-    "Savings",
-    "Emergency Fund",
-    "Investment",
-    "Miscellaneous",
-  ];
+  // Housing & Bills
+  "House Rent",
+  "Utilities",
+  "Mobile & Internet",
+
+  // Financial Obligations
+  "Loan/EMI",
+  "Subscriptions",
+
+  // Food & Daily Essentials
+  "Groceries",
+  "Dining",
+  "Tea",
+
+  // Transportation
+  "Transport",
+
+  // Health & Personal
+  "Healthcare",
+  "Personal Care",
+  "Cosmetics",
+  "Haircut",
+  "Beard Care",
+
+  // Education & Family
+  "Education",
+  "Family Support",
+
+  // Lifestyle & Shopping
+  "Clothing",
+  "Shoes",
+  "Shopping",
+  "Gadgets",
+  "Gifts",
+  "Entertainment",
+  "Travel",
+
+  // Religious & Giving
+  "Religious/Charity",
+  "Donation (3% Income)",
+
+  // Savings & Investments
+  "Savings (10% Income)",
+  "Emergency Fund",
+  "Investment",
+
+  // Other
+  "Miscellaneous",
+];
   const categories =
     transactionType === "income" ? incomeCategories : expenseCategories;
 
@@ -131,36 +159,15 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
-      amount: undefined,
-      category: categories[0],
-      method: "Cash",
-      date: new Date().toISOString().split("T")[0],
-      time: new Date()
-        .toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        })
-        .toUpperCase(),
-      note: "",
+      amount: initialTransaction?.amount,
+      category: initialTransaction?.category ?? categories[0],
+      method: initialTransaction?.method ?? "Cash",
+      date: initialTransaction?.date ?? new Date().toISOString().split("T")[0],
+      time: normalizeTimeForInput(initialTransaction?.time ?? ""),
+      note: initialTransaction?.note ?? "",
+      attachment: initialTransaction?.attachment ?? "",
     },
   });
-
-  useEffect(() => {
-    if (!isOpen || !initialTransaction || initialTransaction._id !== transactionId) {
-      return;
-    }
-
-    setTransactionType(initialTransaction.transactionType);
-    setValue("amount", initialTransaction.amount);
-    setValue("category", initialTransaction.category);
-    setValue("method", initialTransaction.method);
-    setValue("date", initialTransaction.date);
-    setValue("time", normalizeTimeForInput(initialTransaction.time));
-    setValue("note", initialTransaction.note || "");
-    setValue("attachment", initialTransaction.attachment || "");
-    setPreview(initialTransaction.attachment || null);
-  }, [isOpen, transactionId, initialTransaction, setValue]);
 
   const handleClose = (): void => {
     onClose();
