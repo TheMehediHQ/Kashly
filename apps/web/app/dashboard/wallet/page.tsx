@@ -62,12 +62,10 @@ const Wallet = () => {
 
   return (
     <div className="min-h-screen w-full space-y-6 bg-[#0B0F17] p-3 text-white sm:space-y-8 sm:p-6 lg:p-8">
-
       {/* =========================
           HEADER
       ========================== */}
       <div className="flex flex-col justify-between gap-4 border-b border-white/10 pb-6 md:flex-row md:items-center">
-
         {/* Header Content */}
         <div>
           <div className="mb-2.5 inline-flex items-center gap-2 rounded-full border border-[#BDFE00]/20 bg-[#BDFE00]/10 px-3 py-1 text-xs font-mono tracking-wide text-[#BDFE00]">
@@ -87,7 +85,6 @@ const Wallet = () => {
 
         {/* Top Right Controls */}
         <div className="flex items-center gap-3 self-start md:self-auto">
-
           {/* Budgets */}
           <Link
             href="/dashboard/budgets"
@@ -108,9 +105,7 @@ const Wallet = () => {
           >
             <FiRefreshCw
               className={`h-4 w-4 ${
-                isRefreshing
-                  ? "animate-spin text-[#BDFE00]"
-                  : ""
+                isRefreshing ? "animate-spin text-[#BDFE00]" : ""
               }`}
             />
           </button>
@@ -127,37 +122,28 @@ const Wallet = () => {
       {/* =========================
           TRANSACTION ACTIONS
       ========================== */}
-     <div className="border-b border-white/10 pb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-  {/* Left: Title */}
-  <div>
-    <h2 className="text-2xl font-bold text-white">
-      Monthly Cash Flow
-    </h2>
+      <div className="border-b border-white/10 pb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* Left: Title */}
+        <div>
+          <h2 className="text-2xl font-bold text-white">Monthly Cash Flow</h2>
 
-    <p className="mt-0.5 text-xs text-slate-400">
-      Active spending and earning flow for current month
-    </p>
-  </div>
+          <p className="mt-0.5 text-xs text-slate-400">
+            Active spending and earning flow for current month
+          </p>
+        </div>
 
-  {/* Right: Actions */}
-  <div className="flex flex-wrap items-center gap-3 sm:justify-end ">
-    <TransactionModal
-      type="income"
-      onSuccess={handleRefresh}
-    />
+        {/* Right: Actions */}
+        <div className="flex flex-wrap items-center gap-3 sm:justify-end ">
+          <TransactionModal type="income" onSuccess={handleRefresh} />
 
-    <TransactionModal
-      type="expense"
-      onSuccess={handleRefresh}
-    />
-  </div>
-</div>
+          <TransactionModal type="expense" onSuccess={handleRefresh} />
+        </div>
+      </div>
 
       {/* =========================
           INCOME & EXPENSE OVERVIEW
       ========================== */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-
         <LastMonthIncome
           income={summary?.thisMonthIncome}
           count={summary?.incomeTransactions}
@@ -169,7 +155,6 @@ const Wallet = () => {
           count={summary?.expenseTransactions}
           loading={summaryLoading}
         />
-
       </div>
 
       {/* =========================
@@ -183,12 +168,8 @@ const Wallet = () => {
           TRANSACTION HISTORY
       ========================== */}
       <div className="w-full pt-2">
-        <TransactionHistory
-          refreshKey={refreshKey}
-          onRefresh={handleRefresh}
-        />
+        <TransactionHistory refreshKey={refreshKey} onRefresh={handleRefresh} />
       </div>
-
     </div>
   );
 };

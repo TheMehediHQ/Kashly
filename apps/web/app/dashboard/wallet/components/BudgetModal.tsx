@@ -73,7 +73,7 @@ const expenseCategories = [
   "Donation (3% Income)",
   "Quantum Programme",
   "Etiman",
- "Qurbani (2% Income)", 
+  "Qurbani (2% Income)",
 
   // Savings & Investments
   "Savings (10% Income)",
@@ -128,7 +128,7 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
-    
+
     return year < currentYear || (year === currentYear && month < currentMonth);
   };
 
@@ -154,7 +154,7 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
           },
           {
             withCredentials: true,
-          }
+          },
         );
 
         if (response.data.success) {
@@ -175,7 +175,7 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
           },
           {
             withCredentials: true,
-          }
+          },
         );
 
         if (response.data.success) {
@@ -186,9 +186,10 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
         }
       }
     } catch (error) {
-      const errorMessage = error instanceof axios.AxiosError 
-        ? error.response?.data?.message 
-        : "Failed to save budget";
+      const errorMessage =
+        error instanceof axios.AxiosError
+          ? error.response?.data?.message
+          : "Failed to save budget";
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -221,7 +222,10 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
                 <span className="w-1.5 h-1.5 rounded-full bg-[#BDFE00] animate-pulse" />
                 BUDGET TARGET
               </div>
-              <h2 id="budget-modal-title" className="text-xl font-bold text-white">
+              <h2
+                id="budget-modal-title"
+                className="text-xl font-bold text-white"
+              >
                 {editingBudgetId ? "Edit Budget" : "Create Budget"}
               </h2>
             </div>
@@ -245,13 +249,19 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
                 className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
               >
                 {expenseCategories.map((cat) => (
-                  <option key={cat} value={cat} className="bg-[#0B0F17] text-white">
+                  <option
+                    key={cat}
+                    value={cat}
+                    className="bg-[#0B0F17] text-white"
+                  >
                     {cat}
                   </option>
                 ))}
               </select>
               {errors.category && (
-                <p className="text-rose-400 text-xs mt-1.5">{errors.category.message}</p>
+                <p className="text-rose-400 text-xs mt-1.5">
+                  {errors.category.message}
+                </p>
               )}
             </div>
 
@@ -270,7 +280,9 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
                 className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
               />
               {errors.limit && (
-                <p className="text-rose-400 text-xs mt-1.5">{errors.limit.message}</p>
+                <p className="text-rose-400 text-xs mt-1.5">
+                  {errors.limit.message}
+                </p>
               )}
             </div>
 
@@ -285,13 +297,21 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
                   className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
                 >
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                    <option key={month} value={month} className="bg-[#0B0F17] text-white">
-                      {new Date(0, month - 1).toLocaleString('default', { month: 'long' })}
+                    <option
+                      key={month}
+                      value={month}
+                      className="bg-[#0B0F17] text-white"
+                    >
+                      {new Date(0, month - 1).toLocaleString("default", {
+                        month: "long",
+                      })}
                     </option>
                   ))}
                 </select>
                 {errors.month && (
-                  <p className="text-rose-400 text-xs mt-1.5">{errors.month.message}</p>
+                  <p className="text-rose-400 text-xs mt-1.5">
+                    {errors.month.message}
+                  </p>
                 )}
               </div>
 
@@ -304,12 +324,17 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
                   placeholder="2026"
                   {...register("year", {
                     required: "Year is required",
-                    min: { value: new Date().getFullYear(), message: "Year cannot be in the past" },
+                    min: {
+                      value: new Date().getFullYear(),
+                      message: "Year cannot be in the past",
+                    },
                   })}
                   className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
                 />
                 {errors.year && (
-                  <p className="text-rose-400 text-xs mt-1.5">{errors.year.message}</p>
+                  <p className="text-rose-400 text-xs mt-1.5">
+                    {errors.year.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -344,14 +369,18 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
                 disabled={isLoading}
                 className="flex-1 px-4 py-3 rounded-xl font-semibold bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)] transition-all cursor-pointer disabled:opacity-50"
               >
-                {isLoading ? "Saving..." : editingBudgetId ? "Update Budget" : "Create Budget"}
+                {isLoading
+                  ? "Saving..."
+                  : editingBudgetId
+                    ? "Update Budget"
+                    : "Create Budget"}
               </button>
             </div>
           </form>
         </div>
       </div>
     </>,
-    document.body
+    document.body,
   );
 };
 

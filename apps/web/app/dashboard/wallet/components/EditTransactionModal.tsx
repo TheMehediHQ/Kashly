@@ -78,7 +78,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(
-    initialTransaction?.attachment ?? null
+    initialTransaction?.attachment ?? null,
   );
 
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -101,58 +101,58 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     "Other Income",
   ];
   const expenseCategories = [
-  // Housing & Bills
-  "House Rent",
-  "Utilities",
-  "Mobile & Internet",
+    // Housing & Bills
+    "House Rent",
+    "Utilities",
+    "Mobile & Internet",
 
-  // Financial Obligations
-  "Loan/EMI",
-  "Subscriptions",
+    // Financial Obligations
+    "Loan/EMI",
+    "Subscriptions",
 
-  // Food & Daily Essentials
-  "Groceries",
-  "Dining",
-  "Tea",
+    // Food & Daily Essentials
+    "Groceries",
+    "Dining",
+    "Tea",
 
-  // Transportation
-  "Transport",
+    // Transportation
+    "Transport",
 
-  // Health & Personal
-  "Healthcare",
-  "Personal Care",
-  "Cosmetics",
-  "Haircut",
-  "Beard Care",
+    // Health & Personal
+    "Healthcare",
+    "Personal Care",
+    "Cosmetics",
+    "Haircut",
+    "Beard Care",
 
-  // Education & Family
-  "Education",
-  "Family Support",
+    // Education & Family
+    "Education",
+    "Family Support",
 
-  // Lifestyle & Shopping
-  "Clothing",
-  "Shoes",
-  "Shopping",
-  "Gadgets",
-  "Gifts",
-  "Entertainment",
-  "Travel",
+    // Lifestyle & Shopping
+    "Clothing",
+    "Shoes",
+    "Shopping",
+    "Gadgets",
+    "Gifts",
+    "Entertainment",
+    "Travel",
 
-  // Religious & Giving
-  "Religious/Charity",
-  "Donation (3% Income)",
-   "Quantum Programme",
-  "Etiman",
- "Qurbani (2% Income)", 
+    // Religious & Giving
+    "Religious/Charity",
+    "Donation (3% Income)",
+    "Quantum Programme",
+    "Etiman",
+    "Qurbani (2% Income)",
 
-  // Savings & Investments
-  "Savings (10% Income)",
-  "Emergency Fund",
-  "Investment",
+    // Savings & Investments
+    "Savings (10% Income)",
+    "Emergency Fund",
+    "Investment",
 
-  // Other
-  "Miscellaneous",
-];
+    // Other
+    "Miscellaneous",
+  ];
   const categories =
     transactionType === "income" ? incomeCategories : expenseCategories;
 
@@ -181,7 +181,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   };
 
   const handleImageChange = async (
-    e: ChangeEvent<HTMLInputElement>
+    e: ChangeEvent<HTMLInputElement>,
   ): Promise<void> => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -202,7 +202,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     try {
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-        { method: "POST", body: formData }
+        { method: "POST", body: formData },
       );
       const data = await response.json();
       if (!response.ok) {
@@ -227,7 +227,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       const res = await axios.put(
         `/api/transactions/${transactionId}`,
         updateData,
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (res.data.success) {
@@ -238,11 +238,11 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     } catch (err) {
       const error = err as AxiosError<{ message: string }> | Error;
       let errorMessage = "Failed to update transaction";
-      
+
       if (axios.isAxiosError(error) && error.response?.data?.message) {
         errorMessage = error.response.data.message;
       }
-      
+
       toast.error(errorMessage);
     }
   };
@@ -271,17 +271,24 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
               <div>
-                <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wide mb-1 ${
-                  isIncome
-                    ? "bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00]"
-                    : "bg-rose-500/10 border border-rose-500/20 text-rose-400"
-                }`}>
-                  <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isIncome ? "bg-[#BDFE00]" : "bg-rose-400"}`} />
+                <div
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono tracking-wide mb-1 ${
+                    isIncome
+                      ? "bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00]"
+                      : "bg-rose-500/10 border border-rose-500/20 text-rose-400"
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full animate-pulse ${isIncome ? "bg-[#BDFE00]" : "bg-rose-400"}`}
+                  />
                   EDIT {label.toUpperCase()}
                 </div>
-              <h2 id="edit-transaction-modal-title" className="text-xl font-bold text-white">
-                Update Entry
-              </h2>
+                <h2
+                  id="edit-transaction-modal-title"
+                  className="text-xl font-bold text-white"
+                >
+                  Update Entry
+                </h2>
               </div>
               <button
                 type="button"
@@ -303,7 +310,9 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                     <FiUploadCloud
                       size={24}
                       className={`transition-colors duration-200 group-hover:scale-110 ${
-                        isUploading ? "animate-spin text-[#BDFE00]" : "text-slate-400 group-hover:text-[#BDFE00]"
+                        isUploading
+                          ? "animate-spin text-[#BDFE00]"
+                          : "text-slate-400 group-hover:text-[#BDFE00]"
                       }`}
                     />
                     <span className="mt-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400 group-hover:text-white">
@@ -341,9 +350,11 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
               {/* Amount Display */}
               <div className="rounded-2xl p-5 bg-white/5 border border-white/10 focus-within:border-[#BDFE00]/60 transition-colors">
-                <p className={`text-[10px] font-mono font-bold uppercase tracking-widest mb-1 ${
-                  isIncome ? "text-[#BDFE00]" : "text-rose-400"
-                }`}>
+                <p
+                  className={`text-[10px] font-mono font-bold uppercase tracking-widest mb-1 ${
+                    isIncome ? "text-[#BDFE00]" : "text-rose-400"
+                  }`}
+                >
                   Total {label}
                 </p>
                 <div className="flex items-center gap-3">
@@ -379,15 +390,21 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
               {/* Dropdowns Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="relative">
-                  <FiTag className={`absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 ${
-                    isIncome ? "text-[#BDFE00]" : "text-rose-400"
-                  }`} />
+                  <FiTag
+                    className={`absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 ${
+                      isIncome ? "text-[#BDFE00]" : "text-rose-400"
+                    }`}
+                  />
                   <select
                     {...register("category", { required: true })}
                     className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 pl-10 pr-9 py-3 text-sm font-medium text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
                   >
                     {categories.map((cat) => (
-                      <option key={cat} value={cat} className="bg-[#0B0F17] text-white">
+                      <option
+                        key={cat}
+                        value={cat}
+                        className="bg-[#0B0F17] text-white"
+                      >
                         {cat}
                       </option>
                     ))}
@@ -396,20 +413,36 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                 </div>
 
                 <div className="relative">
-                  <FiCreditCard className={`absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 ${
-                    isIncome ? "text-[#BDFE00]" : "text-rose-400"
-                  }`} />
+                  <FiCreditCard
+                    className={`absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 ${
+                      isIncome ? "text-[#BDFE00]" : "text-rose-400"
+                    }`}
+                  />
                   <select
                     {...register("method", { required: true })}
                     className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 pl-10 pr-9 py-3 text-sm font-medium text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
                   >
-                    <option value="Cash" className="bg-[#0B0F17] text-white">Cash</option>
-                    <option value="bKash" className="bg-[#0B0F17] text-white">BKash</option>
-                    <option value="Nagad" className="bg-[#0B0F17] text-white">Nagad</option>
-                    <option value="Rocket" className="bg-[#0B0F17] text-white">Rocket</option>
-                    <option value="Bank" className="bg-[#0B0F17] text-white">Bank Transfer</option>
-                    <option value="Card" className="bg-[#0B0F17] text-white">Card</option>
-                    <option value="Other" className="bg-[#0B0F17] text-white">Other</option>
+                    <option value="Cash" className="bg-[#0B0F17] text-white">
+                      Cash
+                    </option>
+                    <option value="bKash" className="bg-[#0B0F17] text-white">
+                      BKash
+                    </option>
+                    <option value="Nagad" className="bg-[#0B0F17] text-white">
+                      Nagad
+                    </option>
+                    <option value="Rocket" className="bg-[#0B0F17] text-white">
+                      Rocket
+                    </option>
+                    <option value="Bank" className="bg-[#0B0F17] text-white">
+                      Bank Transfer
+                    </option>
+                    <option value="Card" className="bg-[#0B0F17] text-white">
+                      Card
+                    </option>
+                    <option value="Other" className="bg-[#0B0F17] text-white">
+                      Other
+                    </option>
                   </select>
                   <FiChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
@@ -468,7 +501,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
         </div>
       </div>
     </>,
-    document.body
+    document.body,
   );
 };
 

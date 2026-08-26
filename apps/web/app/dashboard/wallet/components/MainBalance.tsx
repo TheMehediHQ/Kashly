@@ -31,18 +31,11 @@ const MainBalance: React.FC<MainBalanceProps> = ({ refreshKey }) => {
       .then((res) => {
         if (res.data) {
           setData({
-            income:
-              typeof res.data.income === "number"
-                ? res.data.income
-                : 0,
+            income: typeof res.data.income === "number" ? res.data.income : 0,
             expense:
-              typeof res.data.expense === "number"
-                ? res.data.expense
-                : 0,
+              typeof res.data.expense === "number" ? res.data.expense : 0,
             balance:
-              typeof res.data.balance === "number"
-                ? res.data.balance
-                : 0,
+              typeof res.data.balance === "number" ? res.data.balance : 0,
           });
         }
       })
@@ -61,17 +54,14 @@ const MainBalance: React.FC<MainBalanceProps> = ({ refreshKey }) => {
 
   return (
     <div className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-slate-900/40 p-6 shadow-2xl backdrop-blur-xl transition-all sm:p-8">
-
       {/* Background Glow */}
       <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-[#BDFE00]/5 blur-3xl" />
 
       <div className="relative z-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-
         {/* =========================
             BALANCE CONTENT
         ========================== */}
         <div className="min-w-0 space-y-4">
-
           {/* Badge */}
           <div className="inline-flex items-center gap-2 rounded-full border border-[#BDFE00]/20 bg-[#BDFE00]/10 px-3 py-1 text-xs font-mono tracking-wide text-[#BDFE00]">
             <span className="h-2 w-2 animate-pulse rounded-full bg-[#BDFE00]" />
@@ -82,17 +72,14 @@ const MainBalance: React.FC<MainBalanceProps> = ({ refreshKey }) => {
           <div>
             {loading ? (
               <div className="flex items-center gap-2 py-2">
-
                 <div className="h-8 w-7 animate-pulse rounded bg-white/10" />
 
                 <div className="h-12 w-52 animate-pulse rounded-xl bg-white/10 sm:h-16 sm:w-72" />
 
                 <div className="h-5 w-12 animate-pulse rounded bg-white/5" />
-
               </div>
             ) : (
               <div className="flex min-w-0 items-baseline gap-2 font-mono select-none">
-
                 {/* Currency */}
                 <span className="shrink-0 text-2xl font-bold text-[#BDFE00] sm:text-3xl">
                   ৳
@@ -118,7 +105,6 @@ const MainBalance: React.FC<MainBalanceProps> = ({ refreshKey }) => {
             VISIBILITY TOGGLE
         ========================== */}
         <div className="flex shrink-0 items-center">
-
           {!loading && (
             <button
               type="button"
@@ -134,7 +120,6 @@ const MainBalance: React.FC<MainBalanceProps> = ({ refreshKey }) => {
               )}
             </button>
           )}
-
         </div>
       </div>
     </div>
