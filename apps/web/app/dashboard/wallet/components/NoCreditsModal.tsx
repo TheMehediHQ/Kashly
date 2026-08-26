@@ -1,7 +1,9 @@
 "use client";
 
 import React from "react";
+import { createPortal } from "react-dom";
 import { FiX, FiMessageCircle, FiPhone } from "react-icons/fi";
+import { useModalA11y } from "./useModalA11y";
 
 interface NoCreditsModalProps {
   isOpen: boolean;
@@ -9,6 +11,8 @@ interface NoCreditsModalProps {
 }
 
 const NoCreditsModal: React.FC<NoCreditsModalProps> = ({ isOpen, onClose }) => {
+  const { dialogRef } = useModalA11y({ isOpen, onClose });
+
   if (!isOpen) return null;
 
   const whatsappNumber = "01747874773";
@@ -17,7 +21,7 @@ const NoCreditsModal: React.FC<NoCreditsModalProps> = ({ isOpen, onClose }) => {
   );
   const whatsappLink = `https://wa.me/88${whatsappNumber}?text=${whatsappMessage}`;
 
-  return (
+  return createPortal(
     <>
       {/* Backdrop */}
       <div
@@ -26,9 +30,14 @@ const NoCreditsModal: React.FC<NoCreditsModalProps> = ({ isOpen, onClose }) => {
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 pointer-events-none">
+      <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="pointer-events-auto relative w-full max-w-md rounded-3xl bg-[#0B0F17]/95 border border-rose-500/30 backdrop-blur-xl shadow-2xl overflow-hidden"
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="no-credits-modal-title"
+          tabIndex={-1}
+          className="pointer-events-auto relative w-full max-w-md rounded-3xl bg-[#0B0F17]/95 border border-rose-500/30 backdrop-blur-xl shadow-2xl overflow-y-auto overflow-x-hidden max-h-[calc(100dvh-2rem)]"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close Button */}
@@ -48,7 +57,7 @@ const NoCreditsModal: React.FC<NoCreditsModalProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Title */}
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 id="no-credits-modal-title" className="text-2xl font-bold text-white mb-2">
               No Credits Left!
             </h2>
 
@@ -100,7 +109,8 @@ const NoCreditsModal: React.FC<NoCreditsModalProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 };
 

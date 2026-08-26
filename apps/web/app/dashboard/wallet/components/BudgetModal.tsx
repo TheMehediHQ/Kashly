@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { FiX, FiEdit3 } from "react-icons/fi";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useModalA11y } from "./useModalA11y";
 
 interface BudgetFormData {
   category: string;
@@ -116,6 +118,8 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
     }
   }, [editingBudgetData, setValue, reset]);
 
+  const { dialogRef } = useModalA11y({ isOpen, onClose });
+
   // Validation helper
   const isDateInPast = (month: number, year: number) => {
     const now = new Date();
@@ -190,14 +194,23 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
+      {/* Backdrop */}
       <div
-        className="fixed inset-0 z-60 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+        className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
         onClick={onClose}
       />
-      <div className="fixed inset-0 z-60 flex items-center justify-center p-4 pointer-events-none">
-        <div className="pointer-events-auto rounded-3xl bg-[#0B0F17] border border-white/10 shadow-2xl w-full max-w-md overflow-hidden">
+      {/* Modal */}
+      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 pointer-events-none">
+        <div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="budget-modal-title"
+          tabIndex={-1}
+          className="pointer-events-auto my-auto w-full max-w-md rounded-3xl bg-[#0B0F17] border border-white/10 shadow-2xl overflow-y-auto overflow-x-hidden max-h-[calc(100dvh-2rem)]"
+        >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
             <div>
@@ -205,7 +218,7 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
                 <span className="w-1.5 h-1.5 rounded-full bg-[#BDFE00] animate-pulse" />
                 BUDGET TARGET
               </div>
-              <h2 className="text-xl font-bold text-white">
+              <h2 id="budget-modal-title" className="text-xl font-bold text-white">
                 {editingBudgetId ? "Edit Budget" : "Create Budget"}
               </h2>
             </div>
@@ -334,7 +347,8 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
           </form>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 };
 

@@ -3,6 +3,7 @@
 import axios, { AxiosError } from "axios";
 import Image from "next/image";
 import React, { useState, useRef, ChangeEvent } from "react";
+import { createPortal } from "react-dom";
 import { format } from "date-fns";
 import { useForm, SubmitHandler } from "react-hook-form";
 import {
@@ -17,6 +18,7 @@ import {
   FiChevronDown,
 } from "react-icons/fi";
 import toast from "react-hot-toast";
+import { useModalA11y } from "./useModalA11y";
 
 interface FormValues {
   amount: number;
@@ -242,20 +244,27 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     }
   };
 
+  const { dialogRef } = useModalA11y({ isOpen, onClose });
+
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <>
       <div
-        className="fixed inset-0 z-60 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+        className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
         onClick={handleClose}
       />
-      <div className="fixed inset-0 z-60 flex items-start sm:items-center justify-center overflow-y-auto p-3 sm:p-4 pointer-events-none">
+      <div className="fixed inset-0 z-[60] flex items-start sm:items-center justify-center overflow-y-auto p-3 sm:p-4 pointer-events-none">
         <div
-          className="pointer-events-auto relative w-full max-w-md rounded-3xl border border-white/10 bg-[#0B0F17] shadow-2xl overflow-hidden max-h-[calc(100vh-1.5rem)] sm:max-h-[90vh]"
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="edit-transaction-modal-title"
+          tabIndex={-1}
+          className="pointer-events-auto relative w-full max-w-md rounded-3xl border border-white/10 bg-[#0B0F17] shadow-2xl overflow-hidden max-h-[calc(100dvh-1.5rem)] sm:max-h-[90dvh]"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="overflow-y-auto max-h-[calc(100vh-1.5rem)] sm:max-h-[90vh] p-6 sm:p-8">
+          <div className="overflow-y-auto max-h-[calc(100dvh-1.5rem)] sm:max-h-[90dvh] p-6 sm:p-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
               <div>
@@ -267,9 +276,9 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                   <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isIncome ? "bg-[#BDFE00]" : "bg-rose-400"}`} />
                   EDIT {label.toUpperCase()}
                 </div>
-                <h2 className="text-xl font-bold text-white">
-                  Update Entry
-                </h2>
+              <h2 id="edit-transaction-modal-title" className="text-xl font-bold text-white">
+                Update Entry
+              </h2>
               </div>
               <button
                 type="button"
@@ -455,7 +464,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 };
 
