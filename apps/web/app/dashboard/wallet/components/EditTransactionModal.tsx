@@ -141,6 +141,9 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   // Religious & Giving
   "Religious/Charity",
   "Donation (3% Income)",
+   "Quantum Programme",
+  "Etiman",
+ "Qurbani (2% Income)", 
 
   // Savings & Investments
   "Savings (10% Income)",

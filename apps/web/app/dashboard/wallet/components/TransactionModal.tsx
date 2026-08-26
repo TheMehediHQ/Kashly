@@ -70,54 +70,57 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         "Other Income",
       ]
     : [
-         // Housing & Bills
-  "House Rent",
-  "Utilities",
-  "Mobile & Internet",
+        // Housing & Bills
+        "House Rent",
+        "Utilities",
+        "Mobile & Internet",
 
-  // Financial Obligations
-  "Loan/EMI",
-  "Subscriptions",
+        // Financial Obligations
+        "Loan/EMI",
+        "Subscriptions",
 
-  // Food & Daily Essentials
-  "Groceries",
-  "Dining",
-  "Tea",
+        // Food & Daily Essentials
+        "Groceries",
+        "Dining",
+        "Tea",
 
-  // Transportation
-  "Transport",
+        // Transportation
+        "Transport",
 
-  // Health & Personal
-  "Healthcare",
-  "Personal Care",
-  "Cosmetics",
-  "Haircut",
-  "Beard Care",
+        // Health & Personal
+        "Healthcare",
+        "Personal Care",
+        "Cosmetics",
+        "Haircut",
+        "Beard Care",
 
-  // Education & Family
-  "Education",
-  "Family Support",
+        // Education & Family
+        "Education",
+        "Family Support",
 
-  // Lifestyle & Shopping
-  "Clothing",
-  "Shoes",
-  "Shopping",
-  "Gadgets",
-  "Gifts",
-  "Entertainment",
-  "Travel",
+        // Lifestyle & Shopping
+        "Clothing",
+        "Shoes",
+        "Shopping",
+        "Gadgets",
+        "Gifts",
+        "Entertainment",
+        "Travel",
 
-  // Religious & Giving
-  "Religious/Charity",
-  "Donation (3% Income)",
+        // Religious & Giving
+        "Religious/Charity",
+        "Donation (3% Income)",
+        "Quantum Programme",
+        "Etiman",
+        "Qurbani (2% Income)",
 
-  // Savings & Investments
-  "Savings (10% Income)",
-  "Emergency Fund",
-  "Investment",
+        // Savings & Investments
+        "Savings (10% Income)",
+        "Emergency Fund",
+        "Investment",
 
-  // Other
-  "Miscellaneous",
+        // Other
+        "Miscellaneous",
       ];
 
   const {
@@ -153,7 +156,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
   const { dialogRef } = useModalA11y({ isOpen: open, onClose: handleClose });
 
   const handleImageChange = async (
-    e: ChangeEvent<HTMLInputElement>
+    e: ChangeEvent<HTMLInputElement>,
   ): Promise<void> => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -176,7 +179,7 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
     try {
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-        { method: "POST", body: formData }
+        { method: "POST", body: formData },
       );
       const data = await response.json();
       if (!response.ok) {
@@ -255,272 +258,293 @@ const TransactionModal: React.FC<TransactionModalProps> = ({
         onClose={() => setShowNoCreditsModal(false)}
       />
 
-      {open && createPortal(
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
-            onClick={handleClose}
-          />
-
-          {/* Modal Container */}
-          <div className="fixed inset-0 z-[60] flex items-start sm:items-center justify-center p-3 sm:p-4 pointer-events-none overflow-y-auto">
+      {open &&
+        createPortal(
+          <>
+            {/* Backdrop */}
             <div
-              ref={dialogRef}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="transaction-modal-title"
-              tabIndex={-1}
-              className="pointer-events-auto relative w-full max-w-md rounded-3xl bg-[#0B0F17]/95 border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden max-h-[calc(100dvh-1.5rem)] sm:max-h-[90dvh]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="overflow-y-auto max-h-[calc(100dvh-1.5rem)] sm:max-h-[90dvh] p-5 sm:p-7">
-                {/* Close Button */}
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  className="absolute right-4 top-4 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer z-10"
-                >
-                  <FiX size={20} />
-                </button>
+              className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+              onClick={handleClose}
+            />
 
-                {/* Header Badge */}
-                <div className="mb-6 text-center">
-                  <div
-                    className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-wide mb-2 ${
-                      isIncome
-                        ? "bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00]"
-                        : "bg-rose-500/10 border border-rose-500/20 text-rose-400"
-                    }`}
+            {/* Modal Container */}
+            <div className="fixed inset-0 z-[60] flex items-start sm:items-center justify-center p-3 sm:p-4 pointer-events-none overflow-y-auto">
+              <div
+                ref={dialogRef}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="transaction-modal-title"
+                tabIndex={-1}
+                className="pointer-events-auto relative w-full max-w-md rounded-3xl bg-[#0B0F17]/95 border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden max-h-[calc(100dvh-1.5rem)] sm:max-h-[90dvh]"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="overflow-y-auto max-h-[calc(100dvh-1.5rem)] sm:max-h-[90dvh] p-5 sm:p-7">
+                  {/* Close Button */}
+                  <button
+                    type="button"
+                    onClick={handleClose}
+                    className="absolute right-4 top-4 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors cursor-pointer z-10"
                   >
-                    <span
-                      className={`w-2 h-2 rounded-full animate-pulse ${
-                        isIncome ? "bg-[#BDFE00]" : "bg-rose-500"
-                      }`}
-                    />
-                    NEW {label.toUpperCase()}
-                  </div>
-                  <h3 id="transaction-modal-title" className="text-xl font-bold text-white">Add {label}</h3>
-                </div>
+                    <FiX size={20} />
+                  </button>
 
-                <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-                  {/* Image Attachment Upload Section */}
-                  <div className="flex flex-col items-center justify-center">
-                    {!preview ? (
-                      <div
-                        onClick={() => fileInputRef.current?.click()}
-                        className={`group relative flex h-24 w-24 sm:h-28 sm:w-28 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed transition-all ${
-                          error
-                            ? "border-rose-500 bg-rose-500/10"
-                            : "border-white/10 bg-white/5 hover:border-[#BDFE00]/50 hover:bg-white/[0.07]"
+                  {/* Header Badge */}
+                  <div className="mb-6 text-center">
+                    <div
+                      className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-wide mb-2 ${
+                        isIncome
+                          ? "bg-[#BDFE00]/10 border border-[#BDFE00]/20 text-[#BDFE00]"
+                          : "bg-rose-500/10 border border-rose-500/20 text-rose-400"
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full animate-pulse ${
+                          isIncome ? "bg-[#BDFE00]" : "bg-rose-500"
                         }`}
-                      >
-                        <FiUploadCloud
-                          size={26}
-                          className={`text-slate-400 group-hover:text-[#BDFE00] transition-colors ${
-                            isUploading ? "animate-spin text-[#BDFE00]" : ""
+                      />
+                      NEW {label.toUpperCase()}
+                    </div>
+                    <h3
+                      id="transaction-modal-title"
+                      className="text-xl font-bold text-white"
+                    >
+                      Add {label}
+                    </h3>
+                  </div>
+
+                  <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+                    {/* Image Attachment Upload Section */}
+                    <div className="flex flex-col items-center justify-center">
+                      {!preview ? (
+                        <div
+                          onClick={() => fileInputRef.current?.click()}
+                          className={`group relative flex h-24 w-24 sm:h-28 sm:w-28 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed transition-all ${
+                            error
+                              ? "border-rose-500 bg-rose-500/10"
+                              : "border-white/10 bg-white/5 hover:border-[#BDFE00]/50 hover:bg-white/[0.07]"
                           }`}
-                        />
-                        <span className="mt-2 text-[10px] font-mono uppercase tracking-widest text-slate-400 group-hover:text-slate-200">
-                          Receipt
+                        >
+                          <FiUploadCloud
+                            size={26}
+                            className={`text-slate-400 group-hover:text-[#BDFE00] transition-colors ${
+                              isUploading ? "animate-spin text-[#BDFE00]" : ""
+                            }`}
+                          />
+                          <span className="mt-2 text-[10px] font-mono uppercase tracking-widest text-slate-400 group-hover:text-slate-200">
+                            Receipt
+                          </span>
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                          />
+                        </div>
+                      ) : (
+                        <div className="relative h-24 w-24 sm:h-28 sm:w-28 group">
+                          <img
+                            src={preview}
+                            alt="Preview"
+                            className="h-full w-full rounded-2xl object-cover border border-white/20"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPreview(null);
+                              setValue("attachment", "");
+                            }}
+                            className="absolute inset-0 flex items-center justify-center bg-black/60 text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                          >
+                            <FiTrash2 size={22} className="text-rose-400" />
+                          </button>
+                        </div>
+                      )}
+                      {error && (
+                        <p className="mt-2 text-[10px] font-mono text-rose-400">
+                          {error}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Amount Display */}
+                    <div
+                      className={`rounded-2xl p-4 border transition-all bg-slate-900/50 ${
+                        errors.amount
+                          ? "border-rose-500/80"
+                          : "border-white/10 focus-within:border-[#BDFE00]/60"
+                      }`}
+                    >
+                      <p className="text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-1">
+                        Total {label} Amount
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-3xl font-bold text-[#BDFE00] font-mono">
+                          ৳
                         </span>
                         <input
-                          type="file"
-                          ref={fileInputRef}
-                          className="hidden"
-                          accept="image/*"
-                          onChange={handleImageChange}
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          onKeyDown={(e) =>
+                            ["e", "E", "+", "-"].includes(e.key) &&
+                            e.preventDefault()
+                          }
+                          {...register("amount", {
+                            required: "Amount is required",
+                            valueAsNumber: true,
+                            min: {
+                              value: 0.01,
+                              message: "Amount must be greater than 0",
+                            },
+                          })}
+                          placeholder="0.00"
+                          className="w-full bg-transparent text-3xl font-mono font-bold text-white outline-none placeholder:text-slate-600 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          autoFocus
                         />
                       </div>
-                    ) : (
-                      <div className="relative h-24 w-24 sm:h-28 sm:w-28 group">
-                        <img
-                          src={preview}
-                          alt="Preview"
-                          className="h-full w-full rounded-2xl object-cover border border-white/20"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setPreview(null);
-                            setValue("attachment", "");
-                          }}
-                          className="absolute inset-0 flex items-center justify-center bg-black/60 text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                        >
-                          <FiTrash2 size={22} className="text-rose-400" />
-                        </button>
-                      </div>
-                    )}
-                    {error && (
-                      <p className="mt-2 text-[10px] font-mono text-rose-400">
-                        {error}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Amount Display */}
-                  <div
-                    className={`rounded-2xl p-4 border transition-all bg-slate-900/50 ${
-                      errors.amount
-                        ? "border-rose-500/80"
-                        : "border-white/10 focus-within:border-[#BDFE00]/60"
-                    }`}
-                  >
-                    <p className="text-[10px] font-mono uppercase tracking-widest text-slate-400 mb-1">
-                      Total {label} Amount
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-3xl font-bold text-[#BDFE00] font-mono">
-                        ৳
-                      </span>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        onKeyDown={(e) =>
-                          ["e", "E", "+", "-"].includes(e.key) &&
-                          e.preventDefault()
-                        }
-                        {...register("amount", {
-                          required: "Amount is required",
-                          valueAsNumber: true,
-                          min: {
-                            value: 0.01,
-                            message: "Amount must be greater than 0",
-                          },
-                        })}
-                        placeholder="0.00"
-                        className="w-full bg-transparent text-3xl font-mono font-bold text-white outline-none placeholder:text-slate-600 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        autoFocus
-                      />
+                      {errors.amount && (
+                        <p className="mt-2 text-[10px] font-mono text-rose-400">
+                          {errors.amount.message}
+                        </p>
+                      )}
                     </div>
-                    {errors.amount && (
-                      <p className="mt-2 text-[10px] font-mono text-rose-400">
-                        {errors.amount.message}
-                      </p>
-                    )}
-                  </div>
 
-                  {/* Grid for Category & Method */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* Category Dropdown */}
-                    <div className="relative group">
-                      <FiTag className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
-                      <select
-                        {...register("category", { required: true })}
-                        className="w-full appearance-none rounded-xl bg-white/5 border border-white/10 pl-10 pr-8 py-3 text-xs font-semibold text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
-                      >
-                        {categories.map((cat) => (
+                    {/* Grid for Category & Method */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Category Dropdown */}
+                      <div className="relative group">
+                        <FiTag className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+                        <select
+                          {...register("category", { required: true })}
+                          className="w-full appearance-none rounded-xl bg-white/5 border border-white/10 pl-10 pr-8 py-3 text-xs font-semibold text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
+                        >
+                          {categories.map((cat) => (
+                            <option
+                              key={cat}
+                              value={cat}
+                              className="bg-[#0B0F17] text-white"
+                            >
+                              {cat}
+                            </option>
+                          ))}
+                        </select>
+                        <FiChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                      </div>
+
+                      {/* Method Dropdown */}
+                      <div className="relative group">
+                        <FiCreditCard className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
+                        <select
+                          {...register("method", { required: true })}
+                          className="w-full appearance-none rounded-xl bg-white/5 border border-white/10 pl-10 pr-8 py-3 text-xs font-semibold text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
+                        >
                           <option
-                            key={cat}
-                            value={cat}
+                            value="Cash"
                             className="bg-[#0B0F17] text-white"
                           >
-                            {cat}
+                            Cash
                           </option>
-                        ))}
-                      </select>
-                      <FiChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                          <option
+                            value="bKash"
+                            className="bg-[#0B0F17] text-white"
+                          >
+                            bKash
+                          </option>
+                          <option
+                            value="Nagad"
+                            className="bg-[#0B0F17] text-white"
+                          >
+                            Nagad
+                          </option>
+                          <option
+                            value="Rocket"
+                            className="bg-[#0B0F17] text-white"
+                          >
+                            Rocket
+                          </option>
+                          <option
+                            value="Bank"
+                            className="bg-[#0B0F17] text-white"
+                          >
+                            Bank Transfer
+                          </option>
+                          <option
+                            value="Card"
+                            className="bg-[#0B0F17] text-white"
+                          >
+                            Card
+                          </option>
+                          <option
+                            value="Other"
+                            className="bg-[#0B0F17] text-white"
+                          >
+                            Other
+                          </option>
+                        </select>
+                        <FiChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                      </div>
                     </div>
 
-                    {/* Method Dropdown */}
-                    <div className="relative group">
-                      <FiCreditCard className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 z-10" />
-                      <select
-                        {...register("method", { required: true })}
-                        className="w-full appearance-none rounded-xl bg-white/5 border border-white/10 pl-10 pr-8 py-3 text-xs font-semibold text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors cursor-pointer"
+                    {/* Grid for Date & Time */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="relative">
+                        <FiCalendar className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                          type="date"
+                          {...register("date", { required: true })}
+                          className="w-full rounded-xl bg-white/5 border border-white/10 pl-10 pr-3 py-3 text-xs font-semibold text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
+                        />
+                      </div>
+                      <div className="relative">
+                        <FiClock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                          type="time"
+                          {...register("time", { required: true })}
+                          className="w-full rounded-xl bg-white/5 border border-white/10 pl-10 pr-3 py-3 text-xs font-semibold text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Reference Note */}
+                    <div className="relative">
+                      <FiEdit3 className="absolute left-3.5 top-3.5 text-slate-400" />
+                      <textarea
+                        placeholder="Add reference note..."
+                        rows={2}
+                        {...register("note")}
+                        className="w-full rounded-xl bg-white/5 border border-white/10 pl-10 pr-4 py-3 text-xs font-semibold text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors resize-none placeholder:text-slate-500"
+                      />
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="grid grid-cols-2 gap-3 pt-2">
+                      <button
+                        type="button"
+                        onClick={handleClose}
+                        className="py-3 text-xs font-mono font-semibold rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer uppercase tracking-wider"
                       >
-                        <option value="Cash" className="bg-[#0B0F17] text-white">
-                          Cash
-                        </option>
-                        <option value="bKash" className="bg-[#0B0F17] text-white">
-                          bKash
-                        </option>
-                        <option value="Nagad" className="bg-[#0B0F17] text-white">
-                          Nagad
-                        </option>
-                        <option
-                          value="Rocket"
-                          className="bg-[#0B0F17] text-white"
-                        >
-                          Rocket
-                        </option>
-                        <option value="Bank" className="bg-[#0B0F17] text-white">
-                          Bank Transfer
-                        </option>
-                        <option value="Card" className="bg-[#0B0F17] text-white">
-                          Card
-                        </option>
-                        <option
-                          value="Other"
-                          className="bg-[#0B0F17] text-white"
-                        >
-                          Other
-                        </option>
-                      </select>
-                      <FiChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isUploading}
+                        className={`py-3 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer uppercase tracking-wider disabled:opacity-50 ${
+                          isIncome
+                            ? "bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)]"
+                            : "bg-rose-500 text-white hover:bg-rose-600 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)]"
+                        }`}
+                      >
+                        {isUploading ? "Uploading..." : `Save ${label}`}
+                      </button>
                     </div>
-                  </div>
-
-                  {/* Grid for Date & Time */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="relative">
-                      <FiCalendar className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input
-                        type="date"
-                        {...register("date", { required: true })}
-                        className="w-full rounded-xl bg-white/5 border border-white/10 pl-10 pr-3 py-3 text-xs font-semibold text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
-                      />
-                    </div>
-                    <div className="relative">
-                      <FiClock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input
-                        type="time"
-                        {...register("time", { required: true })}
-                        className="w-full rounded-xl bg-white/5 border border-white/10 pl-10 pr-3 py-3 text-xs font-semibold text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Reference Note */}
-                  <div className="relative">
-                    <FiEdit3 className="absolute left-3.5 top-3.5 text-slate-400" />
-                    <textarea
-                      placeholder="Add reference note..."
-                      rows={2}
-                      {...register("note")}
-                      className="w-full rounded-xl bg-white/5 border border-white/10 pl-10 pr-4 py-3 text-xs font-semibold text-white focus:outline-none focus:border-[#BDFE00]/60 transition-colors resize-none placeholder:text-slate-500"
-                    />
-                  </div>
-
-                  {/* Footer Actions */}
-                  <div className="grid grid-cols-2 gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={handleClose}
-                      className="py-3 text-xs font-mono font-semibold rounded-xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white transition-colors cursor-pointer uppercase tracking-wider"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isUploading}
-                      className={`py-3 text-xs font-mono font-bold rounded-xl transition-all cursor-pointer uppercase tracking-wider disabled:opacity-50 ${
-                        isIncome
-                          ? "bg-[#BDFE00] text-black hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)]"
-                          : "bg-rose-500 text-white hover:bg-rose-600 hover:shadow-[0_0_20px_rgba(244,63,94,0.3)]"
-                      }`}
-                    >
-                      {isUploading ? "Uploading..." : `Save ${label}`}
-                    </button>
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
-      </>,
-      document.body
-    )}
+          </>,
+          document.body,
+        )}
     </>
   );
 };
