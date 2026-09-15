@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { FiPlusCircle } from "react-icons/fi";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -166,17 +167,12 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({ refreshKey }) => {
           </p>
         </div>
 
-        <button
-          onClick={() => {
-            setEditingBudgetId(null);
-            setEditingBudgetData(null);
-            setIsModalOpen(true);
-          }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#BDFE00] text-black font-semibold text-sm hover:bg-[#aef000] hover:shadow-[0_0_20px_rgba(189,254,0,0.3)] transition-all cursor-pointer active:scale-95"
+        <Link
+          href="/dashboard/budgets"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-white/5 text-slate-300 font-semibold text-sm hover:bg-white/10 hover:text-white transition-all active:scale-95"
         >
-          <FiPlusCircle className="w-4 h-4 stroke-[2.5]" />
-          <span>New Budget</span>
-        </button>
+          <span>View All</span>
+        </Link>
       </div>
 
       {/* Total Budget Summary */}
