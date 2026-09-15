@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { FiPlusCircle } from "react-icons/fi";
 import axios from "axios";
@@ -36,9 +36,8 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({ refreshKey }) => {
     note?: string;
   } | null>(null);
 
-  const fetchBudgets = async () => {
+  const fetchBudgets = useCallback(async () => {
     try {
-      setLoading(true);
       const response = await axios.get(
         `/api/budgets`,
         {
@@ -54,10 +53,29 @@ const BudgetOverview: React.FC<BudgetOverviewProps> = ({ refreshKey }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchBudgets();
+    let ignore = false;
+    axios
+      .get("/api/budgets", { withCredentials: true })
+      .then((response) => {
+        if (!ignore && response.data.success) {
+          setBudgets(response.data.data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching budgets:", error);
+      })
+      .finally(() => {
+        if (!ignore) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      ignore = true;
+    };
   }, [refreshKey]);
 
   const handleEdit = (budgetId: string) => {
