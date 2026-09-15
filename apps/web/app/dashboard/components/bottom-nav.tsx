@@ -10,6 +10,7 @@ import {
   LuArchive,
   LuUser,
   LuSettings,
+  LuTarget,
 } from "react-icons/lu";
 import { useAuth } from "@/app/context/AuthContext";
 
@@ -17,6 +18,7 @@ const navItems = [
   { name: "Home", href: "/dashboard", icon: LuLayoutDashboard },
   { name: "Wallet", href: "/dashboard/wallet", icon: LuWallet },
   { name: "Budgets", href: "/dashboard/budgets", icon: LuArchive },
+  { name: "Income", href: "/dashboard/income", icon: LuTarget },
   { name: "Profile", href: "/dashboard/my-profile", icon: LuUser },
   { name: "Settings", href: "/dashboard/user-management", icon: LuSettings, adminOnly: true },
 ];

@@ -184,6 +184,7 @@ async function run() {
     const transactionsCollection = My_Finance.collection("transactions");
     const budgetsCollection = My_Finance.collection("budgets");
     const notificationsCollection = My_Finance.collection("notifications");
+    const incomeGoalsCollection = My_Finance.collection("incomeGoals");
 
     // Helper: create notification
     const createNotification = async (userId, type, title, message) => {
@@ -753,6 +754,55 @@ async function run() {
                   "warning",
                   "Budget Warning ⚠️",
                   `You've used 80%+ of "${category || "Others"}" budget. Spent: ৳${totalSpent} / Limit: ৳${budget.limit}`
+                );
+              }
+            }
+          }
+
+          // Check income goal achievement for income transactions
+          if (transactionType === "income") {
+            const now = new Date();
+            const currentMonth = now.getMonth() + 1;
+            const currentYear = now.getFullYear();
+            const dateRegex = new RegExp(
+              `^${currentYear}-${String(currentMonth).padStart(2, "0")}-`
+            );
+
+            const incomeGoal = await incomeGoalsCollection.findOne({
+              userId,
+              month: currentMonth,
+              year: currentYear,
+            });
+
+            if (incomeGoal) {
+              const totalEarned = await transactionsCollection
+                .aggregate([
+                  {
+                    $match: {
+                      userId,
+                      transactionType: "income",
+                      date: { $regex: dateRegex },
+                    },
+                  },
+                  { $group: { _id: null, total: { $sum: "$amount" } } },
+                ])
+                .toArray();
+
+              const earned = totalEarned[0]?.total || 0;
+
+              if (earned >= incomeGoal.goalAmount) {
+                await createNotification(
+                  userId,
+                  "success",
+                  "Income Goal Achieved! 🎉",
+                  `Congratulations! You've reached your income goal of ৳${incomeGoal.goalAmount}. Earned: ৳${earned}`
+                );
+              } else if (earned >= incomeGoal.goalAmount * 0.8) {
+                await createNotification(
+                  userId,
+                  "info",
+                  "Almost There! 💪",
+                  `You've earned 80%+ of your income goal. Earned: ৳${earned} / Goal: ৳${incomeGoal.goalAmount}`
                 );
               }
             }
@@ -1513,6 +1563,313 @@ async function run() {
         return res.status(404).json({
           success: false,
           message: "Budget not found",
+        });
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          message: error.message,
+        });
+      }
+    });
+
+    // ===== INCOME GOALS =====
+
+    // POST: Create income goal
+    app.post("/api/income-goals", verifyToken, async (req, res) => {
+      try {
+        const userId = req.user.id;
+        const { goalAmount, month, year, note } = req.body;
+
+        if (!goalAmount || !month || !year) {
+          return res.status(400).json({
+            success: false,
+            message: "Goal amount, month, and year are required",
+          });
+        }
+
+        const monthNum = Number(month);
+        const yearNum = Number(year);
+
+        const existingGoal = await incomeGoalsCollection.findOne({
+          userId,
+          month: monthNum,
+          year: yearNum,
+        });
+
+        if (existingGoal) {
+          return res.status(409).json({
+            success: false,
+            message: "Income goal already exists for this month",
+          });
+        }
+
+        const newGoal = {
+          userId,
+          goalAmount: Number(goalAmount),
+          month: monthNum,
+          year: yearNum,
+          note: typeof note === "string" ? note.trim() : "",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        const result = await incomeGoalsCollection.insertOne(newGoal);
+
+        if (result.insertedId) {
+          return res.status(201).json({
+            success: true,
+            message: "Income goal created successfully",
+            data: { _id: result.insertedId, ...newGoal },
+          });
+        }
+
+        return res.status(500).json({
+          success: false,
+          message: "Failed to create income goal",
+        });
+      } catch (error) {
+        return res.status(500).json({
+          success: false,
+          message: error.message,
+        });
+      }
+    });
+
+    // GET: Fetch income goal for current month (with earned amount)
+    app.get("/api/income-goals", verifyToken, async (req, res) => {
+      try {
+        const userId = req.user.id;
+        const now = new Date();
+        const month = req.query.month ? Number(req.query.month) : now.getMonth() + 1;
+        const year = req.query.year ? Number(req.query.year) : now.getFullYear();
+
+        const goal = await incomeGoalsCollection.findOne({
+          userId,
+          month,
+          year,
+        });
+
+        if (!goal) {
+          return res.json({
+            success: true,
+            data: null,
+          });
+        }
+
+        const dateRegex = new RegExp(
+          `^${year}-${String(month).padStart(2, "0")}-`
+        );
+
+        const earned = await transactionsCollection
+          .aggregate([
+            {
+              $match: {
+                userId,
+                transactionType: "income",
+                date: { $regex: dateRegex },
+              },
+            },
+            {
+              $group: {
+                _id: null,
+                total: { $sum: "$amount" },
+              },
+            },
+          ])
+          .toArray();
+
+        res.json({
+          success: true,
+          data: {
+            ...goal,
+            earned: earned.length > 0 ? earned[0].total : 0,
+          },
+        });
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          message: error.message,
+        });
+      }
+    });
+
+    // GET: Fetch all income goals history (paginated)
+    app.get("/api/income-goals/history/all", verifyToken, async (req, res) => {
+      try {
+        const userId = req.user.id;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const skip = (page - 1) * limit;
+
+        const total = await incomeGoalsCollection.countDocuments({ userId });
+
+        const goals = await incomeGoalsCollection
+          .find({ userId })
+          .sort({ year: -1, month: -1 })
+          .skip(skip)
+          .limit(limit)
+          .toArray();
+
+        const enhancedGoals = await Promise.all(
+          goals.map(async (goal) => {
+            const dateRegex = new RegExp(
+              `^${goal.year}-${String(goal.month).padStart(2, "0")}-`
+            );
+
+            const earned = await transactionsCollection
+              .aggregate([
+                {
+                  $match: {
+                    userId,
+                    transactionType: "income",
+                    date: { $regex: dateRegex },
+                  },
+                },
+                {
+                  $group: {
+                    _id: null,
+                    total: { $sum: "$amount" },
+                  },
+                },
+              ])
+              .toArray();
+
+            return {
+              ...goal,
+              earned: earned.length > 0 ? earned[0].total : 0,
+            };
+          })
+        );
+
+        res.json({
+          success: true,
+          data: enhancedGoals,
+          page,
+          hasMore: skip + limit < total,
+        });
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          message: error.message,
+        });
+      }
+    });
+
+    // PUT: Update income goal
+    app.put("/api/income-goals/:id", verifyToken, async (req, res) => {
+      try {
+        const userId = req.user.id;
+        const { id } = req.params;
+        const { goalAmount, month, year, note } = req.body;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid income goal ID",
+          });
+        }
+
+        if (!goalAmount) {
+          return res.status(400).json({
+            success: false,
+            message: "Goal amount is required",
+          });
+        }
+
+        const goalObjectId = new ObjectId(id);
+        const existingGoal = await incomeGoalsCollection.findOne({
+          _id: goalObjectId,
+          userId,
+        });
+
+        if (!existingGoal) {
+          return res.status(404).json({
+            success: false,
+            message: "Income goal not found",
+          });
+        }
+
+        const monthNum = month ? Number(month) : existingGoal.month;
+        const yearNum = year ? Number(year) : existingGoal.year;
+
+        const duplicateGoal = await incomeGoalsCollection.findOne({
+          userId,
+          month: monthNum,
+          year: yearNum,
+          _id: { $ne: goalObjectId },
+        });
+
+        if (duplicateGoal) {
+          return res.status(409).json({
+            success: false,
+            message: "Income goal already exists for this month",
+          });
+        }
+
+        const updateGoal = {
+          goalAmount: Number(goalAmount),
+          month: monthNum,
+          year: yearNum,
+          note: typeof note === "string" ? note.trim() : undefined,
+          updatedAt: new Date(),
+        };
+
+        Object.keys(updateGoal).forEach(
+          (key) => updateGoal[key] === undefined && delete updateGoal[key]
+        );
+
+        const result = await incomeGoalsCollection.updateOne(
+          { _id: goalObjectId, userId },
+          { $set: updateGoal }
+        );
+
+        if (result.matchedCount === 1) {
+          return res.json({
+            success: true,
+            message: "Income goal updated successfully",
+          });
+        }
+
+        return res.status(500).json({
+          success: false,
+          message: "Failed to update income goal",
+        });
+      } catch (error) {
+        return res.status(500).json({
+          success: false,
+          message: error.message,
+        });
+      }
+    });
+
+    // DELETE: Delete income goal
+    app.delete("/api/income-goals/:id", verifyToken, async (req, res) => {
+      try {
+        const userId = req.user.id;
+        const { id } = req.params;
+
+        if (!ObjectId.isValid(id)) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid income goal ID",
+          });
+        }
+
+        const result = await incomeGoalsCollection.deleteOne({
+          _id: new ObjectId(id),
+          userId,
+        });
+
+        if (result.deletedCount === 1) {
+          return res.json({
+            success: true,
+            message: "Income goal deleted successfully",
+          });
+        }
+
+        return res.status(404).json({
+          success: false,
+          message: "Income goal not found",
         });
       } catch (error) {
         res.status(500).json({

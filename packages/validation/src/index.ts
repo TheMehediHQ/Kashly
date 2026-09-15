@@ -38,6 +38,13 @@ export const budgetSchema = z.object({
   note: z.string().optional(),
 });
 
+export const incomeGoalSchema = z.object({
+  goalAmount: z.number().positive("Goal amount must be greater than 0"),
+  month: z.number().min(1).max(12),
+  year: z.number().min(2000),
+  note: z.string().optional(),
+});
+
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, "Token is required"),
   newPassword: passwordSchema,

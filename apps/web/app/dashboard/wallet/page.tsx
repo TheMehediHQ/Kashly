@@ -11,6 +11,7 @@ import TransactionHistory from "./components/TransactionHistory";
 import LastMonthIncome from "./components/LastMonthIncome";
 import LastMonthExpense from "./components/LastMonthExpense";
 import BudgetOverview from "./components/BudgetOverview";
+import IncomeGoalOverview from "./components/IncomeGoalOverview";
 
 type Summary = {
   thisMonthIncome: number;
@@ -162,6 +163,13 @@ const Wallet = () => {
       ========================== */}
       <div className="w-full">
         <BudgetOverview refreshKey={refreshKey} />
+      </div>
+
+      {/* =========================
+          INCOME GOAL OVERVIEW
+      ========================== */}
+      <div className="w-full">
+        <IncomeGoalOverview refreshKey={refreshKey} />
       </div>
 
       {/* =========================

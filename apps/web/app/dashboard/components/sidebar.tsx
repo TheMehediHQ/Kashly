@@ -12,6 +12,7 @@ import {
   LuArchive,
   LuMenu,
   LuX,
+  LuTarget,
 } from "react-icons/lu";
 import { IoWallet } from "react-icons/io5";
 import { FiUser } from "react-icons/fi";
@@ -44,6 +45,11 @@ const Sidebar = () => {
       name: "Budgets",
       href: "/dashboard/budgets",
       icon: <LuArchive size={20} />,
+    },
+    {
+      name: "Income",
+      href: "/dashboard/income",
+      icon: <LuTarget size={20} />,
     },
     {
       name: "User Management",
