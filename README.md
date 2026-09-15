@@ -192,7 +192,6 @@ bun run dev
 
 - **Web** → [http://localhost:3000](http://localhost:3000)
 - **API** → [http://localhost:5000](http://localhost:5000)
-- **Mobile** → `cd apps/mobile && bun run start`
 
 ### Build
 
@@ -236,7 +235,6 @@ Kashly uses **Clerk** for authentication. When a user signs up or signs in, a Cl
 | `apps/web/app/dashboard/` | Main dashboard views |
 | `apps/web/lib/` | Auth, DB, services, and utilities |
 | `apps/api/` | Express server and API endpoints |
-| `apps/mobile/` | Expo React Native app |
 | `packages/ui/` | Shared UI components |
 | `packages/validation/` | Zod schemas shared between apps |
 
