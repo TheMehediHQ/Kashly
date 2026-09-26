@@ -2,6 +2,7 @@
 
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
+import ChatWidget from "./components/ChatWidget";
 import { usePathname } from "next/navigation";
 
 export function LayoutContent({
@@ -21,6 +22,7 @@ export function LayoutContent({
         {children}
       </div>
       {!isDashboardPage && <Footer />}
+      <ChatWidget />
     </div>
   );
 }

@@ -28,6 +28,10 @@ app.use(
   }),
 );
 
+// AI Chatbot route
+const chatRoutes = require("./routes/chat.routes");
+app.use("/api", chatRoutes);
+
 const verifyToken = async (req, res, next) => {
   let token = req.headers.authorization?.replace("Bearer ", "");
   if (!token) {
