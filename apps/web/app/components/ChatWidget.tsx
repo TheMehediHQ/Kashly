@@ -282,7 +282,7 @@ export default function ChatWidget() {
                     Kashly AI
                   </h3>
                   <span className="rounded bg-[#1FBFD8]/10 px-1.5 py-0.5 text-[10px] font-medium text-[#1FBFD8] border border-[#1FBFD8]/20">
-                    3.8 Flash
+                    Gemini Flash
                   </span>
                 </div>
                 <p className="text-[11px] text-zinc-400">
@@ -471,7 +471,7 @@ export default function ChatWidget() {
                 Shift + Enter for new line
               </span>
               <span className="text-[10px] text-zinc-500">
-                Powered by Gemini 3.8 Flash
+                Powered by Gemini Gemini Flash
               </span>
             </div>
           </div>
