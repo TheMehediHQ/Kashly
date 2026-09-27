@@ -22,7 +22,7 @@ export function LayoutContent({
         {children}
       </div>
       {!isDashboardPage && <Footer />}
-      <ChatWidget />
+      {!isDashboardPage && <ChatWidget />}
     </div>
   );
 }
