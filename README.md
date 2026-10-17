@@ -9,6 +9,7 @@
 </p>
 
 <p align="center">
+  <a href="#demo-credentials">Demo Credentials</a> •
   <a href="#features">Features</a> •
   <a href="#tech-stack">Tech Stack</a> •
   <a href="#getting-started">Getting Started</a> •
@@ -38,6 +39,19 @@
 <p align="center">
   <img src="figma/3c730e8e-fbbc-4d55-b78b-a73f7d6ecfce.jpeg" alt="Kashly Dashboard" width="70%" />
 </p>
+
+---
+
+## Demo Credentials
+
+For testing and evaluation purposes (e.g. HR / reviewers), you can sign in using the following test credentials:
+
+| Role | Email | Password |
+|:-----|:------|:---------|
+| **Demo User** | `demo@mehedi-hasan.me` | `0123456789#Pass` |
+
+> [!NOTE]
+> For testing with the **Admin** role, please reach out via email: [`hello@mehedi-hasan.me`](mailto:hello@mehedi-hasan.me)
 
 ---
 
